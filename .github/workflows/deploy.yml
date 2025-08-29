@@ -1,30 +1,48 @@
-name: git push into another repo to deploy to vercel
+# .github/workflows/deploy-storybook.yml
+name: Deploy Storybook
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    container: pandoc/latex
     steps:
-      - uses: actions/checkout@v2
-      - name: Install mustache (to update the date)
-        run: apk add ruby && gem install mustache
-      - name: creates output
-        run: sh ./build.sh
-      - name: Pushes to another repository
-        id: push_directory
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.AUTO_ACTION }}
+      - name: Checkout current repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          source-directory: 'output'
-          destination-github-username: psm1st
-          destination-repository-name: wedit
-          user-email: ${{ secrets.EMAIL }}
-          commit-message: ${{ github.event.commits[0].message }}
-          target-branch: main
-      - name: Test get variable exported by push-to-another-repository
-        run: echo $DESTINATION_CLONED_DIRECTORY
+          node-version: 18
+
+      - name: Install deps
+        run: |
+          corepack enable
+          pnpm i --frozen-lockfile
+
+      - name: Build Storybook
+        run: pnpm build-storybook --output-dir storybook-static
+
+      - name: Checkout org repo
+        uses: actions/checkout@v4
+        with:
+          repository: 9oormthon-univ/2025_SEASONTHON_TEAM_29_FE
+          token: ${{ secrets.AUTO_ACTION }} 
+          path: org-repo
+
+      - name: Copy artifacts
+        run: |
+          rm -rf org-repo/storybook
+          mkdir -p org-repo/storybook
+          cp -R storybook-static/. org-repo/storybook/
+
+      - name: Commit & push
+        run: |
+          cd org-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: deploy storybook $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "No changes"
+          git push origin HEAD:storybook
