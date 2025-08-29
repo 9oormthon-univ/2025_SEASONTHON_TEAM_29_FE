@@ -27,7 +27,7 @@
   --color-text--tertiary: var(--color-text-tertiary);
 
   --color-input-box--active: #404040;
-  --color-box-line: #404040;
+  --color-box-line: #dddddd;
   --color-stroke-dash: #8c8c8c;
 }
 
