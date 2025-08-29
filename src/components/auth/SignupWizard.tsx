@@ -1,4 +1,3 @@
-// src/components/auth/signup/SignupWizard.tsx
 'use client';
 
 import { useSignupWizard } from '@/hooks/useSignupWizard';
@@ -6,7 +5,9 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import Button from '../common/atomic/Button';
 import ProgressBar from '../common/atomic/ProgressBar';
+import StepBasic from './steps/StepBasic';
 
 export default function SignupWizard() {
   const router = useRouter();
@@ -23,6 +24,10 @@ export default function SignupWizard() {
   const prev = () => index > 0 && embla?.scrollTo(index - 1);
   const next = () => index < 2 && embla?.scrollTo(index + 1);
 
+  const onSignUp = () => {
+    router.push('/home');
+  }
+
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -36,9 +41,40 @@ export default function SignupWizard() {
         <ProgressBar
           value={index + 1} 
           max={3} 
+          size='xs'
           className="w-full" 
         />
       </header>
+
+      <div className="flex-1 overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          <StepBasic {...wiz} />
+        </div>
+      </div>
+
+      <div className="sticky bottom-0 bg-white/70 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 backdrop-blur">
+        {index < 2 ? (
+          <Button
+            size="md"
+            fullWidth
+            disabled={(index === 0 && !wiz.canNextTerms) || (index === 1 && !wiz.canNextBasic)}
+            onClick={next}
+            className="h-12 text-sm"
+          >
+            다음
+          </Button>
+        ) : (
+          <Button
+            size="md"
+            fullWidth
+            disabled={!wiz.canSubmitExtra}
+            onClick={onSignUp}
+            className="h-12 text-sm"
+          >
+            웨딧 시작하기
+          </Button>
+        )}
+      </div>
     </div>
   );
 }
