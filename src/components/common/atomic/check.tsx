@@ -1,9 +1,12 @@
-// src/components/common/Check.tsx
 'use client';
 
 import * as React from 'react';
 
-export type CheckType = 'default' | 'variant2' | 'selectedFull' | 'selectedLine';
+export type CheckType =
+  | 'default'
+  | 'variant2'
+  | 'selectedFull'
+  | 'selectedLine';
 
 export type CheckProps = {
   type?: CheckType;
@@ -12,7 +15,7 @@ export type CheckProps = {
   ariaLabel?: string;
 };
 
-const TICK_PX = 15; 
+const TICK_PX = 15;
 
 export default function Check({
   type: checkType = 'default',
@@ -24,24 +27,26 @@ export default function Check({
     checkType === 'default'
       ? 'bg-zinc-300'
       : checkType === 'variant2'
-      ? 'bg-transparent border-[1.5px] border-gray-400'
-      : checkType === 'selectedFull'
-      ? 'bg-primary-500'
-      : 'bg-transparent border-[1.5px] border-primary-300';
+        ? 'bg-transparent border-[1.5px] border-gray-400'
+        : checkType === 'selectedFull'
+          ? 'bg-primary-500'
+          : 'bg-transparent border-[1.5px] border-primary-300';
 
   const tickClass =
     checkType === 'default'
       ? 'stroke-gray-500/70'
       : checkType === 'variant2'
-      ? 'stroke-gray-400'
-      : checkType === 'selectedFull'
-      ? 'stroke-white'
-      : 'stroke-primary-300'; 
+        ? 'stroke-gray-400'
+        : checkType === 'selectedFull'
+          ? 'stroke-white'
+          : 'stroke-primary-300';
 
   return (
     <div
       role="checkbox"
-      aria-checked={checkType === 'selectedFull' || checkType === 'selectedLine'}
+      aria-checked={
+        checkType === 'selectedFull' || checkType === 'selectedLine'
+      }
       aria-label={ariaLabel}
       onClick={onClick}
       className={`relative inline-flex items-center justify-center w-6 h-6 ${className}`}
