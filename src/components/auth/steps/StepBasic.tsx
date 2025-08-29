@@ -4,12 +4,17 @@ import Input from '@/components/common/atomic/Input';
 import { Field } from '@/components/forms/Field';
 import FieldHint from '@/components/forms/FieldHint';
 import { InputWithButton } from '@/components/forms/InputWithButton';
+import SmsCodeField from '@/components/forms/SmsCodeField';
 import type { Basic } from '@/hooks/useSignupWizard';
 import { useSignupWizard } from '@/hooks/useSignupWizard';
+import { useState } from 'react';
 
 type Props = ReturnType<typeof useSignupWizard>;
 
 export default function StepBasic(props: Props) {
+  const [nameActive, setNameActive]   = useState(false);
+  const [birthActive, setBirthActive] = useState(false);
+  const [resendKey, setResendKey] = useState(0);
   const {
     basic, setBasic,
     isValidPhone, sendingCode, codeRequested, verifySms, sendSms,
@@ -36,6 +41,11 @@ export default function StepBasic(props: Props) {
             placeholder="실명을 입력해주세요."
             value={basic.name}
             onChange={(e) => setBasicField('name', e.target.value)}
+            type={basic.name || nameActive ? 'variant4' : 'default'}
+            onFocus={() => setNameActive(true)}
+            onBlur={() => setNameActive(false)}
+            onMouseEnter={() => setNameActive(true)}
+            onMouseLeave={() => setNameActive(false)}
           />
           {touchedName && !flags.nameOk && (
             <FieldHint tone="error">이름은 2자 이상 입력해주세요.</FieldHint>
@@ -50,6 +60,11 @@ export default function StepBasic(props: Props) {
             inputMode="numeric"
             value={basic.birth}
             onChange={(e) => setBasicField('birth', e.target.value)}
+            type={basic.birth || birthActive ? 'variant4' : 'default'}
+            onFocus={() => setBirthActive(true)}
+            onBlur={() => setBirthActive(false)}
+            onMouseEnter={() => setBirthActive(true)}
+            onMouseLeave={() => setBirthActive(false)}
           />
           {touchedBirth && !flags.birthOk && (
             <FieldHint tone="error">YYYYMMDD 또는 YYYY/MM/DD 형식으로 입력해주세요.</FieldHint>
@@ -79,20 +94,16 @@ export default function StepBasic(props: Props) {
           )}
         </Field>
 
-        {/* 인증번호 입력 */}
         {codeRequested && (
-          <Field label="인증번호" htmlFor="code" className="mt-4">
-            <Input
-              id="code"
-              inputMode="numeric"
-              maxLength={6}
-              placeholder="6자리"
-              onChange={async (e) => {
-                const ok = await verifySms(e.target.value);
-                // 필요시 추가 처리
-              }}
-            />
-          </Field>
+          <SmsCodeField
+            key={resendKey} // 또는 resendKey={resendKey}
+            onVerify={verifySms}
+            onExpire={() => {
+              // ✅ 만료 처리
+              console.log('만료됨');
+            }}
+            seconds={300} // ✅ 5분 (기본 180초 → 300초로 변경)
+          />
         )}
       </div>
     </section>

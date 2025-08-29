@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import Button from '../common/atomic/Button';
 import ProgressBar from '../common/atomic/ProgressBar';
 import StepBasic from './steps/StepBasic';
+import StepTerms from './steps/StepTerms';
 
 export default function SignupWizard() {
   const router = useRouter();
@@ -48,6 +49,7 @@ export default function SignupWizard() {
 
       <div className="flex-1 overflow-hidden" ref={emblaRef}>
         <div className="flex">
+          <StepTerms {...wiz} />
           <StepBasic {...wiz} />
         </div>
       </div>

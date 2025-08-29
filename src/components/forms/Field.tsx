@@ -13,8 +13,8 @@ type Props = {
 
 export function Field({ label, htmlFor, className, children, required }: Props) {
   return (
-    <div className={cn('mt-5', className)}>
-      <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-900">
+    <div className={cn('mt-2', className)}>
+      <label htmlFor={htmlFor} className="block mb-2 text-sm font-medium text-gray-900">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       {children}
