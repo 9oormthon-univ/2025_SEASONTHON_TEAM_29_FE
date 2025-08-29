@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
@@ -12,11 +12,23 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   /* MAIN */
-  --color-primary-500: #6B5BD7; /* Primary */
-  --color-primary-300: #9B9AEA; /* Secondary */
-  --color-primary-200: #C2C3EF; /* Tertiary */
-  --color-primary-100: #DFDFF8; /* Inactive/Ghost */
-  --color-accent-500: #FFD650;  /* Sub Primary */
+  --color-primary-500: #6b5bd7; /* Primary */
+  --color-primary-300: #9b9aea; /* Secondary */
+  --color-primary-200: #c2c3ef; /* Tertiary */
+  --color-primary-100: #dfdff8; /* Inactive/Ghost */
+  --color-accent-500: #ffd650; /* Sub Primary */
+  /* TEXT */
+  --color-text-default: #303030;
+  --color-text-secondary: #8c8c8c;
+  --color-text-tertiary: #b8b8b8;
+
+  --color-text--default: var(--color-text-default);
+  --color-text--secondary: var(--color-text-secondary);
+  --color-text--tertiary: var(--color-text-tertiary);
+
+  --color-input-box--active: #404040;
+
+  --color-stroke-dash: #8c8c8c;
 }
 
 @media (prefers-color-scheme: dark) {
