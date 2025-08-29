@@ -1,13 +1,17 @@
-# .github/workflows/deploy-storybook.yml
-name: Deploy Storybook
+name: Deploy Storybook (npm)
 
 on:
   push:
     branches: [ main ]
 
+concurrency:
+  group: deploy-storybook
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout current repo
         uses: actions/checkout@v4
@@ -16,29 +20,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-
+          cache: npm
       - name: Install deps
-        run: |
-          corepack enable
-          pnpm i --frozen-lockfile
+        run: npm ci
 
       - name: Build Storybook
-        run: pnpm build-storybook --output-dir storybook-static
+        run: npm run build-storybook -- --output-dir storybook-static
 
       - name: Checkout org repo
         uses: actions/checkout@v4
         with:
           repository: 9oormthon-univ/2025_SEASONTHON_TEAM_29_FE
-          token: ${{ secrets.AUTO_ACTION }} 
+          token: ${{ secrets.AUTO_ACTION }}  
           path: org-repo
 
-      - name: Copy artifacts
+      - name: Copy artifacts into org repo
         run: |
           rm -rf org-repo/storybook
           mkdir -p org-repo/storybook
           cp -R storybook-static/. org-repo/storybook/
 
-      - name: Commit & push
+      - name: Commit & push to storybook branch
         run: |
           cd org-repo
           git config user.name "github-actions[bot]"
