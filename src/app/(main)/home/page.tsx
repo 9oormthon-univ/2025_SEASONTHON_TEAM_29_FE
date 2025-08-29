@@ -1,5 +1,6 @@
 import SearchBar from "@/components/common/atomic/SearchBar";
 import BannerSquareCarousel from "@/components/home/BannerSquareCarousel";
+import CategoryQuick from "@/components/home/CategoryQuick";
 
 
 export default function HomePage() {
@@ -7,7 +8,7 @@ export default function HomePage() {
     <main className="pb-24">
       <SearchBar/>
       <BannerSquareCarousel />
-      {/* 카테고리 */}
+      <CategoryQuick/>
       {/* 리뷰 */}
       {/* 스토리 */}
       {/* 벤더 */}
