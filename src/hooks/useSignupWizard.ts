@@ -1,6 +1,7 @@
 // src/hooks/useSignupWizard.ts
 'use client';
 
+import { isValidYMD } from '@/components/forms/DateInput';
 import * as api from '@/services/auth.api';
 import { SignupWizardCtx } from '@/types/auth';
 import { useMemo, useState } from 'react';
@@ -9,14 +10,14 @@ export type Basic = { name: string; birth: string; phone: string };
 export type Terms = {
   all:boolean; t1:boolean; t2:boolean; t3:boolean; t4:boolean; t5:boolean; mkt?:boolean; third?:boolean
 };
-export type Extra = { email:string; pw:string; pw2:string; role:'groom'|'bride'|null };
+export type Extra = { email:string; pw:string; pw2:string; role:'groom'|'bride'|null; wedding: string; };
 
 export function useSignupWizard(): SignupWizardCtx {
   const [basic, setBasic] = useState<Basic>({ name:'', birth:'', phone:'' });
   const [terms, setTerms] = useState<Terms>({
     all:false, t1:false, t2:false, t3:false, t4:false, t5:false, mkt:false, third:false
   });
-  const [extra, setExtra] = useState<Extra>({ email:'', pw:'', pw2:'', role:null });
+  const [extra, setExtra] = useState<Extra>({ email:'', pw:'', pw2:'', role:null, wedding:'' });
 
   // 전화번호 인증
   const [sendingCode, setSendingCode] = useState(false);
@@ -85,6 +86,7 @@ export function useSignupWizard(): SignupWizardCtx {
   const nameOk  = basic.name.trim().length >= 2;
   const birthOk = /^(\d{4})[.\-/]?(0[1-9]|1[0-2])[.\-/]?(0[1-9]|[12]\d|3[01])$/.test(basic.birth.trim());
   const phoneOk = isValidPhone && codeRequested && codeVerified;
+  const weddingOk = isValidYMD(extra.wedding); 
 
   const canNextTerms = terms.t1 && terms.t2 && terms.t3 && terms.t4 && terms.t5;
   const canNextBasic = nameOk && birthOk && phoneOk;
@@ -94,7 +96,7 @@ export function useSignupWizard(): SignupWizardCtx {
   const roleOk  = !!extra.role;
   const emailOk = isValidEmail && emailVerified;
 
-  const canSubmitExtra = emailOk && pwOk && pw2Ok && roleOk;
+  const canSubmitExtra = emailOk && pwOk && pw2Ok && roleOk && weddingOk;
 
   return {
     // state, actions
@@ -108,6 +110,6 @@ export function useSignupWizard(): SignupWizardCtx {
     canSubmitExtra,
 
     // 디버깅/표시용 상세 항목
-    flags: { nameOk, birthOk, phoneOk, emailOk, emailVerified, pwOk, pw2Ok, roleOk },
+    flags: { nameOk, birthOk, phoneOk, emailOk, emailVerified, pwOk, pw2Ok, roleOk, weddingOk },
   };
 }

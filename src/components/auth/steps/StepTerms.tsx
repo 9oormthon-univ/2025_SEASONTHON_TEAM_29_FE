@@ -9,7 +9,7 @@ type Props = SignupWizardCtx;
 export default function StepTerms({ terms, setTerms, toggleAllTerms }: Props) {
   return (
     <section className="min-w-0 flex-[0_0_100%]">
-      <div className="pt-6">
+      <div className="pt-6 px-4">
         <p className="text-sm text-gray-500">웨딧의 원활한 이용을 위해</p>
         <h2 className="mt-1 text-2xl font-extrabold">약관에 동의해주세요.</h2>
 

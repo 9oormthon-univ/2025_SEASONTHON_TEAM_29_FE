@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import Button from '../common/atomic/Button';
 import ProgressBar from '../common/atomic/ProgressBar';
 import StepBasic from './steps/StepBasic';
+import StepExtra from './steps/StepExtra';
 import StepTerms from './steps/StepTerms';
 
 export default function SignupWizard() {
@@ -32,7 +33,7 @@ export default function SignupWizard() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 bg-white/70 backdrop-blur">
+      <header className="sticky top-0 z-10 bg-white/70 backdrop-blur px-4">
         <div className="relative mx-auto flex h-16 max-w-[420px] items-center justify-center">
           <button aria-label="back" onClick={prev} className="absolute left-0 disabled:opacity-40" disabled={index===0}>
             <ChevronLeft className="h-7 w-7" />
@@ -51,10 +52,11 @@ export default function SignupWizard() {
         <div className="flex">
           <StepTerms {...wiz} />
           <StepBasic {...wiz} />
+          <StepExtra {...wiz} />
         </div>
       </div>
 
-      <div className="sticky bottom-0 bg-white/70 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 backdrop-blur">
+      <div className="sticky bottom-0 px-4 bg-white/70 pb-[calc(env(safe-area-inset-bottom))] pt-3 backdrop-blur">
         {index < 2 ? (
           <Button
             size="md"

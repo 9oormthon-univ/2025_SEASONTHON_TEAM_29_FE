@@ -18,7 +18,7 @@ export default function InputBadge({
   ...rest
 }: InputBadgeProps) {
   const base =
-    'inline-flex items-center justify-center gap-2.5 px-2.5 py-1 rounded text-xs font-medium leading-loose';
+    'inline-flex items-center justify-center gap-2.5 px-2 py-0.5 rounded text-xs font-medium leading-loose';
 
   const scheme =
     variant === 'primary'

@@ -1,6 +1,7 @@
 'use client';
 
 import Input from '@/components/common/atomic/Input';
+import DateInput from '@/components/forms/DateInput';
 import { Field } from '@/components/forms/Field';
 import FieldHint from '@/components/forms/FieldHint';
 import { InputWithButton } from '@/components/forms/InputWithButton';
@@ -30,7 +31,7 @@ export default function StepBasic(props: Props) {
 
   return (
     <section className="min-w-0 flex-[0_0_100%]">
-      <div className="pt-6">
+      <div className="pt-6 px-4">
         <p className="text-sm text-text-secondary">검증된 개인정보 수집을 위해</p>
         <h2 className="mt-1 text-2xl font-extrabold">본인확인을 해주세요.</h2>
 
@@ -54,20 +55,12 @@ export default function StepBasic(props: Props) {
 
         {/* 생년월일 */}
         <Field label="생년월일" htmlFor="birth" className="mt-4">
-          <Input
-            id="birth"
-            placeholder="YYYY / MM / DD"
-            inputMode="numeric"
-            value={basic.birth}
-            onChange={(e) => setBasicField('birth', e.target.value)}
-            type={basic.birth || birthActive ? 'variant4' : 'default'}
-            onFocus={() => setBirthActive(true)}
-            onBlur={() => setBirthActive(false)}
-            onMouseEnter={() => setBirthActive(true)}
-            onMouseLeave={() => setBirthActive(false)}
+          <DateInput
+            raw={basic.birth}
+            onRawChange={(raw) => setBasicField('birth', raw)}
           />
           {touchedBirth && !flags.birthOk && (
-            <FieldHint tone="error">YYYYMMDD 또는 YYYY/MM/DD 형식으로 입력해주세요.</FieldHint>
+            <FieldHint tone="error">YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.</FieldHint>
           )}
         </Field>
 
@@ -88,9 +81,6 @@ export default function StepBasic(props: Props) {
           />
           {touchedPhone && !isValidPhone && (
             <FieldHint tone="error">휴대전화 형식이 올바르지 않습니다. 예) 010-1234-5678</FieldHint>
-          )}
-          {codeRequested && !flags.phoneOk && (
-            <FieldHint>문자로 받은 6자리 인증번호를 입력해 인증을 완료해주세요.</FieldHint>
           )}
         </Field>
 

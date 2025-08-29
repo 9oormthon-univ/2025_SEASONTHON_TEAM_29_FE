@@ -5,7 +5,7 @@ export type Terms = {
   all: boolean; t1: boolean; t2: boolean; t3: boolean; t4: boolean; t5: boolean;
   mkt?: boolean; third?: boolean;
 };
-export type Extra = { email: string; pw: string; pw2: string; role: 'groom' | 'bride' | null };
+export type Extra = { email: string; pw: string; pw2: string; role: 'groom' | 'bride' | null; wedding: string; };
 
 export type SignupFlags = {
   nameOk: boolean;
@@ -16,6 +16,7 @@ export type SignupFlags = {
   pwOk: boolean;
   pw2Ok: boolean;
   roleOk: boolean;
+  weddingOk: boolean;
 };
 
 export type SignupWizardCtx = {
