@@ -19,7 +19,7 @@ export default function Label({
   ...rest
 }: LabelProps) {
   const base =
-    'inline-flex items-center justify-center rounded-[100px] overflow-hidden';
+    'text-default inline-flex items-center justify-center rounded-[100px] overflow-hidden';
 
   const sizeClass =
     size === 'sm'
