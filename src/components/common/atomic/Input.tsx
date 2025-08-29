@@ -35,17 +35,17 @@ export default function Input({
     uiType === 'incorrect'
       ? 'outline-red-500'
       : uiType === 'hover'
-        ? 'outline-gray-600'
+        ? 'outline-box-line'
         : uiType === 'variant4' || uiType === 'variant5'
-          ? 'outline-gray-600'
-          : 'outline-gray-300/70';
+          ? 'outline-inputbox-active'
+          : 'outline-gray-100';
 
   const text =
     uiType === 'incorrect'
       ? 'text-red-500'
       : uiType === 'variant4' || uiType === 'variant5'
-        ? 'text-foreground'
-        : 'text-foreground';
+        ? 'text-default'
+        : 'text-tertiary';
 
   const ph =
     uiType === 'incorrect'
