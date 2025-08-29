@@ -6,10 +6,17 @@
 }
 
 @theme inline {
+  /* 기존 */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  /* MAIN */
+  --color-primary-500: #6B5BD7; /* Primary */
+  --color-primary-300: #9B9AEA; /* Secondary */
+  --color-primary-200: #C2C3EF; /* Tertiary */
+  --color-primary-100: #DFDFF8; /* Inactive/Ghost */
+  --color-accent-500: #FFD650;  /* Sub Primary */
 }
 
 @media (prefers-color-scheme: dark) {
