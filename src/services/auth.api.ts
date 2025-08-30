@@ -66,6 +66,7 @@ export async function reissueToken(): Promise<boolean> {
   const newRT      = res.headers.get('x-refresh-token'); 
 
   const newAT = authHeader?.replace(/^Bearer\s+/i, '') || '';
+  console.log(newAT, newRT);
 
   if (newAT) tokenStore.set(newAT);
   if (newRT) refreshStore.set(newRT);

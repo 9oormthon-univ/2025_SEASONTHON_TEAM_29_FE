@@ -1,77 +1,105 @@
+// app/page.tsx (WelcomeAsRoot)
 'use client';
 
+import AuthCtas from '@/components/onboarding/AuthCtas';
+import OnboardingSlider from '@/components/onboarding/OnboardingSlider';
+import { isStandalonePWA } from '@/lib/pwa';
 import { tokenStore } from '@/lib/tokenStore';
 import * as auth from '@/services/auth.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+const MIN_OVERLAY_MS = 800;   // 브라우저에서만 사용
+const SHOW_AFTER_MS   = 120;  // 짧게 끝나면 오버레이 자체를 안 띄움 (브라우저 전용)
 
-const FADE_MS = 300;
-const MIN_SHOW_MS = 700;
-
-export default function SplashPage() {
+export default function WelcomeAsRoot() {
   const router = useRouter();
-  const [fadeOut, setFadeOut] = useState(false);
-  const timers = useRef<number[]>([]);
+  const installed = isStandalonePWA(); // ✅ PWA 여부
+
+  const [booting, setBooting] = useState(true);
+  const [showOverlay, setShowOverlay] = useState(!installed); 
   const startedAt = useRef<number>(Date.now());
+  const timers = useRef<number[]>([]);
 
   useEffect(() => {
-    const bootstrap = async () => {
-      // 1) 토큰 있으면 바로 홈
+    let cancelled = false;
+
+    if (!installed) {
+      const t = window.setTimeout(() => setShowOverlay(true), SHOW_AFTER_MS);
+      timers.current.push(t);
+    }
+
+    (async () => {
       if (tokenStore.get()) {
-        await go('/home');
+        if (!cancelled) await go('/home');
         return;
       }
+      const ok = await auth.reissueToken().catch(() => false);
 
-      // 2) 없으면 리프레시 시도
-      try {
-        await auth.reissueToken();
-        await go(tokenStore.get() ? '/home' : '/welcome');
-      } catch {
-        await go('/welcome');
+      if (cancelled) return;
+
+      if (ok && tokenStore.get()) {
+        await go('/home');
+      } else {
+        await finish();
       }
-    };
-
-    bootstrap();
+    })();
 
     return () => {
-      // 타이머 정리
+      cancelled = true;
       timers.current.forEach(clearTimeout);
     };
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, installed]);
+
+  async function finish() {
+    if (!installed) {
+      const elapsed = Date.now() - startedAt.current;
+      const wait = Math.max(0, MIN_OVERLAY_MS - elapsed);
+      await new Promise<void>((r) => {
+        const id = window.setTimeout(() => r(), wait);
+        timers.current.push(id);
+      });
+    }
+    setBooting(false);
+    setShowOverlay(false);
+  }
 
   async function go(path: string) {
-    // (선택) 스플래시 최소 노출 시간 보장
-    const elapsed = Date.now() - startedAt.current;
-    const wait = Math.max(0, MIN_SHOW_MS - elapsed);
-    await new Promise<void>((r) => {
-      const id = window.setTimeout(() => r(), wait);
-      timers.current.push(id);
-    });
-
-    setFadeOut(true); // 이제 페이드아웃 시작
-
-    await new Promise<void>((r) => {
-      const id = window.setTimeout(() => r(), FADE_MS);
-      timers.current.push(id);
-    });
-
+    await finish();
     router.replace(path);
   }
 
+  const hideWelcome = booting && installed; // ✅ PWA일 때 부팅중이면 웰컴 콘텐츠 숨김
 
   return (
-    <main className="relative flex min-h-dvh items-center justify-center bg-primary-500">
-      <Image
-        src="/icons/logo.svg"
-        alt="웨딧"
-        width={160}
-        height={80}
-        className={`h-20 w-auto ${fadeOut ? 'animate-fadeOut' : 'animate-fadeIn'}`}
-        aria-hidden
-      />
-      <span className="sr-only">웨딧</span>
+    <main className="relative mx-auto flex h-dvh max-w-[420px] flex-col">
+      {/* 브라우저 전용 스플래시 오버레이 */}
+      {booting && showOverlay && !installed && (
+        <div className="fixed inset-0 z-[9999] grid place-items-center bg-primary-500">
+          <Image
+            src="/icons/logo.svg"
+            alt="웨딧"
+            width={160}
+            height={80}
+            className="h-20 w-auto animate-fadeIn"
+            priority
+          />
+          <span className="sr-only">웨딧</span>
+        </div>
+      )}
+
+      {/* 웰컴 화면 (PWA에선 부팅중일 땐 숨김) */}
+      <div className={hideWelcome ? 'invisible pointer-events-none' : 'flex h-dvh flex-col'}>
+        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 bg-onboarding-gradient" />
+        <div className="relative z-10 flex-1 pt-6">
+          <OnboardingSlider />
+        </div>
+        <div className="relative z-10 px-4 pb-[calc(env(safe-area-inset-bottom)+50px)]">
+          <AuthCtas />
+        </div>
+      </div>
     </main>
   );
 }

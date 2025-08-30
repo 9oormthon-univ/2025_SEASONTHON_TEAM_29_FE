@@ -17,7 +17,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     const goWelcome = () => {
       if (!mounted) return;
-      router.replace('/welcome');
+      router.replace('/');
     };
 
     const ensure = async () => {
