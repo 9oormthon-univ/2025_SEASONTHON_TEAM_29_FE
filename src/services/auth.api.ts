@@ -56,16 +56,20 @@ export async function reissueToken(): Promise<boolean> {
   const rt = refreshStore.get();
   if (!rt) return false;
 
-  const res = await fetch(`${BASE}/v1/member/token-reissue`, {
+  const res = await fetch('/api/v1/member/token-reissue', {
     method: 'GET',
     headers: { 'X-Refresh-Token': rt },
   });
   if (!res.ok) return false;
 
-  const newAT = res.headers.get('X-Access-Token');
-  const newRT = res.headers.get('X-Refresh-Token');
+  const authHeader = res.headers.get('authorization'); 
+  const newRT      = res.headers.get('x-refresh-token'); 
+
+  const newAT = authHeader?.replace(/^Bearer\s+/i, '') || '';
+
   if (newAT) tokenStore.set(newAT);
   if (newRT) refreshStore.set(newRT);
+
   return !!tokenStore.get();
 }
 

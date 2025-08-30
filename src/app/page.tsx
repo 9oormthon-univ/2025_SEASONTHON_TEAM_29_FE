@@ -4,42 +4,62 @@ import { tokenStore } from '@/lib/tokenStore';
 import * as auth from '@/services/auth.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+
+const FADE_MS = 300;
+const MIN_SHOW_MS = 700;
 
 export default function SplashPage() {
   const router = useRouter();
   const [fadeOut, setFadeOut] = useState(false);
+  const timers = useRef<number[]>([]);
+  const startedAt = useRef<number>(Date.now());
 
   useEffect(() => {
     const bootstrap = async () => {
+      // 1) 토큰 있으면 바로 홈
+      if (tokenStore.get()) {
+        await go('/home');
+        return;
+      }
+
+      // 2) 없으면 리프레시 시도
       try {
-        // 이미 메모리에 토큰 있으면 바로 home
-        if (tokenStore.get()) {
-          go('/home');
-          return;
-        }
-        // 없으면 refresh 시도
         await auth.reissueToken();
-        if (tokenStore.get()) {
-          go('/home');
-        } else {
-          go('/welcome');
-        }
+        await go(tokenStore.get() ? '/home' : '/welcome');
       } catch {
-        go('/welcome');
+        await go('/welcome');
       }
     };
 
-    // 살짝 연출 (원하시면 시간 조정/삭제)
-    const t1 = setTimeout(() => setFadeOut(true), 700);
-    const t2 = setTimeout(bootstrap, 800);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    bootstrap();
 
-    function go(path: string) {
-      // 페이드 아웃 타이밍에 맞춰 전환
-      setTimeout(() => router.replace(path), 300);
-    }
+    return () => {
+      // 타이머 정리
+      timers.current.forEach(clearTimeout);
+    };
   }, [router]);
+
+  async function go(path: string) {
+    // (선택) 스플래시 최소 노출 시간 보장
+    const elapsed = Date.now() - startedAt.current;
+    const wait = Math.max(0, MIN_SHOW_MS - elapsed);
+    await new Promise<void>((r) => {
+      const id = window.setTimeout(() => r(), wait);
+      timers.current.push(id);
+    });
+
+    setFadeOut(true); // 이제 페이드아웃 시작
+
+    await new Promise<void>((r) => {
+      const id = window.setTimeout(() => r(), FADE_MS);
+      timers.current.push(id);
+    });
+
+    router.replace(path);
+  }
+
 
   return (
     <main className="relative flex min-h-dvh items-center justify-center bg-primary-500">

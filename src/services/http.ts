@@ -30,7 +30,7 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
         ...init,
         headers: {
           ...headers,
-          Authorization: `Bearer ${tokenStore.get()}`,
+          Authorization: `${tokenStore.get()}`,
         },
       });
       if (!retry.ok) throw await toErr(retry);

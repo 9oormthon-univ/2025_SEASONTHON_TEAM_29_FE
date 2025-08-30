@@ -12,6 +12,7 @@ export const refreshStore = {
       path: '/',       // 전체 경로
       expires: 7,
     });
+    console.log("!");
   },
   clear: () => Cookies.remove(KEY, { path: '/' }),
 };
