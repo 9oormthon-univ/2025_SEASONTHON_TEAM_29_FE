@@ -1,22 +1,10 @@
 'use client';
 
+import { CategoryItem } from '@/types/category';
 import { cn } from '@/utills/cn';
 import Image from 'next/image';
 
-type Category = {
-  key: string;
-  label: string;
-  icon: string;
-};
-
-const mockCategories: Category[] = [
-  { key: 'hall', label: '웨딩홀', icon: '/icons/Category/weddinghall.svg' },
-  { key: 'dress', label: '드레스', icon: '/icons/Category/dress.svg' },
-  { key: 'studio', label: '스튜디오', icon: '/icons/Category/studio.svg' },
-  { key: 'makeup', label: '메이크업', icon: '/icons/Category/makeup.svg' },
-];
-
-export default function CategoryQuick({ bgColor = 'gray' }: { bgColor?: 'gray' | 'white' }) {
+export default function CategoryQuick({ items, bgColor = 'gray' }: { items: CategoryItem[]; bgColor?: 'gray' | 'white' }) {
   return (
     <div
       className={cn(
@@ -24,7 +12,7 @@ export default function CategoryQuick({ bgColor = 'gray' }: { bgColor?: 'gray' |
         bgColor === 'gray' ? 'bg-gray-100' : 'bg-white'
       )}
     >
-      {mockCategories.map((c, i) => (
+      {items.map((c, i) => (
         <a
           key={c.key}
           href={`/search?cat=${c.key}`}
@@ -36,7 +24,7 @@ export default function CategoryQuick({ bgColor = 'gray' }: { bgColor?: 'gray' |
 
           <span>{c.label}</span>
 
-          {i !== mockCategories.length - 1 && (
+          {i !== items.length - 1 && (
             <span className="absolute right-0 top-1/2 h-14 -translate-y-1/2 border-r border-gray-300" />
           )}
         </a>
