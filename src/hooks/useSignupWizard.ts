@@ -4,7 +4,7 @@
 import { isValidYMD } from '@/components/forms/DateInput';
 import * as api from '@/services/auth.api';
 import { SignupWizardCtx } from '@/types/auth';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 export type Basic = { name: string; birth: string; phone: string };
 export type Terms = {
@@ -24,15 +24,13 @@ export function useSignupWizard(): SignupWizardCtx {
   const [codeRequested, setCodeRequested] = useState(false);
   const [codeVerified, setCodeVerified] = useState(false);
 
-  // ✅ 숫자만 추출해서 010-XXXXXXXX(총 11자리)만 허용
-  const phoneDigits = basic.phone.replace(/\D/g, '');
+  const phoneDigits = basic.phone.replace(/\D/g, ''); // 숫자만
   const isValidPhone = /^010\d{8}$/.test(phoneDigits);
 
   async function sendSms() {
     if (!isValidPhone || sendingCode) return;
     setSendingCode(true);
     try {
-      // ✅ 백엔드로는 숫자만 전달(권장)
       await api.sendSms(phoneDigits);
       setCodeRequested(true);
       setCodeVerified(false);
@@ -42,22 +40,20 @@ export function useSignupWizard(): SignupWizardCtx {
   }
 
   async function verifySms(code: string) {
-    // ✅ 인증도 숫자만으로
-    const ok = await api.verifySms(phoneDigits, code);
-    setCodeVerified(ok);
-    return ok;
+    await api.verifySms(code); // 성공/실패는 서버 에러로 판별
+    setCodeVerified(true);
+    return true;
   }
 
-  // 이메일 인증 (MVP: 전송 성공 시 완료로 처리)
+  // 이메일 (스펙에 Email 인증 API 없음 → MVP로 즉시 완료 처리)
   const [emailVerified, setEmailVerified] = useState(false);
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const isValidEmail = emailRegex.test(extra.email);
 
   async function sendEmail() {
     if (!isValidEmail) return false;
-    const ok = await api.sendEmail(extra.email);
-    if (ok) setEmailVerified(true);
-    return ok;
+    setEmailVerified(true);
+    return true;
   }
 
   // 약관 일괄 토글
@@ -66,37 +62,43 @@ export function useSignupWizard(): SignupWizardCtx {
     setTerms({ all:v, t1:v, t2:v, t3:v, t4:v, t5:v, mkt:v, third:v });
   }
 
-  // (기존 버튼 활성화 계산은 내부 사용만 — 외부엔 세분화 플래그로 노출)
-  const canNext0 = useMemo(
-    () => !!(basic.name && basic.birth && isValidPhone && codeRequested && codeVerified),
-    [basic, isValidPhone, codeRequested, codeVerified]
-  );
-  const canNext1 = useMemo(
-    () => terms.t1 && terms.t2 && terms.t3 && terms.t4 && terms.t5,
-    [terms]
-  );
-  const canSubmit = useMemo(() => {
-    if (!extra.email || !isValidEmail || !emailVerified) return false;
-    if (!extra.pw || !extra.pw2 || extra.pw.length < 8 || extra.pw !== extra.pw2) return false;
-    if (!extra.role) return false;
-    return true;
-  }, [extra, emailVerified, isValidEmail]);
+  // 플래그
+  const nameOk    = basic.name.trim().length >= 2;
+  const birthOk   = /^(\d{4})[.\-/]?(0[1-9]|1[0-2])[.\-/]?(0[1-9]|[12]\d|3[01])$/.test(basic.birth.trim());
+  const weddingOk = isValidYMD(extra.wedding);
+  const phoneOk   = isValidPhone && codeRequested && codeVerified;
 
-  // 상세 플래그
-  const nameOk  = basic.name.trim().length >= 2;
-  const birthOk = /^(\d{4})[.\-/]?(0[1-9]|1[0-2])[.\-/]?(0[1-9]|[12]\d|3[01])$/.test(basic.birth.trim());
-  const phoneOk = isValidPhone && codeRequested && codeVerified;
-  const weddingOk = isValidYMD(extra.wedding); 
-
-  const canNextTerms = terms.t1 && terms.t2 && terms.t3 && terms.t4 && terms.t5;
-  const canNextBasic = nameOk && birthOk && phoneOk;
+  const canNextTerms   = terms.t1 && terms.t2 && terms.t3 && terms.t4 && terms.t5;
+  const canNextBasic   = nameOk && birthOk && phoneOk;
 
   const pwOk    = !!extra.pw && extra.pw.length >= 8;
   const pw2Ok   = !!extra.pw2 && extra.pw2 === extra.pw;
   const roleOk  = !!extra.role;
-  const emailOk = isValidEmail && emailVerified;
+  const emailOk = isValidEmail;
 
   const canSubmitExtra = emailOk && pwOk && pw2Ok && roleOk && weddingOk;
+
+  // ✅ 최종 회원가입 호출
+  async function submitSignup() {
+    // 가드
+    if (!canSubmitExtra) throw new Error('필수 항목이 완성되지 않았습니다.');
+    if (!canNextBasic)   throw new Error('본인확인 단계가 완료되지 않았습니다.');
+
+    // YYYY-MM-DD 로 정규화 (isValidYMD 통과한다고 가정)
+    const norm = (v: string) =>
+      v.trim().replace(/[^0-9]/g, '')
+        .replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+
+    await api.signup({
+      email: extra.email.trim(),
+      password: extra.pw,
+      name: basic.name.trim(),
+      phoneNumber: phoneDigits,
+      birthDate: norm(basic.birth),
+      weddingDate: norm(extra.wedding),
+      type: extra.role === 'groom' ? 'GROOM' : 'BRIDE',
+    });
+  }
 
   return {
     // state, actions
@@ -104,12 +106,15 @@ export function useSignupWizard(): SignupWizardCtx {
     isValidPhone, isValidEmail, emailVerified, codeRequested, codeVerified,
     sendSms, verifySms, sendEmail, toggleAllTerms,
 
-    // ✅ 스텝별 플래그
+    // 스텝별 플래그
     canNextTerms,
     canNextBasic,
     canSubmitExtra,
 
-    // 디버깅/표시용 상세 항목
+    // 추가 공개 플래그
     flags: { nameOk, birthOk, phoneOk, emailOk, emailVerified, pwOk, pw2Ok, roleOk, weddingOk },
-  };
+
+    // 🔗 최종 제출
+    submitSignup,
+  } as SignupWizardCtx & { submitSignup: () => Promise<void> };
 }
