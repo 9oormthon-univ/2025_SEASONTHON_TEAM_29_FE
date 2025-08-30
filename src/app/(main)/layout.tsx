@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? '';
 
-  const HIDE_EXACT = ['/search'];
+  const HIDE_EXACT = ['/search', '/search/filters'];
 
   const HIDE_PREFIX: string[] = [];
 
