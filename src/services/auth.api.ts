@@ -46,10 +46,12 @@ export function verifySms(code: string) {
 
 // 로그인
 export function login(payload:{email:string;password:string}) {
-  return req('/v1/member/login', {
+  const r = req('/v1/member/login', {
     method:'POST',
     body: JSON.stringify(payload),
   });
+  console.log(r);
+  return r;
 }
 
 // 토큰 재발급

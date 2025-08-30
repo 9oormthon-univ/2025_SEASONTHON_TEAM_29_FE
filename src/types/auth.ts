@@ -46,6 +46,7 @@ export type SignupWizardCtx = {
   canSubmitExtra: boolean;
 
   flags: SignupFlags;
+  submitSignup: () => Promise<void>;
 };
 
 export type Role = 'groom' | 'bride';
