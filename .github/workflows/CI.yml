@@ -72,3 +72,12 @@ jobs:
         with:
           name: storybook-build
           path: storybook-static/
+          
+      # 10. 패키지 파일 GitHub Artifact에 업로드
+      - name: Upload package files
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-files
+          path: |
+            package.json
+            package-lock.json
