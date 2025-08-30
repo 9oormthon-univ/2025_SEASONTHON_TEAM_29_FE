@@ -13,7 +13,7 @@ permissions:
 jobs:
   # 빌드 파일 GitHub Artifact에서 다운로드 후 EC2 배포
   deploy-to-ec2:
-    runs-on: [self-hosted, wedit-fe]
+    runs-on: self-hosted
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
 
