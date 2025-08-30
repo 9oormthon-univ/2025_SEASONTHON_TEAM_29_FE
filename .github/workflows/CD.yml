@@ -61,7 +61,8 @@ jobs:
     # 4. NextJS 임시 디렉토리 생성 및 권한 설정
     - name: Prepare Next.js deploy directory
       run: |
-        sudo mkdir -p -m 2775 /var/www/wedit-frontend-temp
+        sudo mkdir -p -m 2775 /var/www/wedit-frontend-temp/.next
+        sudo mkdir -p -m 2775 /var/www/wedit-frontend-temp/public
         sudo chown -R ubuntu:www-data /var/www/wedit-frontend-temp
         sudo rm -rf /var/www/wedit-frontend-temp/* /var/www/wedit-frontend-temp/.[!.]*
 
