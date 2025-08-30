@@ -11,8 +11,15 @@ type CommonItem = {
   logo?: string;
   rating?: number;
   count?: number;
+  price?: number;
   href?: string;
 };
+
+function formatManwon(v?: number) {
+  if (v == null) return '';
+  const man = Math.round(v / 10_000);
+  return `${man.toLocaleString()}만원~`;
+}
 
 export default function VendorCard({ item, href, square = true }: { item: CommonItem; href?: string; square?: boolean }) {
   const displayRegion = item.region ?? '';
@@ -50,6 +57,12 @@ export default function VendorCard({ item, href, square = true }: { item: Common
             {item.rating !== undefined ? item.rating.toFixed(1) : '-'}
             {item.count !== undefined ? ` (${item.count})` : ''}
           </span>
+        </div>
+      )}
+      
+      {item.price != null && (
+        <div className="mt-1 text-[13px] font-extrabold text-gray-900">
+          {formatManwon(item.price)}
         </div>
       )}
     </article>

@@ -18,4 +18,6 @@ export type SearchItem = {
   price: number;
   logo?: string;
   tags?: string[];
+  rating?: number;
+  count?: number;
 };

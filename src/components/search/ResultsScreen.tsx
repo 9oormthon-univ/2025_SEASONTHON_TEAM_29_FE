@@ -43,6 +43,9 @@ export default function ResultsScreen({
                       name: it.name,
                       region: it.region,
                       logo: it.logo,
+                      rating: it.rating,
+                      count: it.count,
+                      price: it.price,
                     }}
                     href={`/vendor/${it.id}`}
                   />
