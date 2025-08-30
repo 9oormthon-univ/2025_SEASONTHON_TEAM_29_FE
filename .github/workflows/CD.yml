@@ -1,0 +1,93 @@
+name: Wedit FE CD
+
+on:
+  workflow_run:
+    workflows: ["Wedit FE CI"]
+    types:
+      - completed
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  # 빌드 파일 GitHub Artifact에서 다운로드 후 EC2 배포
+  deploy-to-ec2:
+    runs-on: [self-hosted, wedit-fe]
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+
+    # 1. NextJS 빌드 파일 GitHub Artifact에서 다운로드
+    - name: Download Next.js build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: nextjs-build
+        path: build/next
+
+    # 2. public 디렉토리 GitHub Artifact에서 다운로드
+    - name: Download public assets artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: public-assets
+        path: build/public
+
+    # 3. Storybook 빌드 파일 GitHub Artifact에서 다운로드
+    - name: Download Storybook build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: storybook-build
+        path: build/storybook
+
+    # 4. NextJS 임시 디렉토리 생성 및 권한 설정
+    - name: Prepare Next.js deploy directory
+      run: |
+        sudo mkdir -p -m 2775 /var/www/wedit-frontend-temp
+        sudo chown -R ubuntu:www-data /var/www/wedit-frontend-temp
+        sudo rm -rf /var/www/wedit-frontend-temp/* /var/www/wedit-frontend-temp/.[!.]*
+
+    # 5. NextJS 빌드 파일 복사 및 권한 설정
+    - name: Copy Next.js build files
+      run: |
+        sudo cp -r build/next/* /var/www/wedit-frontend-temp/.next/
+        sudo cp -r build/next/.[!.]* /var/www/wedit-frontend-temp/.next/ 2>/dev/null || true
+        sudo cp -r build/public/* /var/www/wedit-frontend-temp/public/
+        sudo cp -r build/public/.[!.]* /var/www/wedit-frontend-temp/public/ 2>/dev/null || true
+        sudo chown -R ubuntu:www-data /var/www/wedit-frontend-temp
+
+    # 6. Storybook 임시 디렉토리 생성 및 권한 설정
+    - name: Prepare Storybook deploy directory
+      run: |
+        sudo mkdir -p -m 2775 /var/www/storybook-temp
+        sudo chown -R ubuntu:www-data /var/www/storybook-temp
+        sudo rm -rf /var/www/storybook-temp/* /var/www/storybook-temp/.[!.]*
+
+    # 7. Storybook 빌드 파일 복사 및 권한 설정
+    - name: Copy Storybook build files
+      run: |
+        sudo cp -r build/storybook/* /var/www/storybook-temp/
+        sudo cp -r build/storybook/.[!.]* /var/www/storybook-temp/ 2>/dev/null || true
+        sudo chown -R ubuntu:www-data /var/www/storybook-temp
+
+    # 8. 기존 NextJS 배포 디렉토리 삭제 및 임시 디렉토리를 실제 배포 디렉토리로 스왑
+    - name: Swap Next.js deploy directory
+      run: |
+        sudo rm -rf /var/www/wedit-frontend/* /var/www/wedit-frontend/.[!.]*
+        sudo mv /var/www/wedit-frontend-temp/* /var/www/wedit-frontend/
+        sudo mv /var/www/wedit-frontend-temp/.[!.]* /var/www/wedit-frontend/ 2>/dev/null || true
+
+    # 9. 기존 Storybook 배포 디렉토리 삭제 및 임시 디렉토리를 실제 배포 디렉토리로 스왑
+    - name: Swap Storybook deploy directory
+      run: |
+        sudo rm -rf /var/www/storybook/* /var/www/storybook/.[!.]*
+        sudo mv /var/www/storybook-temp/* /var/www/storybook/
+        sudo mv /var/www/storybook-temp/.[!.]* /var/www/storybook/ 2>/dev/null || true
+
+    # 10. Next.js 앱 재시작 (pm2)
+    - name: Restart Next.js app (pm2)
+      run: |
+        pm2 reload wedit-frontend || pm2 start npm --name wedit-frontend -- run start
+        pm2 show wedit-frontend
+    
+    # 11. Nginx reload
+    - name: Reload Nginx
+      run: sudo systemctl reload nginx
