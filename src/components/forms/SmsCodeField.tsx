@@ -34,7 +34,6 @@ export default function SmsCodeField({
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ✅ 재전송 시(키 변경) 리셋
   useEffect(() => {
     setCode('');
     setLeft(seconds);
@@ -42,7 +41,6 @@ export default function SmsCodeField({
     setError(null);
   }, [resendKey, seconds]);
 
-  // 타이머
   useEffect(() => {
     if (verified) return;
     if (left <= 0) { onExpire?.(); return; }
@@ -64,7 +62,7 @@ export default function SmsCodeField({
       setError(null);
       const ok = await onVerify(code.trim());
       setVerified(ok);
-      onVerified?.(ok);               // ✅ 부모 콜백
+      onVerified?.(ok);  
       if (!ok) setError('인증번호가 올바르지 않습니다.');
     } catch {
       setError('인증 중 오류가 발생했어요. 다시 시도해주세요.');
@@ -96,7 +94,6 @@ export default function SmsCodeField({
           )}
         />
 
-        {/* 우측 영역: 타이머 / 인증 버튼 / 완료 뱃지 */}
         {!verified && !showVerifyBtn && (
           <div
             className={cn(
