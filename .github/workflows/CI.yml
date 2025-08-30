@@ -63,6 +63,7 @@ jobs:
         with:
           name: public-assets
           path: public/
+          include-hidden-files: true
 
       # 9. Storybook 빌드 파일을 GitHub Artifact에 업로드
       - name: Upload Storybook artifact
