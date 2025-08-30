@@ -23,7 +23,9 @@ jobs:
       with:
         name: nextjs-build
         path: build/next
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
+    # Debug: 다운로드된 nextjs-build 아티팩트 확인
     - name: Check downloaded nextjs-build artifact
       run: ls -al build/next
 
@@ -33,6 +35,7 @@ jobs:
       with:
         name: public-assets
         path: build/public
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     # 3. Storybook 빌드 파일 GitHub Artifact에서 다운로드
     - name: Download Storybook build artifact
@@ -40,6 +43,7 @@ jobs:
       with:
         name: storybook-build
         path: build/storybook
+        github-token: ${{ secrets.GITHUB_TOKEN }}
 
     # 4. NextJS 임시 디렉토리 생성 및 권한 설정
     - name: Prepare Next.js deploy directory
