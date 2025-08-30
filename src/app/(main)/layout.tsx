@@ -16,7 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     HIDE_PREFIX.some((p) => pathname.startsWith(p));
   return (
     <AuthGate>
-      <div className="flex min-h-dvh flex-col overflow-x-hidden">
+      <div className="flex min-h-dvh flex-col overflow-x-hidden touch-manipulation">
         <Container className="flex-1">{children}</Container>
         {!hideBottomNav && <BottomNav />}
       </div>

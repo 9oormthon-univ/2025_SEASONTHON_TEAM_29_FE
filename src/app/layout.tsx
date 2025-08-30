@@ -18,7 +18,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="min-h-dvh bg-white text-gray-900 antialiased overflow-x-hidden touch-pan-y">
+      <body className="min-h-dvh bg-white text-gray-900 antialiased overflow-x-hidden touch-pan-y touch-manipulation">
         <Providers>{children}</Providers>
       </body>
     </html>
