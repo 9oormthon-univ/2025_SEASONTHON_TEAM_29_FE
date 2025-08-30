@@ -58,7 +58,7 @@ export async function reissueToken(): Promise<boolean> {
 
   const res = await fetch('/api/v1/member/token-reissue', {
     method: 'GET',
-    headers: { 'X-Refresh-Token': rt },
+    headers: { 'X-Refresh-Token': `Bearer ${rt}` },
   });
   if (!res.ok) return false;
 

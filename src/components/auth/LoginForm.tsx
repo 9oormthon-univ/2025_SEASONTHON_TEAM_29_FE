@@ -47,7 +47,7 @@ export default function LoginForm() {
       {/* 로고 & 카피 */}
       <div className="flex flex-col items-center">
         <Image
-          src="/icons/logo-primary.svg"
+          src="/icons/logoPrimary.svg"
           alt="웨딧"
           width={120}
           height={60}
