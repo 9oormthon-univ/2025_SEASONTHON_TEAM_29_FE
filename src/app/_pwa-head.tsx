@@ -1,5 +1,5 @@
 // app/head.tsx
-export default function Head() {
+export function PwaHead() {
   return (
     <>
       {/* PWA 기본 */}

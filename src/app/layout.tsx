@@ -1,6 +1,7 @@
 import '@/app/globals.css';
 import { Providers } from '@/lib/providers';
 import type { Viewport } from 'next';
+import { PwaHead } from './_pwa-head';
 
 export const metadata = {
   title: "웨딧",
@@ -29,6 +30,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
+      <head>
+        <PwaHead />
+      </head>
       <body className="min-h-dvh bg-white text-gray-900 antialiased overflow-x-hidden touch-pan-y touch-manipulation">
         <Providers>{children}</Providers>
       </body>
