@@ -5,6 +5,7 @@ import { CategoryKey } from '@/types/category';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import Button from '../common/atomic/Button';
 import Header from '../common/monocules/Header';
 import CategoryRow from './CategoryRow';
 import { ChipGroup, ChipSingle } from './Chips';
@@ -73,7 +74,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
       </section>
 
       {/* 스크롤 영역 */}
-      <div className="flex-1 overflow-y-auto px-0 pb-[80px] overflow-scroll [&::-webkit-scrollbar]:hidden" 
+      <div className="flex-1 overflow-y-auto px-3 pb-[80px] overflow-scroll [&::-webkit-scrollbar]:hidden" 
       style={{ WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none',}}>
         {isHall ? (
           <>
@@ -128,14 +129,15 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
       {/* 하단 고정 버튼 */}
       <div className="fixed inset-x-0 bottom-0 z-20 bg-white/80 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3 backdrop-blur">
-        <button
-          disabled={!canSearch}
-          className={`mx-auto block h-[54px] w-full max-w-[420px] rounded-xl text-md font-extrabold
-            ${canSearch ? 'bg-primary-500 text-white' : 'bg-primary-500/10 text-primary-500/40'}`}
-          onClick={goResults}
-        >
+        <Button
+            size="md"
+            fullWidth
+            disabled={!canSearch}
+            onClick={goResults}
+            className="h-12 text-sm"
+          >
           검색하기
-        </button>
+        </Button>
       </div>
     </main>
   );

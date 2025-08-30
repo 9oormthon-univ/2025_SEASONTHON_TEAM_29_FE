@@ -67,7 +67,7 @@ export default function PriceRange({ value, onChange, selected=false, onFirstPic
   };
 
   return (
-    <section className="px-1">
+    <section className="">
       <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">가격</h3>
 
       <div className={`px-1 ${bubbleShown ? 'pt-6' : ''}`}>
