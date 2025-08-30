@@ -45,7 +45,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   function goResults() {
     const p = new URLSearchParams();
-    areas.forEach(a => p.append('area', a));
+    areas.forEach(a => p.append('region', a));
     if (cat) p.set('cat', cat);
     if (price !== null) p.set('price', String(price));
     style.forEach(v => p.append('style', v));

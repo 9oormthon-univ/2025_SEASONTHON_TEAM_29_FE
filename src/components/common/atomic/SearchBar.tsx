@@ -24,14 +24,15 @@ export default function SearchBar({ placeholder = '검색어를 입력해 주세
         <Search className="h-5 w-5 text-gray-500" />
       </button>
 
-      <button aria-label="cart" className="h-11 w-11">
-        <Image
-          src="/icons/Cart.svg"
-          alt=""
-          width={40}
-          height={40}
-        />
-      </button>
+      {showCart && (
+        <button
+          aria-label="장바구니"
+          className="grid h-11 w-11 place-items-center rounded-full active:scale-95"
+          onClick={() => router.push('/cart')}
+        >
+          <Image src="/icons/Cart.svg" alt="" width={40} height={40} />
+        </button>
+      )}
     </div>
   );
 }

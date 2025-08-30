@@ -7,6 +7,7 @@ import { useMemo, useRef, useState } from 'react';
 const DISTRICTS = [
   '강남', '서초', '송파', '강동', '영등포', '마포', '용산', '광진',
   '성동', '중구', '종로', '동대문', '성북', '노원', '도봉', '강북',
+  '선릉', '논현', '청담', '신림',
 ];
 
 type Props = {
