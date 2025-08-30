@@ -1,40 +1,34 @@
-// app/page.tsx (WelcomeAsRoot)
+// app/page.tsx (WelcomeAsRoot) — 오버레이 스플래시 항상 사용
 'use client';
 
 import AuthCtas from '@/components/onboarding/AuthCtas';
 import OnboardingSlider from '@/components/onboarding/OnboardingSlider';
-import { isStandalonePWA } from '@/lib/pwa';
 import { tokenStore } from '@/lib/tokenStore';
 import * as auth from '@/services/auth.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-const MIN_OVERLAY_MS = 800;   // 브라우저에서만 사용
-const SHOW_AFTER_MS   = 120;  // 짧게 끝나면 오버레이 자체를 안 띄움 (브라우저 전용)
+const MIN_OVERLAY_MS = 800; // 오버레이 최소 노출 시간
 
 export default function WelcomeAsRoot() {
   const router = useRouter();
-  const installed = isStandalonePWA(); // ✅ PWA 여부
 
+  // 항상 오버레이를 사용: PWA든 브라우저든 첫 렌더부터 가림
   const [booting, setBooting] = useState(true);
-  const [showOverlay, setShowOverlay] = useState(!installed); 
   const startedAt = useRef<number>(Date.now());
   const timers = useRef<number[]>([]);
 
   useEffect(() => {
     let cancelled = false;
 
-    if (!installed) {
-      const t = window.setTimeout(() => setShowOverlay(true), SHOW_AFTER_MS);
-      timers.current.push(t);
-    }
-
     (async () => {
+      // 이미 메모리에 AT가 있으면 홈으로
       if (tokenStore.get()) {
         if (!cancelled) await go('/home');
         return;
       }
+      // 조용히 재발급 시도
       const ok = await auth.reissueToken().catch(() => false);
 
       if (cancelled) return;
@@ -42,7 +36,7 @@ export default function WelcomeAsRoot() {
       if (ok && tokenStore.get()) {
         await go('/home');
       } else {
-        await finish();
+        await finish(); // 실패: 웰컴 유지 + 오버레이 내림
       }
     })();
 
@@ -50,33 +44,27 @@ export default function WelcomeAsRoot() {
       cancelled = true;
       timers.current.forEach(clearTimeout);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, installed]);
+  }, [router]);
 
   async function finish() {
-    if (!installed) {
-      const elapsed = Date.now() - startedAt.current;
-      const wait = Math.max(0, MIN_OVERLAY_MS - elapsed);
-      await new Promise<void>((r) => {
-        const id = window.setTimeout(() => r(), wait);
-        timers.current.push(id);
-      });
-    }
+    const elapsed = Date.now() - startedAt.current;
+    const wait = Math.max(0, MIN_OVERLAY_MS - elapsed);
+    await new Promise<void>((r) => {
+      const id = window.setTimeout(() => r(), wait);
+      timers.current.push(id);
+    });
     setBooting(false);
-    setShowOverlay(false);
   }
 
   async function go(path: string) {
-    await finish();
+    await finish();     // 최소 노출 시간을 지키고
     router.replace(path);
   }
 
-  const hideWelcome = booting && installed; // ✅ PWA일 때 부팅중이면 웰컴 콘텐츠 숨김
-
   return (
     <main className="relative mx-auto flex h-dvh max-w-[420px] flex-col">
-      {/* 브라우저 전용 스플래시 오버레이 */}
-      {booting && showOverlay && !installed && (
+      {/* 오버레이 스플래시: 항상 사용 (PWA에선 네이티브 스플래시 뒤에 연속 노출) */}
+      {booting && (
         <div className="fixed inset-0 z-[9999] grid place-items-center bg-primary-500">
           <Image
             src="/icons/logo.svg"
@@ -90,15 +78,13 @@ export default function WelcomeAsRoot() {
         </div>
       )}
 
-      {/* 웰컴 화면 (PWA에선 부팅중일 땐 숨김) */}
-      <div className={hideWelcome ? 'invisible pointer-events-none' : 'flex h-dvh flex-col'}>
-        <div aria-hidden className="pointer-events-none absolute inset-0 z-0 bg-onboarding-gradient" />
-        <div className="relative z-10 flex-1 pt-6">
-          <OnboardingSlider />
-        </div>
-        <div className="relative z-10 px-4 pb-[calc(env(safe-area-inset-bottom)+50px)]">
-          <AuthCtas />
-        </div>
+      {/* 웰컴 실제 화면 */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 bg-onboarding-gradient" />
+      <div className="relative z-10 flex-1 pt-6">
+        <OnboardingSlider />
+      </div>
+      <div className="relative z-10 px-4 pb-[calc(env(safe-area-inset-bottom)+50px)]">
+        <AuthCtas />
       </div>
     </main>
   );
