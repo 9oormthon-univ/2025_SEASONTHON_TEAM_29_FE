@@ -1,4 +1,3 @@
-// src/components/forms/PillRadio.tsx
 'use client';
 
 import clsx from 'clsx';

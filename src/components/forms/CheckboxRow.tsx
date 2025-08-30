@@ -1,7 +1,6 @@
-// src/components/forms/CheckboxRow.tsx
 'use client';
 
-import Check from '@/components/common/atomic/check'; // 공용 atomic 체크
+import Check from '@/components/common/atomic/check';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import * as React from 'react';
@@ -12,7 +11,7 @@ type Props = {
   onChange: (v: boolean) => void;
   strong?: boolean;      // 상단 "전체 약관 동의"
   muted?: boolean;       // 선택 항목처럼 연한 스타일
-  showArrow?: boolean;   // 우측 꺾쇠 표시
+  showArrow?: boolean;  
   className?: string;
 };
 
@@ -52,8 +51,8 @@ export function CheckboxRow({
               strong
                 ? 'text-[15px] text-gray-900'
                 : muted
-                ? 'text-sm text-gray-400'   // 선택 항목
-                : 'text-sm text-gray-900', // 필수 항목
+                ? 'text-sm text-gray-400'
+                : 'text-sm text-gray-900',
             )}
           >
           {label}

@@ -1,4 +1,3 @@
-// src/components/home/BannerSquareCarousel.tsx
 'use client';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -42,7 +41,6 @@ export default function BannerSquareCarousel() {
           {mockBanners.map((b, i) => (
             <a key={b.id} href={b.href} className="min-w-0 flex-[0_0_92%]">
               <div className="relative w-full overflow-hidden rounded-2xl" style={{ aspectRatio: '1/1' }} aria-label={`배너 ${i + 1}`}>
-                {/* 이미지 자리: 플레이스홀더 */}
                 <div className="absolute inset-0 bg-gray-200" />
 
                 <div className={`absolute bottom-6 left-6 drop-shadow-md ${b.color === 'black' ? 'text-black' : 'text-white'}`}>

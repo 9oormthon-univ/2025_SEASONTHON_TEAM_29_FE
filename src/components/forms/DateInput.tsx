@@ -3,7 +3,6 @@
 import Input from '@/components/common/atomic/Input';
 import * as React from 'react';
 
-/** 숫자 8자리(raw) → 표시 문자열(YYYY / MM / DD) */
 function toDisplay(raw: string) {
   const digits = (raw || '').replace(/\D/g, '').slice(0, 8);
   const y = digits.slice(0, 4);
@@ -12,13 +11,11 @@ function toDisplay(raw: string) {
   return [y, m && ` / ${m}`, d && ` / ${d}`].filter(Boolean).join('');
 }
 
-/** 표시 문자열 → 숫자 8자리(raw) */
 function toRaw(input: string) {
   return input.replace(/\D/g, '').slice(0, 8);
 }
 
 export function isValidYMD(raw: string) {
-  // YYYYMMDD 유효성(월/일 범위 포함, 윤년 간단 체크)
   if (raw.length !== 8) return false;
   const y = +raw.slice(0, 4);
   const m = +raw.slice(4, 6);
@@ -35,9 +32,7 @@ export default function DateInput({
   onRawChange,
   className,
 }: {
-  /** 숫자 8자리(예: 20260607) */
   raw: string;
-  /** 숫자 8자리로 변경 알림 */
   onRawChange: (nextRaw: string) => void;
   className?: string;
 }) {
@@ -48,7 +43,6 @@ export default function DateInput({
 
   return (
     <Input
-      // 디자인 시스템 타입: 기본은 default, hover되거나 값이 있으면 variant4
       type={hasValue || hover ? 'variant4' : 'default'}
       inputType="text"
       value={display}

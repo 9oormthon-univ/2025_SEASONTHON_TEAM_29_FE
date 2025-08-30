@@ -1,6 +1,7 @@
 import SearchBar from "@/components/common/atomic/SearchBar";
 import BannerSquareCarousel from "@/components/home/BannerSquareCarousel";
 import CategoryQuick from "@/components/home/CategoryQuick";
+import ReviewSquareCarousel from "@/components/home/ReviewSquareCarousel";
 
 
 export default function HomePage() {
@@ -9,7 +10,7 @@ export default function HomePage() {
       <SearchBar/>
       <BannerSquareCarousel />
       <CategoryQuick/>
-      {/* 리뷰 */}
+      <ReviewSquareCarousel/>
       {/* 스토리 */}
       {/* 벤더 */}
     </main>
