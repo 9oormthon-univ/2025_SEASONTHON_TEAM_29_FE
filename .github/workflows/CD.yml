@@ -16,9 +16,6 @@ jobs:
     runs-on: self-hosted
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
-    
-    - name: Check downloaded nextjs-build artifact
-      run: ls -al build/next
 
     # 1. NextJS 빌드 파일 GitHub Artifact에서 다운로드
     - name: Download Next.js build artifact
@@ -26,6 +23,9 @@ jobs:
       with:
         name: nextjs-build
         path: build/next
+
+    - name: Check downloaded nextjs-build artifact
+      run: ls -al build/next
 
     # 2. public 디렉토리 GitHub Artifact에서 다운로드
     - name: Download public assets artifact
