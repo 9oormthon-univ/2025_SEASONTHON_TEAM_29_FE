@@ -8,7 +8,7 @@ export default function CategoryQuick({ items, bgColor = 'gray' }: { items: Cate
   return (
     <div
       className={cn(
-        'mt-5 grid grid-cols-4 gap-2 rounded-2xl',
+        'mt-5 grid grid-cols-4 gap-2 rounded-xl',
         bgColor === 'gray' ? 'bg-gray-100' : 'bg-white'
       )}
     >

@@ -27,7 +27,7 @@ export default function BannerSquareCarousel({ items }: { items: BannerItem[] })
         <div className="flex gap-3 px-4">
           {items.map((b, i) => (
             <a key={b.id} href={b.href} className="min-w-0 flex-[0_0_92%]">
-              <div className="relative w-full overflow-hidden rounded-2xl" style={{ aspectRatio: '1/1' }} aria-label={`배너 ${i + 1}`}>
+              <div className="relative w-full overflow-hidden rounded-xl" style={{ aspectRatio: '1/1' }} aria-label={`배너 ${i + 1}`}>
                 <div className="absolute inset-0 bg-gray-200" />
 
                 <div className={`absolute bottom-6 left-6 drop-shadow-md ${b.color === 'black' ? 'text-black' : 'text-white'}`}>

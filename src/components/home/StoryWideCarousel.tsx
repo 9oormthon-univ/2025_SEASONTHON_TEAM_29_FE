@@ -1,4 +1,3 @@
-// src/components/home/StoryWideCarousel.tsx
 'use client';
 
 import Section from '@/components/common/Section';
@@ -11,7 +10,7 @@ export default function StoryWideCarousel({
   const [ref] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
 
   return (
-    <Section title="따끈따끈 스토리" onMore={() => {}} bleed="viewport">
+    <Section title="따끈따끈, 신규 스토리" onMore={() => {}} bleed="viewport">
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4 touch-pan-y">
           {items.map((s, i) => (
@@ -22,7 +21,7 @@ export default function StoryWideCarousel({
                 i === items.length - 1 ? 'mr-4' : ''
               }`}
             >
-              <article className="flex overflow-hidden rounded-2xl border border-gray-200 bg-white py-2 px-3">
+              <article className="flex overflow-hidden rounded-xl border border-gray-200 bg-white py-2 px-3">
                 <div className="mt-5 flex-1">
                   <div className="text-xs text-gray-400">
                     {s.category.map((c, idx) => (

@@ -25,7 +25,7 @@ export default function ReviewSquareCarousel({items}:{items:ReviewItem[]}) {
               }`}
               aria-label={`${it.category} 후기: ${it.title}`}
             >
-              <article className="overflow-hidden border border-gray-200 rounded-2xl bg-white">
+              <article className="overflow-hidden border border-gray-200 rounded-xl bg-white">
                 <div className="relative w-full" style={{ aspectRatio: '3/2' }}>
                   <div className="absolute inset-0 grid place-items-center bg-gray-200 text-xs text-gray-600">
                     이미지 없음
