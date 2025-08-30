@@ -27,9 +27,7 @@ export default function LoginForm() {
     setLoading(true);
     setErr(null);
     try {
-      const res: any = await api.login({ email: email.trim(), password: pw });
-      if (res?.accessToken) localStorage.setItem('accessToken', res.accessToken);
-      if (res?.refreshToken) localStorage.setItem('refreshToken', res.refreshToken);
+      await api.login({ email: email.trim(), password: pw });
       router.replace('/home');
     } catch (e: any) {
       setErr(e?.message || '로그인에 실패했어요. 이메일/비밀번호를 확인해주세요.');
