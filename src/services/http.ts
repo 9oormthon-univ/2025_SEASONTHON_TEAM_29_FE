@@ -30,7 +30,7 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
         ...init,
         headers: {
           ...headers,
-          Authorization: `${tokenStore.get()}`,
+          Authorization: `Bearer ${tokenStore.get()}`,
         },
       });
       if (!retry.ok) throw await toErr(retry);
@@ -48,21 +48,17 @@ async function tryRefresh(): Promise<boolean> {
 
   const res = await fetch('/api/v1/member/token-reissue', {
     method: 'GET',
-    headers: { 'X-Refresh-Token': `Bearer ${rt}` },
+    headers: { 'X-Refresh-Token': rt }, 
   });
   if (!res.ok) return false;
 
-  const newAT = res.headers.get('X-Access-Token');
-  const newRT = res.headers.get('X-Refresh-Token');
+  const authHeader = res.headers.get('authorization');
+  const newRT      = res.headers.get('x-refresh-token');
+  const newAT      = authHeader?.replace(/^Bearer\s+/i, '') || '';
 
   if (newAT) tokenStore.set(newAT);
   if (newRT) refreshStore.set(newRT);
 
-  if (!newAT || !newRT) {
-    const body = await res.json().catch(() => null);
-    if (body?.accessToken) tokenStore.set(body.accessToken);
-    if (body?.refreshToken) refreshStore.set(body.refreshToken);
-  }
   return !!tokenStore.get();
 }
 
