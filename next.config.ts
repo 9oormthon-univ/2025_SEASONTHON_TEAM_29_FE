@@ -1,14 +1,19 @@
 // next.config.ts
-import type { NextConfig } from 'next';
+// ⚠️ Turbopack과 next-pwa는 궁합이 안 맞습니다. (아래 3번 참고)
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const withPWA = require('next-pwa')({
+  dest: 'public',
+  register: true,
+  skipWaiting: true,
+  disable: process.env.NODE_ENV !== 'production', // 개발환경에서는 비활성화 권장
+  // buildExcludes: [/middleware-manifest\.json$/], // (선택) 일부 파일 제외
+});
 
-const backend = process.env.BACKEND_URL?.replace(/\/$/, ''); // 뒤 슬래시 제거(// 방지)
+// backend URL 처리
+const backend = process.env.BACKEND_URL?.replace(/\/$/, '');
 
-const nextConfig: NextConfig = {
-  /* config options here */
-  eslint: {
-    // 빌드 시 eslint 검사하지 않음 (임시)
-    ignoreDuringBuilds: true,
-  },
+const baseConfig = {
+  eslint: { ignoreDuringBuilds: true },
   async rewrites() {
     if (!backend) {
       console.warn('⚠️ BACKEND_URL is not set');
@@ -23,4 +28,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = withPWA(baseConfig);

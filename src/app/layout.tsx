@@ -1,10 +1,21 @@
 import '@/app/globals.css';
 import { Providers } from '@/lib/providers';
-import type { Metadata, Viewport } from 'next';
+import type { Viewport } from 'next';
 
-export const metadata: Metadata = {
-  title: '웨딧 | 결혼 준비도 쉽고, 투명하게',
-  description: '예식장 · 스드메 · 혼수 가격/구성/후기 비교 플랫폼',
+export const metadata = {
+  title: "웨딧",
+  description: "예식장 · 스드메 · 혼수 가격/구성/후기 비교 플랫폼",
+  manifest: "/manifest.json",
+  themeColor: "#6b5bd7",
+  icons: {
+    icon: [
+      { url: "/icons/pwa-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/pwa-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/pwa-192.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
 };
 
 export const viewport: Viewport = {
