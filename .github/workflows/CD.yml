@@ -64,7 +64,8 @@ jobs:
         sudo mkdir -p -m 2775 /var/www/wedit-frontend-temp/.next
         sudo mkdir -p -m 2775 /var/www/wedit-frontend-temp/public
         sudo chown -R ubuntu:www-data /var/www/wedit-frontend-temp
-        sudo rm -rf /var/www/wedit-frontend-temp/* /var/www/wedit-frontend-temp/.[!.]*
+        sudo rm -rf /var/www/wedit-frontend-temp/.next/* /var/www/wedit-frontend-temp/.next/.[!.]*
+        sudo rm -rf /var/www/wedit-frontend-temp/public/* /var/www/wedit-frontend-temp/public/.[!.]*
 
     # 5. NextJS 빌드 파일 복사 및 권한 설정
     - name: Copy Next.js build files
