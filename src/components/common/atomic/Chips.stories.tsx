@@ -1,13 +1,12 @@
-import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import Label from './Label';
+import Chips from './Chips';
 
-const meta: Meta<typeof Label> = {
-  title: 'common/Label',
-  component: Label,
+const meta: Meta<typeof Chips> = {
+  title: 'common/Chips',
+  component: Chips,
   parameters: { layout: 'padded' },
   args: {
-    children: '이름',
+    children: '칩',
     size: 'sm',
     variant: 'default',
   },
@@ -19,7 +18,7 @@ const meta: Meta<typeof Label> = {
 };
 export default meta;
 
-type Story = StoryObj<typeof Label>;
+type Story = StoryObj<typeof Chips>;
 
 export const Playground: Story = {};
 
@@ -28,16 +27,16 @@ export const AllStates: Story = {
   render: () => (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-8">
-        <Label size="sm">sm / default</Label>
-        <Label size="sm" variant="variant3">
+        <Chips size="sm">sm / default</Chips>
+        <Chips size="sm" variant="variant3">
           sm / variant3
-        </Label>
+        </Chips>
       </div>
       <div className="flex items-center gap-8">
-        <Label size="lg">lg / default</Label>
-        <Label size="lg" variant="variant3">
+        <Chips size="lg">lg / default</Chips>
+        <Chips size="lg" variant="variant3">
           lg / variant3
-        </Label>
+        </Chips>
       </div>
     </div>
   ),
@@ -46,10 +45,10 @@ export const AllStates: Story = {
 export const LongText: Story = {
   render: () => (
     <div className="flex flex-col gap-4">
-      <Label size="sm">아주아주 긴 텍스트 테스트 입니다</Label>
-      <Label size="lg" variant="variant3">
+      <Chips size="sm">아주아주 긴 텍스트 테스트 입니다</Chips>
+      <Chips size="lg" variant="variant3">
         아주아주 긴 텍스트 테스트 입니다
-      </Label>
+      </Chips>
     </div>
   ),
 };
