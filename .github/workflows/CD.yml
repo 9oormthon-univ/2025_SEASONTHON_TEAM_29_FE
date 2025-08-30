@@ -16,6 +16,13 @@ jobs:
     runs-on: self-hosted
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
+    
+    # Debug: workflow_run 정보 출력
+    - name: Debug workflow_run info
+      run: |
+        echo "Workflow run id: ${{ github.event.workflow_run.id }}"
+        echo "Repository: ${{ github.repository }}"
+        echo "Branch: ${{ github.ref }}"
 
     # 1. NextJS 빌드 파일 GitHub Artifact에서 다운로드
     - name: Download Next.js build artifact
