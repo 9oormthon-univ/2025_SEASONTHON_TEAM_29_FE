@@ -28,7 +28,6 @@ function isStaticAsset(pathname: string) {
     pathname === '/sw.js' ||
     pathname === '/manifest.json' ||
     pathname === '/robots.txt' ||
-    pathname === '/favicon.ico' ||
     pathname === '/apple-touch-icon.png'
   ) return true;
 

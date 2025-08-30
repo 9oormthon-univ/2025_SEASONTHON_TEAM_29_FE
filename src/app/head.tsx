@@ -9,8 +9,8 @@ export default function Head() {
       {/* iOS PWA */}
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-      <link rel="apple-touch-icon" href="/icons/pwa-192.png" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/icons/pwa-192.png" />
+      <link rel="apple-touch-icon" href="/icons/pwa180.png" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/icons/pwa180.png" />
 
       {/* iOS 전용 스플래시 */}
       <link rel="apple-touch-startup-image" media="screen and (device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)" href="splash_screens/iPhone_16_Pro_Max_landscape.png"/>
