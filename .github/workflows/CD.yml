@@ -107,6 +107,9 @@ jobs:
     # 10. Next.js 앱 재시작 (pm2)
     - name: Restart Next.js app (pm2)
       run: |
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
         /home/ubuntu/.nvm/versions/node/v20.18.0/bin/pm2 reload wedit-frontend || /home/ubuntu/.nvm/versions/node/v20.18.0/bin/pm2 start npm --name wedit-frontend -- run start
         /home/ubuntu/.nvm/versions/node/v20.18.0/bin/pm2 show wedit-frontend
     
