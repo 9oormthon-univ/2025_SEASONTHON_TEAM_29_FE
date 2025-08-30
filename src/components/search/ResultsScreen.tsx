@@ -47,7 +47,7 @@ export default function ResultsScreen({
                       count: it.count,
                       price: it.price,
                     }}
-                    href={`/vendor/${it.id}`}
+                    href={`/vendor/${it.cat}/${it.id}`}
                   />
                 ))}
               </div>
