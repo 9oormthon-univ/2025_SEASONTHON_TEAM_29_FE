@@ -2,6 +2,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 
 type CommonItem = {
   id: number;
@@ -55,9 +56,9 @@ export default function VendorCard({ item, href, square = true }: { item: Common
   );
 
   return href ? (
-    <a href={href} className="block min-w-0">
+    <Link href={href} className="block min-w-0">
       {content}
-    </a>
+    </Link>
   ) : (
     <div className="min-w-0">{content}</div>
   );

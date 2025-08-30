@@ -11,15 +11,6 @@ export default function ResultsScreen({
   items,
 }: {
   items: SearchItem[];
-  query: {
-    cat: CategoryKey | null;
-    areas: string[];
-    price: number;
-    styles: string[];
-    meals: string[];
-    guest: string | null;
-    trans: string[];
-  };
 }) {
   // 카테고리별 묶기
   const grouped = items.reduce((acc, it) => {
