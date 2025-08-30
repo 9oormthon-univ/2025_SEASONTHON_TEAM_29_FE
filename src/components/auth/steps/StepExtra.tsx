@@ -5,7 +5,6 @@ import Input from '@/components/common/atomic/Input';
 import DateInput, { isValidYMD } from '@/components/forms/DateInput';
 import { Field } from '@/components/forms/Field';
 import FieldHint from '@/components/forms/FieldHint';
-import { InputWithButton } from '@/components/forms/InputWithButton';
 import { PillRadio } from '@/components/forms/PillRadio';
 import type { Extra } from '@/hooks/useSignupWizard';
 import { SignupWizardCtx } from '@/types/auth';
@@ -14,49 +13,42 @@ import { useState } from 'react';
 type Props = SignupWizardCtx;
 
 export default function StepExtra(props: Props) {
-  const { extra, setExtra, isValidEmail, emailVerified, sendEmail, flags } = props;
+  // ⬇️ 이메일 전송/인증은 제거. 형식(validEmail)만 사용.
+  const { extra, setExtra, isValidEmail, flags } = props;
 
   const setExtraField = <K extends keyof Extra>(key: K, value: Extra[K]) =>
     setExtra((s) => ({ ...s, [key]: value }));
 
+  // hover/focus 스타일용
   const [emailActive, setEmailActive] = useState(false);
   const [pwActive, setPwActive]       = useState(false);
   const [pw2Active, setPw2Active]     = useState(false);
 
-  const touchedEmail = extra.email.length > 0;
-  const touchedPw    = extra.pw.length   > 0;
-  const touchedPw2   = extra.pw2.length  > 0;
+  const touchedEmail   = extra.email.length > 0;
+  const touchedPw      = extra.pw.length   > 0;
+  const touchedPw2     = extra.pw2.length  > 0;
   const touchedWedding = extra.wedding.length > 0;
-  const weddingOk = isValidYMD(extra.wedding);
+  const weddingOk      = isValidYMD(extra.wedding);
 
   return (
     <section className="min-w-0 flex-[0_0_100%]">
       <div className="pt-6 px-4">
         <p className="text-sm text-gray-500">이제 다 끝났어요!</p>
         <h2 className="mt-1 text-2xl font-extrabold">추가정보를 입력해주세요.</h2>
-        {/* 이메일 + 인증버튼(배지) */}
+
+        {/* 이메일 (전송 버튼/인증 제거, 형식만 검증) */}
         <Field label="이메일" htmlFor="email" className="mt-4">
-          <InputWithButton
-            inputProps={{
-              id: 'email',
-              placeholder: 'examples33@gmail.com',
-              inputMode: 'email',
-              value: extra.email,
-              onChange: (e) => setExtraField('email', e.target.value),
-              // hover/focus 시 variant4, 아닐 때 default
-              type: (emailActive || !!extra.email) ? 'variant4' : 'default',
-              onFocus: () => setEmailActive(true),
-              onBlur: () => setEmailActive(false),
-              onMouseEnter: () => setEmailActive(true),
-              onMouseLeave: () => setEmailActive(false),
-            }}
-            buttonText={emailVerified ? '인증완료' : '인증메일'}
-            onButtonClick={async () => {
-              if (!isValidEmail || emailVerified) return;
-              await sendEmail();
-            }}
-            disabled={!isValidEmail || emailVerified}
-            invalid={touchedEmail && !isValidEmail}
+          <Input
+            id="email"
+            inputType="email"
+            placeholder="examples33@gmail.com"
+            value={extra.email}
+            onChange={(e) => setExtraField('email', e.target.value)}  // ✅ 버그 수정
+            type={(emailActive || !!extra.email) ? 'variant4' : 'default'}
+            onFocus={() => setEmailActive(true)}
+            onBlur={() => setEmailActive(false)}
+            onMouseEnter={() => setEmailActive(true)}
+            onMouseLeave={() => setEmailActive(false)}
           />
           {touchedEmail && !isValidEmail && (
             <FieldHint tone="error">이메일 형식이 올바르지 않습니다.</FieldHint>
@@ -101,6 +93,7 @@ export default function StepExtra(props: Props) {
           )}
         </Field>
 
+        {/* 결혼예정일 */}
         <Field label="결혼예정일" htmlFor="wedding" className="mt-4">
           <DateInput
             raw={extra.wedding}

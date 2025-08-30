@@ -74,25 +74,34 @@ export default function StepBasic(props: Props) {
               value: basic.phone,
               onChange: (e) => setBasicField('phone', e.target.value),
             }}
-            buttonText={codeRequested ? (sendingCode ? '전송중…' : '재전송') : (sendingCode ? '전송중…' : '인증번호')}
-            onButtonClick={sendSms}
+            buttonText={
+              codeRequested ? (sendingCode ? '전송중…' : '재전송') :
+                              (sendingCode ? '전송중…' : '인증번호')
+            }
+            onButtonClick={async () => {
+              const wasRequested = codeRequested; // 재전송 여부 체크
+              await sendSms();                    // 전송(성공 시 hook에서 codeRequested true 유지/설정)
+              if (wasRequested) setResendKey((k) => k + 1); // ✅ 재전송이면 입력칸/타이머 초기화
+            }}
             disabled={!isValidPhone || sendingCode}
             invalid={touchedPhone && !isValidPhone}
           />
           {touchedPhone && !isValidPhone && (
-            <FieldHint tone="error">휴대전화 형식이 올바르지 않습니다. 예) 010-1234-5678</FieldHint>
+            <FieldHint tone="error">
+              휴대전화 형식이 올바르지 않습니다. 예) 010-1234-5678
+            </FieldHint>
           )}
         </Field>
 
+        {/* 인증번호 입력 (key가 바뀌면 초기화) */}
         {codeRequested && (
           <SmsCodeField
-            key={resendKey} // 또는 resendKey={resendKey}
+            key={resendKey}
             onVerify={verifySms}
             onExpire={() => {
-              // ✅ 만료 처리
               console.log('만료됨');
             }}
-            seconds={300} // ✅ 5분 (기본 180초 → 300초로 변경)
+            seconds={300}
           />
         )}
       </div>

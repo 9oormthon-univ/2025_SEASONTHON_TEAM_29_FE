@@ -1,7 +1,7 @@
 'use client';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Button from '../common/atomic/Button';
+import { SocialCircle } from '../common/atomic/SocialCircle';
 
 const API = process.env.NEXT_PUBLIC_API_BASE!;
 const APP = process.env.NEXT_PUBLIC_APP_BASE!;
@@ -19,7 +19,7 @@ export default function AuthCtas() {
       <Button
         fullWidth
         size="md"
-        onClick={() => router.push('/signin')}
+        onClick={() => router.push('/login')}
         className="h-[54px] max-w-[346px] text-[15px] font-extrabold shadow-sm"
       >
         이메일로 로그인하기
@@ -35,13 +35,5 @@ export default function AuthCtas() {
         회원가입
       </button>
     </div>
-  );
-}
-
-function SocialCircle({ src, alt, onClick }: { src:string; alt:string; onClick:()=>void }) {
-  return (
-    <button onClick={onClick} aria-label={alt} className="grid h-9 w-9 place-items-center rounded-full shadow-[0_1px_6px_rgba(0,0,0,0.12)]">
-      <Image src={src} alt="" width={36} height={36} />
-    </button>
   );
 }
