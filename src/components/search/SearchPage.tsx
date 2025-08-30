@@ -35,12 +35,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
     if (!isHall) return false; // ← hall만 검색 가능
     return (
       areas.length > 0 &&
-      cat !== null &&
-      price !== null &&
-      style.length > 0 &&
-      meal.length > 0 &&
-      guest !== null &&
-      trans.length > 0
+      cat !== null
     );
   }, [isHall, areas, cat, price, style, meal, guest, trans]);
 
