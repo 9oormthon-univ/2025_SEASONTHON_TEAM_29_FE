@@ -45,12 +45,17 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook -- --output-dir storybook-static
 
+      - name: List .next contents (debug)
+        run: ls -alR .next
+
       # 7. NextJS 빌드 파일을 GitHub Artifact에 업로드
       - name: Upload Next.js build artifact
         uses: actions/upload-artifact@v4
         with:
           name: nextjs-build
-          path: .next/
+          path: |
+            .next/
+            .next/**/*
 
       # 8. Storybook 빌드 파일을 GitHub Artifact에 업로드
       - name: Upload public assets
