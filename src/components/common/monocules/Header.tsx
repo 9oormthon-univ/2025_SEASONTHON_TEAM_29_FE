@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import clsx from 'clsx';
 
 export type HeaderProps = {
@@ -23,7 +22,7 @@ export default function Header({
           type="button"
           aria-label="뒤로가기"
           onClick={() => (onBack ? onBack() : history.back())}
-          className="absolute left-5 top-1/2 -translate-y-1/2 p-1"
+          className="absolute top-1/2 -translate-y-1/2 p-1"
         >
           <svg
             viewBox="0 0 24 24"

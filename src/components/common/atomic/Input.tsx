@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
 import clsx from 'clsx';
+import * as React from 'react';
 
 export type InputType =
   | 'default'
@@ -30,7 +30,7 @@ export default function Input({
   ...rest
 }: InputProps) {
   const base =
-    'w-80 relative inline-flex items-center gap-2.5 overflow-hidden rounded-lg px-4 py-2.5 h-12 outline outline-[1.2px] outline-offset-[-1.2px] bg-transparent';
+    'w-80 relative inline-flex items-center gap-2.5 overflow-hidden rounded-lg px-4 py-2.5 h-10 outline outline-[1.2px] outline-offset-[-1.2px] bg-transparent';
   const frame =
     uiType === 'incorrect'
       ? 'outline-red-500'

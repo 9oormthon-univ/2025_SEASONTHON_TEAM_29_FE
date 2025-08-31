@@ -1,28 +1,38 @@
 'use client';
 
-import Image from 'next/image';
 import { Search } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
-export default function SearchBar() {
+type Props = {
+  placeholder?: string;
+  showCart?: boolean; // ✅ cart 아이콘 표시 여부
+};
+
+export default function SearchBar({ placeholder = '검색어를 입력해 주세요', showCart = false }: Props) {
+  const router = useRouter();
+
   return (
-    <div className="flex items-center gap-3 px-4 pt-3">
-      <div className="flex h-11 flex-1 items-center gap-2 rounded-full bg-gray-100 px-4">
-        <input
-          placeholder="스타일플로어 메이크업"
-          className="w-full bg-transparent text-[15px] outline-none placeholder:text-gray-400"
-        />
+    <div className="flex items-center gap-3 py-5">
+      {/* 검색창 자체를 버튼처럼 */}
+      <button
+        onClick={() => router.push('/search')}
+        className={`flex h-11 items-center gap-2 rounded-full bg-gray-100 px-4 text-left 
+          ${showCart ? 'flex-1' : 'w-full'}`}
+      >
+        <span className="flex-1 text-[15px] text-gray-500">{placeholder}</span>
         <Search className="h-5 w-5 text-gray-500" />
-      </div>
-
-      <button aria-label="cart" className="h-11 w-11">
-        <Image
-          src="/icons/Cart.svg"
-          alt=""
-          width={24}
-          height={24}
-          className="h-7 w-8 select-none"
-        />
       </button>
+
+      {showCart && (
+        <button
+          aria-label="장바구니"
+          className="grid h-11 w-11 place-items-center rounded-full active:scale-95"
+          onClick={() => router.push('/cart')}
+        >
+          <Image src="/icons/Cart.svg" alt="" width={40} height={40} />
+        </button>
+      )}
     </div>
   );
 }
