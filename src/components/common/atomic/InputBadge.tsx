@@ -9,7 +9,7 @@ export type InputBadgeProps = {
   children: React.ReactNode;
   variant?: InputBadgeVariant;
   className?: string;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>; // ← 버튼 속성 허용
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function InputBadge({
   children,
@@ -25,7 +25,7 @@ export default function InputBadge({
       ? 'bg-primary-500 text-white'
       : variant === 'secondary'
         ? 'bg-primary-300 text-white'
-        : 'bg-primary-100 text-white';
+        : 'bg-primary-200 text-primary-300';
 
   return (
     <button type="button" className={clsx(base, scheme, className)} {...rest}>
