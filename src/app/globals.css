@@ -12,11 +12,11 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   /* MAIN */
-  --color-primary-500: #6b5bd7; /* Primary */
-  --color-primary-300: #9b9aea; /* Secondary */
-  --color-primary-200: #c2c3ef; /* Tertiary */
-  --color-primary-100: #dfdff8; /* Inactive/Ghost */
-  --color-accent-500: #ffd650; /* Sub Primary */
+  --color-primary-500: #ff9b9d; /* Primary */
+  --color-primary-300: #ffcccd; /* Secondary */
+  --color-primary-200: #ffefee; /* Tertiary */
+  --color-primary-100: #d7cae7; /* sub-purple */
+  --color-accent-500: #ffd650; /* sub-yellow */
   /* TEXT */
   --color-text-default: #303030;
   --color-text-secondary: #8c8c8c;
@@ -39,10 +39,13 @@
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     height: 100%;
   }
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     touch-action: manipulation;
   }
 }
@@ -53,7 +56,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-input, select, textarea, button {
+input,
+select,
+textarea,
+button {
   font-size: 16px;
 }
 
@@ -62,24 +68,33 @@ html {
   text-size-adjust: 100%;
 }
 
-button, a {
+button,
+a {
   touch-action: manipulation;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0 }
-  to   { opacity: 1 }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .animate-fadeIn {
-  animation: fadeIn .3s ease-out forwards;
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
 @keyframes fadeOut {
-  from { opacity: 1 }
-  to   { opacity: 0 }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 .animate-fadeOut {
-  animation: fadeOut .3s ease-in forwards;
+  animation: fadeOut 0.3s ease-in forwards;
 }
 
 @layer utilities {

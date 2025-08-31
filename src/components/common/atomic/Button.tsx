@@ -35,7 +35,7 @@ export default function Button({
     size === 'lg' ? 'w-80 px-40 py-3 rounded-xl' : 'px-14 py-2.5 rounded-xl';
 
   const colorClass = isInactive
-    ? 'bg-primary-100 text-white/50 cursor-not-allowed'
+    ? 'bg-primary-200 text-primary-300 cursor-not-allowed'
     : state === 'hover'
       ? 'bg-primary-300 text-white/80'
       : 'bg-primary-500 text-white hover:bg-primary-300 hover:text-white/80';

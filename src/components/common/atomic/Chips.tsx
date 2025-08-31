@@ -29,7 +29,7 @@ export default function Chips({
 
   const frameClass =
     variant === 'variant3'
-      ? 'bg-primary-100 outline outline-1 outline-offset-[-1px] outline-primary-300'
+      ? 'bg-primary-300 outline outline-1 outline-offset-[-1px] outline-primary-500'
       : 'bg-transparent outline outline-1 outline-offset-[-1px] outline-gray-300/80';
 
   const textClass = 'text-foreground';
