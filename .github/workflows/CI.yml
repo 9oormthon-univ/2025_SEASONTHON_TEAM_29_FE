@@ -1,0 +1,83 @@
+name: Wedit FE CI
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-nextjs-and-storybook:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. GitHub 레포지토리 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. npm 캐싱
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      # 3. Node.js 설정
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.18.0'
+
+      # 4. 의존성 설치
+      - name: Install dependencies
+        run: npm ci
+
+      # 5. NextJS 빌드 (warring 무시)
+      - name: Build Next.js SSR
+        run: npm run build
+        env:
+          CI: false
+
+      # 6. Storybook 빌드
+      - name: Build Storybook
+        run: npm run build-storybook -- --output-dir storybook-static
+
+      # Debug: .next 디렉토리 내용 확인
+      - name: List .next contents (debug)
+        run: ls -alR .next
+
+      # 7. NextJS 빌드 파일을 GitHub Artifact에 업로드
+      - name: Upload Next.js build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          include-hidden-files: true
+          path: |
+            .next/
+            .next/**/*
+
+      # 8. Storybook 빌드 파일을 GitHub Artifact에 업로드
+      - name: Upload public assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-assets
+          path: public/
+
+      # 9. Storybook 빌드 파일을 GitHub Artifact에 업로드
+      - name: Upload Storybook artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: storybook-build
+          path: storybook-static/
+          
+      # 10. 패키지 파일 GitHub Artifact에 업로드
+      - name: Upload package files
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-files
+          path: |
+            package.json
+            package-lock.json
