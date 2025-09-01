@@ -19,8 +19,8 @@ export default function CategorySelectPage() {
   };
 
   return (
-    <main className="w-full px-[22px] max-w-[420px]">
-      <Header value="검색" className='h-[70px]'/>
+    <main className="w-full max-w-[420px] mx-auto px-[22px]">
+      <Header value="검색" className="h-[50px]" />
 
       <div className="pt-3">
         <h1 className="text-head-2 font-extrabold">
@@ -49,15 +49,12 @@ export default function CategorySelectPage() {
           })}
         </div>
       </div>
-      <div className="fixed bottom-0 left-0 right-0 z-10 bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
-        <Button
-          fullWidth
-          size="lg"
-          disabled={!selected}
-          onClick={goNext}
-        >
-          다음
-        </Button>
+      <div className="fixed inset-x-0 bottom-0 z-10">
+        <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+          <Button fullWidth size="lg" disabled={!selected} onClick={goNext}>
+            다음
+          </Button>
+        </div>
       </div>
     </main>
   );

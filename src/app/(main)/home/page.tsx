@@ -9,7 +9,7 @@ import { banners, categories, makeupVendors, reviews, stories, studioVendors } f
 
 export default function HomePage() {
   return (
-    <main className="pb-24 px-4">
+    <main className="w-full max-w-[420px] mx-auto px-[22px] pb-24">
       <SearchBar showCart={true}/>
       <BannerSquareCarousel items={banners}/>
       <CategoryQuick items={categories}/>
