@@ -27,7 +27,15 @@ export default function SignupWizard() {
     embla.on('select', onSel);
   }, [embla]);
 
-  const prev = () => index > 0 && embla?.scrollTo(index - 1);
+  const prev = () => {
+    if (index > 0) {
+      embla?.scrollTo(index - 1);
+    } else {
+      // 첫 섹션이면 라우팅 뒤로가기 → 없으면 홈으로
+      if (window.history.length > 1) router.back();
+      else router.replace('/');
+    }
+  };
   const next = () => index < 2 && embla?.scrollTo(index + 1);
 
   const onSignUp = async () => {
@@ -52,7 +60,6 @@ export default function SignupWizard() {
             aria-label="back"
             onClick={prev}
             className="absolute left-0 disabled:opacity-40"
-            disabled={index === 0}
           >
             <ChevronLeft className="h-7 w-7" />
           </button>
