@@ -1,14 +1,14 @@
+// src/app/(main)/tours/page.tsx
 'use client';
 
 import Header from '@/components/common/monocules/Header';
 import TourList from '@/components/tours/TourList';
 import TourTabs from '@/components/tours/TourTabs';
 import { getTours } from '@/services/tours.api';
-import type { TourTab, ToursBundle } from '@/types/tour';
+import type { ToursBundle } from '@/types/tour';
 import { useEffect, useState } from 'react';
 
 export default function ToursPage() {
-  const [tab, setTab] = useState<TourTab>('dressTour');
   const [data, setData] = useState<ToursBundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
@@ -30,17 +30,18 @@ export default function ToursPage() {
   }, []);
 
   return (
-    <main className="flex min-h-dvh flex-col bg-white">
-      <Header value="투어일지" className="h-[70px]" />
+    <main className="w-full max-w-[420px]">
+      <Header value="투어일지" className="h-[70px] px-[22px]" />
 
-      <TourTabs value={tab} onChange={setTab} />
+      {/* 현재 경로 기반으로 활성 탭 표시 */}
+      <TourTabs />
 
       <section className="flex-1 overflow-y-auto">
         {loading && <ToursSkeleton />}
         {!loading && err && (
           <p className="p-4 text-sm text-rose-500">데이터를 불러오지 못했어요. {err}</p>
         )}
-        {!loading && data && <TourList tab={tab} data={data} />}
+        {!loading && data && <TourList data={data} />}
       </section>
     </main>
   );
