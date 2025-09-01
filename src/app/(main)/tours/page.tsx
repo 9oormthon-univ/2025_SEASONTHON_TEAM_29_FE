@@ -30,17 +30,12 @@ export default function ToursPage() {
   }, []);
 
   return (
-    <main className="w-full max-w-[420px]">
-      <Header value="투어일지" className="h-[70px] px-[22px]" />
-
-      {/* 현재 경로 기반으로 활성 탭 표시 */}
+    <main className="w-full max-w-[420px] mx-auto">
+      <Header value="투어일지" className="h-[50px] px-[22px]" />
       <TourTabs />
-
       <section className="flex-1 overflow-y-auto">
         {loading && <ToursSkeleton />}
-        {!loading && err && (
-          <p className="p-4 text-sm text-rose-500">데이터를 불러오지 못했어요. {err}</p>
-        )}
+        {!loading && err && <p className="p-4 text-sm text-rose-500">데이터를 불러오지 못했어요. {err}</p>}
         {!loading && data && <TourList data={data} />}
       </section>
     </main>

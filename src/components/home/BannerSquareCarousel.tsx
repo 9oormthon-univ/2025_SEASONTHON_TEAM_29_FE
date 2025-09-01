@@ -3,7 +3,7 @@ import { BannerItem } from '@/types/banner';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useCallback, useEffect, useState } from 'react';
-import EdgeBleed from '../common/atomic/EdgeBleed';
+import Section from '../common/Section';
 
 export default function BannerSquareCarousel({ items }: { items: BannerItem[] }) {
   const [, setSelected] = useState(0);
@@ -22,7 +22,7 @@ export default function BannerSquareCarousel({ items }: { items: BannerItem[] })
   }, [api, onSelect]);
 
   return (
-    <EdgeBleed>
+    <Section bleed="viewport">
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4">
           {items.map((b, i) => (
@@ -39,6 +39,6 @@ export default function BannerSquareCarousel({ items }: { items: BannerItem[] })
           ))}
         </div>
       </div>
-    </EdgeBleed>
+    </Section>
   );
 }

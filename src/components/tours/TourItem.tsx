@@ -1,4 +1,3 @@
-// components/tours/TourItem.tsx
 'use client';
 
 import { ChevronRight } from 'lucide-react';
@@ -8,7 +7,7 @@ type Props = {
   name: string;
   logo?: string;                    // 없으면 플레이스홀더
   status: '기록 대기' | '기록 완료';
-  onClick?: () => void;             // (선택) 클릭 이동용
+  onClick?: () => void;             // 클릭 이동용
 };
 
 export default function TourItem({ name, logo, status, onClick }: Props) {
@@ -21,7 +20,15 @@ export default function TourItem({ name, logo, status, onClick }: Props) {
   return (
     <li
       onClick={onClick}
-      className="relative select-none px-[22px] py-4 active:bg-gray-50"
+      onKeyDown={(e) => {
+        if (!onClick) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      tabIndex={onClick ? 0 : -1}
+      className="relative select-none px-[22px] py-4 active:bg-gray-50 cursor-pointer outline-none focus:bg-gray-50"
       role={onClick ? 'button' : undefined}
     >
       <div className="flex items-center gap-3">
@@ -48,9 +55,7 @@ export default function TourItem({ name, logo, status, onClick }: Props) {
             <p className="truncate text-sm font-semibold text-gray-900">
               {name}
             </p>
-            <span
-              className={`rounded-lg px-3 py-1 text-xs ${badgeClass}`}
-            >
+            <span className={`rounded-lg px-3 py-1 text-xs ${badgeClass}`}>
               {status}
             </span>
           </div>
