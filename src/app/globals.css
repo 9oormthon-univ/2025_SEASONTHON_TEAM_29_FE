@@ -132,9 +132,9 @@ a {
   .bg-onboarding-gradient {
     background: linear-gradient(
       180deg,
-      hsl(240 50% 94%) 50%,
-      hsl(240 50% 99%) 70%,
-      #fff 80%
+      theme('colors.pink.50') 50%,
+      theme('colors.violet.50') 70%,
+      theme('colors.white') 80%
     );
   }
 }
