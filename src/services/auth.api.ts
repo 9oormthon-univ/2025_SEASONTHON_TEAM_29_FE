@@ -2,8 +2,6 @@ import { refreshStore } from "@/lib/refreshStore";
 import { tokenStore } from "@/lib/tokenStore";
 import { ApiEnvelope, http } from "./http";
 
-const BASE = "/api";
-
 // 회원가입
 export function signup(payload: {
   email: string;

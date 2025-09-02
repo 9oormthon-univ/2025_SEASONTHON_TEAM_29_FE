@@ -1,9 +1,11 @@
+import Image from "next/image";
+
 //src/app/(public)/coming-soon/page.tsx
 export default function ComingSoonPage() {
   return (
     <main className="flex h-dvh flex-col items-center justify-center bg-white">
       <div className="flex flex-col items-center">
-        <img
+        <Image
           src="/lock.png"
           alt="준비중"
           className="h-40 w-auto"

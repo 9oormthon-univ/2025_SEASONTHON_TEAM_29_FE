@@ -8,7 +8,7 @@ import ThumbGrid from '@/components/tours/fitting/ThumbGrid';
 import { dressLines, dressMaterials, dressNecklines } from '@/data/dressOptions';
 import { useDressFitting } from '@/hooks/useDressFitting';
 
-export default function DressFittingPage({ params }: { params: { id: string } }) {
+export default function DressFittingPage({ params: _params }: { params: { id: string } }) {
   const { materials, toggleMaterial, neck, setNeck, line, setLine, canSave } = useDressFitting();
 
   const onSave = () => {
