@@ -10,11 +10,11 @@ export const metadata = {
   themeColor: "#6b5bd7",
   icons: {
     icon: [
-      { url: "/icons/pwa-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/pwa-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/pwa192-2.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/pwa512-2.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/icons/pwa-192.png", sizes: "180x180", type: "image/png" },
+      { url: "/icons/pwa180-2.png", sizes: "180x180", type: "image/png" },
     ],
   },
 };
