@@ -7,7 +7,7 @@ export const metadata = {
   title: "웨딧",
   description: "예식장 · 스드메 · 혼수 가격/구성/후기 비교 플랫폼",
   manifest: "/manifest.json",
-  themeColor: "#6b5bd7",
+  themeColor: "#FF9B9D",
   icons: {
     icon: [
       { url: "/icons/pwa192-2.png", sizes: "192x192", type: "image/png" },
