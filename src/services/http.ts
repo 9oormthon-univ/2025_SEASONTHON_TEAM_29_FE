@@ -12,6 +12,20 @@ export type ApiEnvelope<T> = {
   data?: T;
 };
 
+function absoluteUrl(path: string) {
+  // 브라우저에선 상대 경로 OK
+  if (typeof window !== 'undefined') return path;
+
+  // 서버에선 절대 경로 필요
+  const site =
+    process.env.NEXT_PUBLIC_SITE_URL ||            // 예: https://wed-it.me
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
+    'http://localhost:3000';
+
+  return new URL(path, site).toString();
+}
+
+
 function toHeaderRecord(h?: HeadersInit): Record<string, string> {
   if (!h) return {};
   if (h instanceof Headers) {
@@ -34,7 +48,8 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
     headers.Authorization = `Bearer ${at}`;
   }
 
-  let res = await fetch(`${BASE}${path}`, { ...init, headers });
+  let url = absoluteUrl(`${BASE}${path}`);
+  let res = await fetch(url, { ...init, headers });
 
   if (res.status === 401 && !init.skipAuth) {
     const ok = await tryRefresh();
@@ -43,7 +58,8 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
         ...headers,
         Authorization: `Bearer ${tokenStore.get() || ''}`,
       };
-      res = await fetch(`${BASE}${path}`, { ...init, headers: retryHeaders });
+      url = absoluteUrl(`${BASE}${path}`);
+      res = await fetch(url, { ...init, headers: retryHeaders });
     }
   }
 
