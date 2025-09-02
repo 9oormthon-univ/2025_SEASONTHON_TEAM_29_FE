@@ -20,10 +20,10 @@ export default function ResultsScreen({
 
   return (
     <main
-      className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden"
+      className="mx-auto w-full max-w-[420px] px-[22px] h-dvh flex flex-col overflow-hidden"
       data-hide-bottombar
     >
-      <Header value="검색결과" className="h-[70px]" />
+      <Header value="검색결과" className="h-[50px]" />
       <SearchBar/>
 
       <div className="flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+12px)] space-y-6">

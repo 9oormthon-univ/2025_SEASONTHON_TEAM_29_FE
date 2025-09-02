@@ -1,6 +1,7 @@
 // src/app/(main)/search/page.tsx
 'use client';
 
+import Button from '@/components/common/atomic/Button';
 import Header from '@/components/common/monocules/Header';
 import { categories } from "@/data/homeData";
 import { CategoryKey } from '@/types/category';
@@ -18,12 +19,12 @@ export default function CategorySelectPage() {
   };
 
   return (
-    <main className="w-full max-w-[420px] pb-[calc(env(safe-area-inset-bottom)+100px)]">
-      <Header value="검색" className='h-[70px]'/>
+    <main className="w-full max-w-[420px] mx-auto px-[22px]">
+      <Header value="검색" className="h-[50px]" />
 
-      <div className="px-4 pt-4">
-        <h1 className="text-2xl font-extrabold leading-snug">
-          검색할 카테고리를{'\n'}선택해 주세요.
+      <div className="pt-3">
+        <h1 className="text-head-2 font-extrabold">
+          검색할 카테고리를<br/>선택해 주세요.
         </h1>
 
         <div className="mt-5 grid grid-cols-2 gap-4">
@@ -48,17 +49,12 @@ export default function CategorySelectPage() {
           })}
         </div>
       </div>
-
-      {/* 하단 고정 버튼 */}
-      <div className="fixed inset-x-0 bottom-0 z-20 bg-white/80 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3 backdrop-blur">
-        <button
-          disabled={!selected}
-          onClick={goNext}
-          className={`mx-auto block h-[54px] w-full max-w-[420px] rounded-xl text-md font-extrabold
-            ${selected ? 'bg-primary-500 text-white' : 'bg-primary-500/10 text-primary-500/40'}`}
-        >
-          검색하기
-        </button>
+      <div className="fixed inset-x-0 bottom-0 z-10">
+        <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+          <Button fullWidth size="lg" disabled={!selected} onClick={goNext}>
+            다음
+          </Button>
+        </div>
       </div>
     </main>
   );

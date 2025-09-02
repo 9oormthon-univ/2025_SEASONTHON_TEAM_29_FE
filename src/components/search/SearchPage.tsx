@@ -56,9 +56,9 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
   }
 
   return (
-    <main className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
+    <main className="mx-auto px-[22px] w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
       {/* 상단 고정 */}
-      <Header value="검색" className="h-[70px]" />
+      <Header value="검색" className="h-[50px]" />
 
       <section className="px-0">
         <QueryInput
@@ -128,16 +128,12 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
       </div>
 
       {/* 하단 고정 버튼 */}
-      <div className="fixed inset-x-0 bottom-0 z-20 bg-white/80 px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3 backdrop-blur">
-        <Button
-            size="md"
-            fullWidth
-            disabled={!canSearch}
-            onClick={goResults}
-            className="h-12 text-sm"
-          >
-          검색하기
-        </Button>
+      <div className="fixed inset-x-0 bottom-0 z-10">
+        <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+          <Button fullWidth size="lg" disabled={!canSearch} onClick={goResults}>
+            검색하기
+          </Button>
+        </div>
       </div>
     </main>
   );

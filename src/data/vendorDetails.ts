@@ -22,12 +22,10 @@ export const vendorDetails: VendorDetail[] = [
       {
         name: 'Bridal Room',
         images: ['/vendors/apelgamo/bridal1.jpg'],
-        description: '단아하면서도 고급스러운 브라이덜 룸…',
       },
       {
         name: 'Buffet & Banquet',
         images: ['/vendors/apelgamo/buffet1.jpg'],
-        description: '다양한 메뉴와 고급스러운 뷔페 공간…',
       },
     ],
   },
