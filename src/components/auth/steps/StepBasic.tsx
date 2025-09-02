@@ -14,7 +14,6 @@ type Props = ReturnType<typeof useSignupWizard>;
 
 export default function StepBasic(props: Props) {
   const [nameActive, setNameActive]   = useState(false);
-  const [birthActive, setBirthActive] = useState(false);
   const [resendKey, setResendKey] = useState(0);
   const {
     basic, setBasic,

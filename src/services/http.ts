@@ -1,7 +1,7 @@
-import { refreshStore } from "@/lib/refreshStore";
-import { tokenStore } from "@/lib/tokenStore";
+import { refreshStore } from '@/lib/refreshStore';
+import { tokenStore } from '@/lib/tokenStore';
 
-const BASE = "/api";
+const BASE = '/api';
 
 type HttpInit = RequestInit & { skipAuth?: boolean };
 
@@ -12,10 +12,21 @@ export type ApiEnvelope<T> = {
   data?: T;
 };
 
+function toHeaderRecord(h?: HeadersInit): Record<string, string> {
+  if (!h) return {};
+  if (h instanceof Headers) {
+    return Object.fromEntries(h.entries());
+  }
+  if (Array.isArray(h)) {
+    return Object.fromEntries(h);
+  }
+  return h as Record<string, string>;
+}
+
 export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-    ...(init.headers as any),
+    'Content-Type': 'application/json',
+    ...toHeaderRecord(init.headers),
   };
 
   const at = tokenStore.get();
@@ -28,9 +39,9 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
   if (res.status === 401 && !init.skipAuth) {
     const ok = await tryRefresh();
     if (ok) {
-      const retryHeaders = {
+      const retryHeaders: Record<string, string> = {
         ...headers,
-        Authorization: `Bearer ${tokenStore.get()}`,
+        Authorization: `Bearer ${tokenStore.get() || ''}`,
       };
       res = await fetch(`${BASE}${path}`, { ...init, headers: retryHeaders });
     }
@@ -44,15 +55,15 @@ async function tryRefresh(): Promise<boolean> {
   const rt = refreshStore.get();
   if (!rt) return false;
 
-  const res = await fetch("/api/v1/member/token-reissue", {
-    method: "GET",
-    headers: { "X-Refresh-Token": `Bearer ${rt}` },
+  const res = await fetch('/api/v1/member/token-reissue', {
+    method: 'GET',
+    headers: { 'X-Refresh-Token': `Bearer ${rt}` },
   });
   if (!res.ok) return false;
 
-  const authHeader = res.headers.get("authorization");
-  const newRT = res.headers.get("x-refresh-token");
-  const newAT = authHeader?.replace(/^Bearer\s+/i, "") || "";
+  const authHeader = res.headers.get('authorization');
+  const newRT = res.headers.get('x-refresh-token');
+  const newAT = authHeader?.replace(/^Bearer\s+/i, '') || '';
 
   if (newAT) tokenStore.set(newAT);
   if (newRT) refreshStore.set(newRT);
@@ -61,9 +72,10 @@ async function tryRefresh(): Promise<boolean> {
 }
 
 async function toErr(res: Response) {
-  const text = await res.text().catch(() => "");
+  const text = await res.text().catch(() => '');
   return new Error(text || `HTTP ${res.status}`);
 }
+
 async function safeJson<T>(res: Response): Promise<T> {
   try {
     return (await res.json()) as T;

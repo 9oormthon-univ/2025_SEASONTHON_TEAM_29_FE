@@ -1,8 +1,9 @@
 'use client';
 
+import clsx from 'clsx';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import clsx from 'clsx';
 
 type NavItem = {
   href: string;
@@ -22,10 +23,10 @@ export type BottomNavProps = {
   showLabels?: boolean;
 };
 
-export default function BottomNav({
-  pathname: forcedPathname,
-}: BottomNavProps) {
-  const cur = forcedPathname ?? usePathname() ?? '';
+export default function BottomNav({ pathname: forcedPathname }: BottomNavProps) {
+  // ✅ 항상 호출해 둔 뒤에 값 선택
+  const systemPathname = usePathname() ?? '';
+  const cur = (forcedPathname ?? systemPathname) || '';
   const isActive = (href: string) => cur === href || cur.startsWith(href + '/');
 
   return (
@@ -56,7 +57,7 @@ export default function BottomNav({
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60',
                 )}
               >
-                <img
+                <Image
                   src={src}
                   alt=""
                   width={26}

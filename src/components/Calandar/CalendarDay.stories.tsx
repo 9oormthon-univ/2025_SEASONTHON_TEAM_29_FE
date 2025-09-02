@@ -1,4 +1,3 @@
-import * as React from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import CalendarDay from './CalendarDay';
 
@@ -59,21 +58,18 @@ export const Week: Story = {
 
 export const Month: Story = {
   args: {
-    // @ts-ignore
+    // @ts-expect-error: Storybook args로만 쓰는 가상 필드
     year: new Date().getFullYear(),
-    // @ts-ignore
     month: new Date().getMonth() + 1,
     startOn: 'mon' as 'sun' | 'mon',
   },
   argTypes: {
-    // @ts-ignore
+    // @ts-expect-error: Storybook args로만 쓰는 가상 필드
     year: { control: { type: 'number', min: 1970, max: 2100, step: 1 } },
-    // @ts-ignore
     month: { control: { type: 'number', min: 1, max: 12, step: 1 } },
-    // @ts-ignore
     startOn: { control: 'radio', options: ['sun', 'mon'] },
   },
-  // @ts-ignore
+  // @ts-expect-error: Storybook args로만 쓰는 가상 필드
   render: ({ year, month, startOn }) => {
     const y = Number(year);
     const m = Number(month);

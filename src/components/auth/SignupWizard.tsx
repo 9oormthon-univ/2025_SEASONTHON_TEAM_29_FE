@@ -1,4 +1,3 @@
-// src/components/auth/SignupWizard.tsx
 'use client';
 
 import { useSignupWizard } from '@/hooks/useSignupWizard';
@@ -14,7 +13,11 @@ import StepTerms from './steps/StepTerms';
 
 export default function SignupWizard() {
   const router = useRouter();
-  const [emblaRef, embla] = useEmblaCarousel({ loop: false, align: 'start', watchDrag: false });
+  const [emblaRef, embla] = useEmblaCarousel({
+    loop: false,
+    align: 'start',
+    watchDrag: false,
+  });
   const [index, setIndex] = useState(0);
   const wiz = useSignupWizard();
   const [loading, setLoading] = useState(false);
@@ -31,7 +34,6 @@ export default function SignupWizard() {
     if (index > 0) {
       embla?.scrollTo(index - 1);
     } else {
-      // 첫 섹션이면 라우팅 뒤로가기 → 없으면 홈으로
       if (window.history.length > 1) router.back();
       else router.replace('/');
     }
@@ -43,10 +45,11 @@ export default function SignupWizard() {
     setErr(null);
     try {
       await wiz.submitSignup();
-      // 회원가입 성공 → 로그인 페이지로 이동
       router.replace('/login');
-    } catch (e: any) {
-      setErr(e?.message || '회원가입에 실패했어요. 다시 시도해주세요.');
+    } catch (e: unknown) {
+      const msg =
+        e instanceof Error ? e.message : '회원가입에 실패했어요. 다시 시도해주세요.';
+      setErr(msg);
     } finally {
       setLoading(false);
     }
@@ -81,7 +84,10 @@ export default function SignupWizard() {
           <Button
             size="md"
             fullWidth
-            disabled={(index === 0 && !wiz.canNextTerms) || (index === 1 && !wiz.canNextBasic)}
+            disabled={
+              (index === 0 && !wiz.canNextTerms) ||
+              (index === 1 && !wiz.canNextBasic)
+            }
             onClick={next}
             className="h-12 text-sm"
           >
