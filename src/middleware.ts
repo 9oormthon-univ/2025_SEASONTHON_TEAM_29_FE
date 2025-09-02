@@ -16,6 +16,7 @@ function isStaticAsset(pathname: string) {
     pathname.startsWith("/icons") ||
     pathname.startsWith("/images") ||
     pathname.startsWith("/splash") ||
+    pathname.startsWith("/splash_screens") ||
     pathname.startsWith("/fonts") ||
     pathname.startsWith("/static")
   )
