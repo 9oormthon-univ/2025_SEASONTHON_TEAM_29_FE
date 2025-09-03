@@ -3,15 +3,15 @@ import { useRouter } from 'next/navigation';
 import Button from '../common/atomic/Button';
 import { SocialCircle } from '../common/atomic/SocialCircle';
 
-const API = process.env.NEXT_PUBLIC_API_BASE!;
-const APP = process.env.NEXT_PUBLIC_APP_BASE!;
+const API = process.env.NEXT_PUBLIC_API_URL!;   // ex) https://wedit.me/api
+const APP = process.env.NEXT_PUBLIC_SITE_URL!;
 
 export default function AuthCtas() {
   const router = useRouter();
 
-  const startOAuth = (provider: 'kakao'|'naver'|'google') => {
+  const startOAuth = (provider: 'naver'|'google'|'kakao') => {
     const redirect = encodeURIComponent(`${APP}/auth/callback`);
-    window.location.href = `${API}/oauth2/authorize/${provider}?redirect_uri=${redirect}`;
+    window.location.href = `${API}/oauth2/authorization/${provider}?redirect_uri=${redirect}`;
   };
 
   return (

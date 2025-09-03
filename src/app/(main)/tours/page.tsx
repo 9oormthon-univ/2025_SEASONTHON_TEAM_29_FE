@@ -6,7 +6,23 @@ import TourList from '@/components/tours/TourList';
 import TourTabs from '@/components/tours/TourTabs';
 import { getTours } from '@/services/tours.api';
 import type { ToursBundle } from '@/types/tour';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
+
+function PlusButton() {
+  return (
+    <Link
+      href="/tours/new"
+      aria-label="투어 추가"
+      className="h-9 w-9 rounded-full text-text-secondary text-extrabold
+                 active:scale-95 flex items-center justify-center"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+      </svg>
+    </Link>
+  );
+}
 
 export default function ToursPage() {
   const [data, setData] = useState<ToursBundle | null>(null);
@@ -17,7 +33,7 @@ export default function ToursPage() {
     let alive = true;
     (async () => {
       try {
-        const bundle = await getTours(); // ✅ 한번에 로드
+        const bundle = await getTours();
         if (!alive) return;
         setData(bundle);
       } catch (e) {
@@ -31,7 +47,11 @@ export default function ToursPage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto">
-      <Header value="투어일지" className="h-[50px] px-[22px]" />
+      <Header
+        value="투어일지"
+        className="h-[50px] px-[22px]"
+        rightSlot={<PlusButton />}  // ✅ 우측에 + 버튼
+      />
       <TourTabs />
       <section className="flex-1 overflow-y-auto">
         {loading && <ToursSkeleton />}

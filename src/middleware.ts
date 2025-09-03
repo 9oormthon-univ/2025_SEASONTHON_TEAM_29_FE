@@ -7,6 +7,8 @@ const PUBLIC_PATHS = new Set([
   "/auth/login",
   "/signup",
   "/auth/signup",
+  "/auth/callback",
+  "/auth/social",
 ]);
 
 function isStaticAsset(pathname: string) {

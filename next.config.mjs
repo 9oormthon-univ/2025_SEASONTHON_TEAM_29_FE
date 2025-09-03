@@ -15,9 +15,9 @@ const baseConfig = {
   typescript: { ignoreBuildErrors: true, },
 
   async rewrites() {
-    const backend = process.env.BACKEND_URL?.replace(/\/$/, '');
+    const backend = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
     if (!backend) {
-      console.warn('⚠️ BACKEND_URL is not set');
+      console.warn('⚠️ NEXT_PUBLIC_API_URL is not set');
       return [];
     }
     return [{ source: '/api/:path*', destination: `${backend}/api/:path*` }];

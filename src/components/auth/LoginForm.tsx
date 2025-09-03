@@ -39,9 +39,12 @@ export default function LoginForm() {
     }
   }, [canSubmit, email, pw, router]);
 
-  // 간단 소셜 시작 (백엔드 라우트에 맞게 수정)
+  const API = process.env.NEXT_PUBLIC_API_URL!;   // 예: https://wedit.me/api
+  const APP = process.env.NEXT_PUBLIC_SITE_URL!;  // 예: https://wed-it.me (또는 http://localhost:3000)
+  
   const startOAuth = (provider: 'kakao' | 'naver' | 'google') => {
-    window.location.href = `/api/oauth/${provider}`;
+    const redirect = encodeURIComponent(`${APP}/auth/callback`);
+    window.location.href = `${API}/oauth2/authorization/${provider}?redirect_uri=${redirect}`;
   };
 
   return (

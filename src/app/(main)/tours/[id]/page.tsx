@@ -7,14 +7,33 @@ import Preview from '@/components/tours/fitting/Preview';
 import ThumbGrid from '@/components/tours/fitting/ThumbGrid';
 import { dressLines, dressMaterials, dressNecklines } from '@/data/dressOptions';
 import { useDressFitting } from '@/hooks/useDressFitting';
+import { lineOrderFromId, materialOrderFromNames, neckOrderFromId } from '@/services/mappers/tourMappers';
+import { saveDress } from '@/services/tours.api';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-export default function DressFittingPage({ params: _params }: { params: { id: string } }) {
+export default function DressFittingPage({ params }: { params: { id: string } }) {
   const { materials, toggleMaterial, neck, setNeck, line, setLine, canSave } = useDressFitting();
+  const [saving, setSaving] = useState(false);
+  const router = useRouter();
 
-  const onSave = () => {
-    alert(
-      `저장!\n넥라인: ${neck?.name}\n라인: ${line?.name}\n소재: ${materials.join(', ') || '-'}`
-    );
+  const onSave = async () => {
+    if (!canSave || saving) return;
+    setSaving(true);
+    try {
+      const body = {
+        tourId: Number(params.id),
+        materialOrder: materialOrderFromNames(materials),
+        neckLineOrder: neckOrderFromId(neck?.id),
+        lineOrder: lineOrderFromId(line?.id),
+      };
+      await saveDress(body);
+      router.replace('/tours'); // 저장 후 목록으로 이동(원하면 toast 등)
+    } catch (e) {
+      alert(e instanceof Error ? e.message : '저장 실패');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -38,19 +57,19 @@ export default function DressFittingPage({ params: _params }: { params: { id: st
       <Section title="라인" titleSize="md" bleed="viewport" className="mt-[10px]">
         <ThumbGrid items={dressLines} selectedId={line?.id} onSelect={(it) => setLine(line?.id === it.id ? null : it)} />
       </Section>
-      {/* 하단 고정 저장 버튼 */}
+
       <div className="fixed inset-x-0 bottom-0 z-10 mx-auto w-full max-w-[420px] px-[22px] pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 bg-white/80 backdrop-blur">
         <button
           type="button"
           onClick={onSave}
-          disabled={!canSave}
+          disabled={!canSave || saving}
           className={[
             'h-12 w-full rounded-xl text-white font-semibold',
-            canSave ? 'bg-primary-500 hover:bg-primary-300'
-                    : 'bg-primary-200 text-primary-300 cursor-not-allowed',
+            canSave && !saving ? 'bg-primary-500 hover:bg-primary-300'
+                               : 'bg-primary-200 text-primary-300 cursor-not-allowed',
           ].join(' ')}
         >
-          저장하기
+          {saving ? '저장 중…' : '저장하기'}
         </button>
       </div>
     </main>

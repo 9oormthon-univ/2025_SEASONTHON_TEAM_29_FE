@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import WelcomeClient from "./WelcomeClient";
 
 export default async function Page() {
-  const cookieStore = await cookies(); // 👈 Promise 반환 → await 필요
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
   if (accessToken) {
