@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
   const at = data?.data?.accessToken;
   const rt = data?.data?.refreshToken;
 
-  const res = NextResponse.json({ success: true, accessToken: at });
+  // ➜ 쿠키 굽기
+  const res = NextResponse.json({ success: true }); // 굳이 AT를 응답 바디로 줄 필요 없음
+
+  const isProd = process.env.NODE_ENV === 'production';
 
   if (at) {
     res.cookies.set('accessToken', at, {
@@ -30,16 +33,17 @@ export async function POST(req: NextRequest) {
       secure: isProd,
       sameSite: 'lax',
       path: '/',
+      // maxAge: 백엔드 정책에 맞춰 (예: 15 * 60)
     });
   }
   if (rt) {
     res.cookies.set('refreshToken', rt, {
       httpOnly: true,
-      secure: isProd,     // 로컬에서는 false
+      secure: isProd,
       sameSite: 'lax',
       path: '/',
+      // maxAge: 예: 14 * 24 * 60 * 60
     });
   }
-
   return res;
 }

@@ -9,22 +9,30 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, message: 'Refresh token missing' }, { status: 401 });
   }
 
-  const backendRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/member/token-reissue`, {
+  const be = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/v1/member/token-reissue`, {
     method: 'GET',
     headers: { 'X-Refresh-Token': `Bearer ${rt}` },
     cache: 'no-store',
   });
-
-  if (!backendRes.ok) {
+  if (!be.ok) {
     return NextResponse.json({ success: false, message: 'Failed to reissue' }, { status: 401 });
   }
 
-  const authHeader = backendRes.headers.get('authorization');
-  const newRT = backendRes.headers.get('x-refresh-token');
+  const authHeader = be.headers.get('authorization');
   const newAT = authHeader?.replace(/^Bearer\s+/i, '') || '';
+  const newRT = be.headers.get('x-refresh-token');
 
-  const res = NextResponse.json({ success: true, accessToken: newAT });
+  const res = NextResponse.json({ success: true });
+  const isProd = process.env.NODE_ENV === 'production';
 
+  if (newAT) {
+    res.cookies.set('accessToken', newAT, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: 'lax',
+      path: '/',
+    });
+  }
   if (newRT) {
     res.cookies.set('refreshToken', newRT, {
       httpOnly: true,
@@ -33,6 +41,5 @@ export async function GET(req: NextRequest) {
       path: '/',
     });
   }
-
   return res;
 }
