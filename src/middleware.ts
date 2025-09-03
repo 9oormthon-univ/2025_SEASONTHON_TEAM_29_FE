@@ -1,60 +1,15 @@
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+// middleware.ts (선택사항: 아예 삭제해도 됨)
+import { NextRequest, NextResponse } from 'next/server';
 
-const PUBLIC_PATHS = new Set([
-  "/",
-  "/login",
-  "/auth/login",
-  "/signup",
-  "/auth/signup",
-  "/auth/callback",
-  "/auth/social",
-]);
-
-function isStaticAsset(pathname: string) {
-  if (/\.[a-zA-Z0-9]+$/.test(pathname)) return true;
-  if (pathname.startsWith("/_next")) return true;
-  if (
-    pathname.startsWith("/icons") ||
-    pathname.startsWith("/images") ||
-    pathname.startsWith("/splash") ||
-    pathname.startsWith("/splash_screens") ||
-    pathname.startsWith("/fonts") ||
-    pathname.startsWith("/static")
-  )
-    return true;
-
-  if (
-    pathname === "/sw.js" ||
-    pathname === "/manifest.json" ||
-    pathname === "/robots.txt" ||
-    pathname === "/apple-touch-icon.png"
-  )
-    return true;
-
-  return false;
-}
+const PUBLIC = new Set(['/', '/login', '/signup', '/auth/callback', '/social', '/coming-soon']);
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-
-  // 공개/정적 경로는 통과
-  if (PUBLIC_PATHS.has(pathname) || isStaticAsset(pathname)) {
+  // 정적/공개 경로만 통과 – 보호는 클라이언트 AuthGate로.
+  if (PUBLIC.has(pathname) || pathname.startsWith('/_next') || pathname.startsWith('/icons') || pathname.startsWith('/images') || pathname.startsWith('/static') || pathname === '/sw.js' || pathname === '/manifest.json') {
     return NextResponse.next();
   }
-
-  // 보호 경로: accessToken 없으면 /로
-  const at = req.cookies.get("accessToken")?.value;
-  if (!at) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/";
-    url.search = "";
-    return NextResponse.redirect(url);
-  }
-
   return NextResponse.next();
 }
 
-export const config = {
-  matcher: ["/((?!api).*)"],
-};
+export const config = { matcher: ['/((?!api).*)'] };

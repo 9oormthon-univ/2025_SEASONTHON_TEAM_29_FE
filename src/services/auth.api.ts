@@ -1,6 +1,11 @@
 // src/services/auth.api.ts
+import { refreshStore } from '@/lib/refreshStore';
+import { tokenStore } from '@/lib/tokenStore';
 import { SocialSignupPayload } from '@/types/auth';
 import { http, type ApiEnvelope } from './http';
+
+type LoginData = { accessToken?: string; refreshToken?: string };
+type BaseEnvelope<T> = { status: number; success: boolean; message?: string; data?: T };
 
 // 회원가입
 export function signup(payload: {
@@ -19,19 +24,24 @@ export function signup(payload: {
   });
 }
 
-// 로그인  👉  우리 서버 라우트 호출로 변경
+
 export async function login(payload: { email: string; password: string }) {
-  const res = await http<ApiEnvelope<unknown>>(
-    "/auth/login",
-    { method: "POST", body: JSON.stringify(payload), skipAuth: true }
-  );
-  // 토큰은 서버에서 쿠키로 세팅되므로 클라에서 저장할 일 없음
+  const res = await http<BaseEnvelope<LoginData>>('/v1/member/login', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    skipAuth: true,
+  });
+
+  const at = res.data?.accessToken;
+  const rt = res.data?.refreshToken;
+  if (at) tokenStore.set(at);
+  if (rt) refreshStore.set(rt);
   return res;
 }
 
-// 로그아웃(선택) - 쿠키 삭제용 서버 라우트 만들면 호출
 export async function logout() {
-  await http("/auth/logout", { method: "POST", skipAuth: true }).catch(() => {});
+  tokenStore.clear();
+  refreshStore.clear();
 }
 
 // SMS 전송/검증은 그대로 (백엔드가 공개라면 skipAuth: true)

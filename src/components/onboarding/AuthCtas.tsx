@@ -9,10 +9,10 @@ const APP = process.env.NEXT_PUBLIC_SITE_URL!;
 export default function AuthCtas() {
   const router = useRouter();
 
-  const startOAuth = (provider: 'naver'|'google'|'kakao') => {
+  function startOAuth(provider: 'kakao'|'naver'|'google') {
     const redirect = encodeURIComponent(`${APP}/auth/callback`);
     window.location.href = `${API}/oauth2/authorization/${provider}?redirect_uri=${redirect}`;
-  };
+  }
 
   return (
     <div className="flex flex-col items-center">

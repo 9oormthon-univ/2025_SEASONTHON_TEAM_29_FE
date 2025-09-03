@@ -1,3 +1,4 @@
+// next.config.mjs
 import withPWA from 'next-pwa';
 
 const withPwa = withPWA({
@@ -12,8 +13,12 @@ const baseConfig = {
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
 
-  // 🔥 rewrites() 완전 제거
-  // Next가 /api/* 를 전부 우리 App Route로 우선 처리하게 둠
+  async rewrites() {
+    const backend = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+    if (!backend) return [];
+    // /api/* → https://wedit.me/api/* 로 “그대로” 프록시
+    return [{ source: '/api/:path*', destination: `${backend}/:path*` }];
+  },
 };
 
 export default withPwa(baseConfig);
