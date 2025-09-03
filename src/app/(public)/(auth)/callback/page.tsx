@@ -1,60 +1,69 @@
 // src/app/(public)/(auth)/callback/page.tsx
 'use client';
+
 import { refreshStore } from '@/lib/refreshStore';
 import { tokenStore } from '@/lib/tokenStore';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 type OAuthLoginData = {
   accessToken?: string;
   refreshToken?: string;
-  isNew?: boolean;          // 백엔드가 신규 여부 명시
-  needMoreInfo?: boolean;   // 선택: 추가정보 필요 플래그
+  isNew?: boolean;
+  needMoreInfo?: boolean;
 };
 type Envelope<T> = { status: number; success: boolean; message?: string; data?: T };
 
-const API = process.env.NEXT_PUBLIC_API_URL!;
+const API = process.env.NEXT_PUBLIC_API_URL!; // e.g. https://wedit.me/api
 
 export default function AuthCallbackPage() {
-  const sp = useSearchParams();
   const router = useRouter();
 
   useEffect(() => {
-    const code = sp.get('code');
-    const state = sp.get('state');
-
     (async () => {
+      // 쿼리스트링 그대로 전달 (Suspense 불필요)
+      const qs = typeof window !== 'undefined' ? window.location.search : '';
+      const url = new URLSearchParams(qs);
+      const code = url.get('code');
+      const state = url.get('state');
+
       if (!code) {
         router.replace('/login?e=no_code');
         return;
       }
+
       try {
-        const be = await fetch(`${API}/v1/member/oauth-login?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state ?? '')}`, {
-          method: 'GET',
-          cache: 'no-store',
-        });
+        // (필요하면 redirect_uri도 함께 전달하세요 — 백엔드가 검증한다면)
+        const be = await fetch(
+          `${API}/v1/member/oauth-login?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state ?? '')}`,
+          { method: 'GET', cache: 'no-store' }
+        );
         if (!be.ok) {
           router.replace('/login?e=exchange_fail');
           return;
         }
-        const json: Envelope<OAuthLoginData> = await be.json().catch(() => ({ success: false, status: 500 }));
-        const at = json.data?.accessToken;
-        const rt = json.data?.refreshToken;
+
+        const json = (await be.json()) as Envelope<OAuthLoginData>;
+        const at = json?.data?.accessToken;
+        const rt = json?.data?.refreshToken;
 
         if (at) tokenStore.set(at);
         if (rt) refreshStore.set(rt);
 
-        // 분기: 신규/추가입력 필요 → 소셜 회원가입
-        if (json.data?.isNew || json.data?.needMoreInfo) {
-          router.replace('/social');
+        if (json?.data?.isNew || json?.data?.needMoreInfo) {
+          router.replace('/social'); // 소셜 회원가입 페이지
         } else {
-          router.replace('/home');
+          router.replace('/home');   // 기존 사용자
         }
       } catch {
         router.replace('/login?e=network');
       }
     })();
-  }, [sp, router]);
+  }, [router]);
 
   return <div className="p-6">로그인 중…</div>;
 }
+
+// ✅ 절대 프리렌더하지 않도록
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
