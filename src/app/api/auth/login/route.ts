@@ -1,8 +1,6 @@
 // src/app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-const isProd = process.env.NODE_ENV === 'production';
-
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
