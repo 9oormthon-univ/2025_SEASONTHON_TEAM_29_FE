@@ -1,3 +1,4 @@
+import { ApiEnvelope } from '@/services/http';
 import type { Dispatch, SetStateAction } from 'react';
 
 export type Basic = { name: string; birth: string; phone: string };
@@ -49,10 +50,12 @@ export type SignupWizardCtx = {
   submitSignup: () => Promise<void>;
 };
 
-export type Role = 'groom' | 'bride';
+type SocialSignupResponse = ApiEnvelope<string>;
 
-export type SocialSignupPayload = {
-  birth: string;
-  phone: string;
-  role: Role;
-};
+// 요청 타입 정의
+export interface SocialSignupPayload {
+  birthDate: string;      // YYYY-MM-DD
+  phoneNumber: string;    // "010..."
+  weddingDate: string;    // YYYY-MM-DD
+  type: "GROOM" | "BRIDE";
+}
