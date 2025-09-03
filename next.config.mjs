@@ -20,7 +20,7 @@ const baseConfig = {
       console.warn('⚠️ NEXT_PUBLIC_API_URL is not set');
       return [];
     }
-    return [{ source: '/api/:path*', destination: `${backend}/api/:path*` }];
+    return [{ source: '/api/:path*', destination: `${backend}/:path*` }];
   },
 };
 
