@@ -26,7 +26,7 @@ export function SearchResultsClient() {
 
   const [items, setItems] = useState<SearchItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState<string | null>(null);
+  const [, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
