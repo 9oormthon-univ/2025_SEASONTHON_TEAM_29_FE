@@ -24,7 +24,6 @@ export type BottomNavProps = {
   className?: string;
   innerMax?: string;
 };
-
 export default function BottomNav({
   pathname: forcedPathname,
   className,
