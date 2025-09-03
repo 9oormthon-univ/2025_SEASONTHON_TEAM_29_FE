@@ -9,7 +9,7 @@ export default function FiltersPage({ searchParams }: { searchParams: SearchPara
   const cat = (catParam ?? null) as CategoryKey | null;
   return (
     <Suspense fallback={<div className="p-6">로딩 중…</div>}>
-      <SearchPage initialCat={cat} />;
+      <SearchPage initialCat={cat} />
     </Suspense>
   )
 }
