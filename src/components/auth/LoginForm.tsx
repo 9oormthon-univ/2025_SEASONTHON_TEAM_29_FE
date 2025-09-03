@@ -1,4 +1,3 @@
-// src/components/auth/LoginForm.tsx
 'use client';
 
 import Button from '@/components/common/atomic/Button';
@@ -6,7 +5,7 @@ import Input from '@/components/common/atomic/Input';
 import * as api from '@/services/auth.api';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { SocialCircle } from '../common/atomic/SocialCircle';
 
 export default function LoginForm() {
@@ -29,17 +28,23 @@ export default function LoginForm() {
     try {
       await api.login({ email: email.trim(), password: pw });
       router.replace('/home');
-    } catch (e: any) {
-      setErr(e?.message || '로그인에 실패했어요. 이메일/비밀번호를 확인해주세요.');
+    } catch (e: unknown) {
+      const msg =
+        e instanceof Error
+          ? e.message
+          : '로그인에 실패했어요. 이메일/비밀번호를 확인해주세요.';
+      setErr(msg);
     } finally {
       setLoading(false);
     }
   }, [canSubmit, email, pw, router]);
 
-  // 간단 소셜 시작 (백엔드 라우트에 맞게 수정)
+  const API = process.env.NEXT_PUBLIC_API_URL!;   // 예: https://wedit.me/api
+  const APP = process.env.NEXT_PUBLIC_SITE_URL!;  // 예: https://wed-it.me (또는 http://localhost:3000)
+  
   const startOAuth = (provider: 'kakao' | 'naver' | 'google') => {
-    // 예: /api/oauth/{provider}로 리다이렉트 프록시 (rewrites 사용)
-    window.location.href = `/api/oauth/${provider}`;
+    const redirect = encodeURIComponent(`${APP}/auth/callback`);
+    window.location.href = `${API}/oauth2/authorization/${provider}?redirect_uri=${redirect}`;
   };
 
   return (
@@ -51,7 +56,7 @@ export default function LoginForm() {
           alt="웨딧"
           width={120}
           height={60}
-          className={`h-12 w-auto`}
+          className="h-12 w-auto"
           aria-hidden
         />
         <p className="mt-4 text-center text-[15px] text-black font-semibold">
@@ -71,7 +76,9 @@ export default function LoginForm() {
           autoComplete="email"
           placeholder="이메일 입력"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           type={focusEmail || !!email ? 'variant4' : 'default'}
           onFocus={() => setFocusEmail(true)}
           onBlur={() => setFocusEmail(false)}
@@ -84,7 +91,9 @@ export default function LoginForm() {
           autoComplete="current-password"
           placeholder="비밀번호 입력"
           value={pw}
-          onChange={(e) => setPw(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPw(e.target.value)
+          }
           type={focusPw || !!pw ? 'variant4' : 'default'}
           onFocus={() => setFocusPw(true)}
           onBlur={() => setFocusPw(false)}
@@ -106,11 +115,19 @@ export default function LoginForm() {
 
         {/* 부가 링크 */}
         <div className="text-center text-xs text-black">
-          <button type="button" className="px-2 hover:underline" onClick={() => router.push('/auth/find-id')}>
+          <button
+            type="button"
+            className="px-2 hover:underline"
+            onClick={() => router.push('/auth/find-id')}
+          >
             아이디 찾기
           </button>
           <span className="text-black">|</span>
-          <button type="button" className="px-2 hover:underline" onClick={() => router.push('/auth/reset-password')}>
+          <button
+            type="button"
+            className="px-2 hover:underline"
+            onClick={() => router.push('/auth/reset-password')}
+          >
             비밀번호 찾기
           </button>
         </div>
@@ -124,9 +141,21 @@ export default function LoginForm() {
       </div>
 
       <div className="mt-4 flex items-center justify-center gap-5">
-        <SocialCircle src="/icons/Social/kakao.svg"  alt="카카오 로그인" onClick={() => startOAuth('kakao')} />
-        <SocialCircle src="/icons/Social/naver.svg"  alt="네이버 로그인" onClick={() => startOAuth('naver')} />
-        <SocialCircle src="/icons/Social/google.svg" alt="구글 로그인"  onClick={() => startOAuth('google')} />
+        <SocialCircle
+          src="/icons/Social/kakao.svg"
+          alt="카카오 로그인"
+          onClick={() => startOAuth('kakao')}
+        />
+        <SocialCircle
+          src="/icons/Social/naver.svg"
+          alt="네이버 로그인"
+          onClick={() => startOAuth('naver')}
+        />
+        <SocialCircle
+          src="/icons/Social/google.svg"
+          alt="구글 로그인"
+          onClick={() => startOAuth('google')}
+        />
       </div>
     </div>
   );

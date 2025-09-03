@@ -54,3 +54,7 @@ yarn-error.log*
 **/storybook-static/
 
 **/node_modules/
+
+# next-pwa generated service workers
+public/sw.js
+public/workbox-*.js

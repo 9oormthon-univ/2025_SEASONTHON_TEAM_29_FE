@@ -7,14 +7,13 @@ export const metadata = {
   title: "웨딧",
   description: "예식장 · 스드메 · 혼수 가격/구성/후기 비교 플랫폼",
   manifest: "/manifest.json",
-  themeColor: "#6b5bd7",
   icons: {
     icon: [
-      { url: "/icons/pwa-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/pwa-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/icons/pwa192-2.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/pwa512-2.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/icons/pwa-192.png", sizes: "180x180", type: "image/png" },
+      { url: "/icons/pwa180-2.png", sizes: "180x180", type: "image/png" },
     ],
   },
 };
@@ -23,8 +22,8 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  userScalable: false,
   viewportFit: 'cover',
+  themeColor: '#FDFDFD',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

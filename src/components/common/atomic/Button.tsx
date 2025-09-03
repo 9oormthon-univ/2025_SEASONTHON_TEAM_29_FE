@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
 import clsx from 'clsx';
+import * as React from 'react';
 
 type ButtonSize = 'lg' | 'md';
 type ButtonState = 'default' | 'hover' | 'inactive';
@@ -32,7 +32,7 @@ export default function Button({
   const isInactive = disabled || state === 'inactive';
 
   const sizeClass =
-    size === 'lg' ? 'w-80 px-40 py-3 rounded-xl' : 'px-14 py-2.5 rounded-xl';
+    size === 'lg' ? 'w-80 py-3 rounded-xl' : 'px-14 py-2.5 rounded-xl';
 
   const colorClass = isInactive
     ? 'bg-primary-200 text-primary-300 cursor-not-allowed'
@@ -41,7 +41,7 @@ export default function Button({
       : 'bg-primary-500 text-white hover:bg-primary-300 hover:text-white/80';
 
   const baseClass =
-    'inline-flex items-center justify-center gap-2.5 overflow-hidden font-semibold leading-7';
+    'inline-flex items-center justify-center gap-2.5 overflow-hidden text-size-16px font-semibold leading-7';
 
   return (
     <button

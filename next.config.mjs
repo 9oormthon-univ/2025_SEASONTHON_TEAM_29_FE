@@ -1,7 +1,5 @@
-// next.config.mjs
 import withPWA from 'next-pwa';
 
-/** PWA 옵션 */
 const withPwa = withPWA({
   dest: 'public',
   register: true,
@@ -12,16 +10,10 @@ const withPwa = withPWA({
 /** @type {import('next').NextConfig} */
 const baseConfig = {
   eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true, },
+  typescript: { ignoreBuildErrors: true },
 
-  async rewrites() {
-    const backend = process.env.BACKEND_URL?.replace(/\/$/, '');
-    if (!backend) {
-      console.warn('⚠️ BACKEND_URL is not set');
-      return [];
-    }
-    return [{ source: '/api/:path*', destination: `${backend}/api/:path*` }];
-  },
+  // 🔥 rewrites() 완전 제거
+  // Next가 /api/* 를 전부 우리 App Route로 우선 처리하게 둠
 };
 
 export default withPwa(baseConfig);

@@ -1,11 +1,15 @@
-import ResultsScreen from '@/components/search/ResultsScreen';
-import { filterItems, parseSearchParams } from '@/components/search/search';
-import { SEARCH_ITEMS } from '@/data/searchData';
-import type { SearchParams } from '@/types/search';
+// src/app/(main)/search/results/page.tsx
+import { SearchResultsClient } from '@/components/search/SearchResultsClient';
+import { Suspense } from 'react';
 
-export default function Page({ searchParams }: { searchParams: SearchParams }) {
-  const qp = parseSearchParams(searchParams);
-  const items = filterItems(SEARCH_ITEMS, qp);
+export default function Page() {
+  return (
+    <Suspense fallback={<ResultsFallback />}>
+      <SearchResultsClient />
+    </Suspense>
+  );
+}
 
-  return <ResultsScreen items={items} />;
+function ResultsFallback() {
+  return <div className="p-4 text-sm text-gray-500">검색 결과 불러오는 중…</div>;
 }

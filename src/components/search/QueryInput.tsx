@@ -1,7 +1,6 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useMemo, useRef, useState } from 'react';
 
 const DISTRICTS = [
@@ -20,7 +19,6 @@ type Props = {
 export default function QueryInput({
   query, onQueryChange, selected, onSelectedChange,
 }: Props) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
