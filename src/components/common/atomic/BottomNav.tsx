@@ -21,10 +21,15 @@ const items: NavItem[] = [
 export type BottomNavProps = {
   pathname?: string;
   showLabels?: boolean;
+  className?: string;
+  innerMax?: string;
 };
 
-export default function BottomNav({ pathname: forcedPathname }: BottomNavProps) {
-  // ✅ 항상 호출해 둔 뒤에 값 선택
+export default function BottomNav({
+  pathname: forcedPathname,
+  className,
+  innerMax = 'max-w-screen-sm',
+}: BottomNavProps) {
   const systemPathname = usePathname() ?? '';
   const cur = (forcedPathname ?? systemPathname) || '';
   const isActive = (href: string) => cur === href || cur.startsWith(href + '/');
@@ -32,14 +37,17 @@ export default function BottomNav({ pathname: forcedPathname }: BottomNavProps) 
   return (
     <nav
       aria-label="하단 내비게이션"
-      className="
-        fixed inset-x-0 bottom-0 z-40
-        border-t border-gray-200/70 dark:border-white/10
-        bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75
-        pb-[env(safe-area-inset-bottom)]
-      "
+      className={clsx(
+        'fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-full',
+        'border-t border-gray-200/70 dark:border-white/10',
+        'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75',
+        'pb-[env(safe-area-inset-bottom)]',
+        className,
+      )}
     >
-      <ul className="mx-auto grid max-w-screen-sm grid-cols-4 gap-1 px-4 py-2">
+      <ul
+        className={clsx('mx-auto grid grid-cols-4 gap-1 px-4 py-2', innerMax)}
+      >
         {items.map(({ href, iconBase, label }) => {
           const active = isActive(href);
           const src = active
