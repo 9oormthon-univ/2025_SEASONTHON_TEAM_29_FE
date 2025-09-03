@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import DdayCard from './D-dayCheck';
 
 const meta: Meta<typeof DdayCard> = {

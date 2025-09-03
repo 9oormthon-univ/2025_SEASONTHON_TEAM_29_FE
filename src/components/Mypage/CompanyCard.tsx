@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import { cn } from '@/utills/cn';
+import Image from 'next/image';
 
 type Category = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
 type Variant = 'review' | 'category';
@@ -25,7 +25,6 @@ export default function CompanyCard({
   imageSrc,
   priceText,
   rating,
-  category,
   variant = 'category',
   alt,
   className,
