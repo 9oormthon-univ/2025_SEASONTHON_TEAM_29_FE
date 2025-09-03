@@ -66,4 +66,3 @@ export default function AuthCallbackPage() {
 
 // ✅ 절대 프리렌더하지 않도록
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
