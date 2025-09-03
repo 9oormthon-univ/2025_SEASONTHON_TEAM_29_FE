@@ -32,15 +32,18 @@ export default function CompanyCard({
   onClick,
 }: Props) {
   const altText = alt ?? name;
-
+  //review
   if (variant === 'review') {
     return (
       <button
         type="button"
         onClick={onClick}
-        className={cn('relative w-28 h-44 text-left', className)}
+        className={cn(
+          'relative w-28 h-44 flex flex-col justify-start pl-1 pr-1',
+          className,
+        )}
       >
-        <div className="absolute left-0 top-0 w-28 h-28 bg-white rounded-lg border border-box-line flex items-center justify-center">
+        <div className="w-28 h-28 bg-white rounded-lg border border-box-line flex items-center justify-center">
           <Image
             src={imageSrc}
             alt={altText}
@@ -50,8 +53,8 @@ export default function CompanyCard({
             priority
           />
         </div>
-        <div className="absolute left-0 top-[122px] inline-flex items-center gap-1 max-w-full pr-1">
-          <span className="text-text-secondary text-sm font-medium leading-normal whitespace-nowrap">
+        <div className="mt-2 flex items-center gap-1">
+          <span className="text-text-secondary text-sm font-medium leading-normal">
             {region}
           </span>
           <span className="text-text--default text-sm font-medium leading-normal truncate">
@@ -59,7 +62,7 @@ export default function CompanyCard({
           </span>
         </div>
         {rating && (
-          <div className="absolute left-[1px] top-[138px] flex items-center gap-[5px] text-text-secondary text-xs font-medium leading-normal">
+          <div className="mt-1 flex items-center gap-1 text-text-secondary text-xs font-medium leading-normal">
             <Image
               src="/icons/PinkRing.svg"
               alt="rating-ring"
@@ -78,13 +81,17 @@ export default function CompanyCard({
     );
   }
 
+  // category
   return (
     <button
       type="button"
       onClick={onClick}
-      className={cn('relative w-28 h-44 text-left', className)}
+      className={cn(
+        'relative w-28 h-44 flex flex-col justify-start',
+        className,
+      )}
     >
-      <div className="absolute left-0 top-0 w-28 h-28 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
+      <div className="w-28 h-28 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
         <Image
           src={imageSrc}
           alt={altText}
@@ -94,18 +101,16 @@ export default function CompanyCard({
           priority
         />
       </div>
-
-      <div className="absolute left-0 top-[113px] inline-flex items-start gap-1 max-w-full pr-1">
-        <span className="text-text-secondary text-sm font-medium leading-normal whitespace-nowrap">
+      <div className="mt-2 flex items-center gap-1 pl-0.5">
+        <span className="text-text-secondary text-sm font-medium leading-normal">
           {region}
         </span>
         <span className="text-text--default text-sm font-medium leading-normal truncate">
           {name}
         </span>
       </div>
-
       {rating && (
-        <div className="absolute left-[1px] top-[136px] flex items-center gap-[5px] text-text-secondary text-xs font-medium leading-normal">
+        <div className="mt-1 flex items-center gap-1 pl-0.5 text-text-secondary text-xs font-medium leading-normal">
           <Image
             src="/icons/PinkRing.svg"
             alt="rating-ring"
@@ -120,9 +125,8 @@ export default function CompanyCard({
           </span>
         </div>
       )}
-
       {priceText && (
-        <div className="absolute left-[1px] top-[156px] text-text--default text-xs font-semibold leading-normal">
+        <div className="mt-1 pr-14.5 text-text--default text-xs font-semibold leading-normal">
           {priceText}
         </div>
       )}
