@@ -1,13 +1,11 @@
 // src/app/(public)/(auth)/callback/page.tsx
-'use client';
-import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { redirect } from 'next/navigation';
 
-export default function AuthCallbackPage() {
-  const sp = useSearchParams();
-  useEffect(() => {
-    const qs = sp.toString();
-    window.location.href = `/api/auth/callback?${qs}`; // 서버 라우트로 넘겨 쿠키 세팅
-  }, [sp]);
-  return <div className="p-6">로그인 중…</div>;
+type Props = {
+  searchParams: Record<string, string | string[] | undefined>;
+};
+
+export default function AuthCallbackPage({ searchParams }: Props) {
+  const qs = new URLSearchParams(searchParams as Record<string, string>).toString();
+  redirect(`/api/auth/callback?${qs}`);
 }
