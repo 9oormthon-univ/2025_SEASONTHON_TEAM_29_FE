@@ -1,13 +1,12 @@
-import type { StaticImageData } from 'next/image';
-
+// src/types/banner.ts
 export type BannerColor = 'black' | 'white';
 
 export type BannerItem = {
   id: number;
-  src: StaticImageData | null;
+  src: string;        // ✅ 문자열 경로로 변경
   href: string;
   alt: string;
-  title: string; // \n 포함 가능
+  title: string;      // \n 가능
   sub: string;
   color: BannerColor;
 };

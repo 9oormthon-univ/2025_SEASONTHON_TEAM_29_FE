@@ -17,7 +17,7 @@ export function signup(payload: {
   weddingDate: string;
   type: "GROOM" | "BRIDE";
 }) {
-  return http("/auth/signup", { // ← 백엔드가 /v1/member/signup이면 /api/auth/signup 프록시 라우트를 만들어도 OK
+  return http("/v1/member/signup", { // ← 백엔드가 /v1/member/signup이면 /api/auth/signup 프록시 라우트를 만들어도 OK
     method: "POST",
     body: JSON.stringify(payload),
     skipAuth: true,

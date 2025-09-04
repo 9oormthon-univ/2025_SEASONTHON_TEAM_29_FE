@@ -1,38 +1,7 @@
-import { BannerItem } from "@/types/banner";
 import { CategoryItem } from "@/types/category";
 import { ReviewItem } from "@/types/review";
 import { StoryItem } from "@/types/story";
 import { VendorItem } from "@/types/vendor";
-
-export const banners: BannerItem[] = [
-  {
-    id: 1,
-    src: null,
-    href: '#',
-    alt: '감성 포토 스튜디오 배너',
-    title: '완벽한 날을 위한 선택\n웨딩드레스 추천',
-    sub: '내 몸에 맞는 웨딩드레스 찾아보기',
-    color: 'black',
-  },
-  {
-    id: 2,
-    src: null,
-    href: '#',
-    alt: '드레스 할인 프로모션',
-    title: '감성을 가득 담은\n감도 높은 웨딩 포토',
-    sub: '감성 포토 스튜디오 찾아보기',
-    color: 'white',
-  },
-  {
-    id: 3,
-    src: null,
-    href: '#',
-    alt: '메이크업 아티스트 추천',
-    title: '요즘 뜨고 있는\n본식 헤어메이크업',
-    sub: '유행하는 헤어와 메이크업 찾아보기',
-    color: 'white',
-  },
-];
 
 export const categories: CategoryItem[] = [
     { key: 'hall', label: '웨딩홀', icon: '/icons/Category/weddinghall.svg' },
