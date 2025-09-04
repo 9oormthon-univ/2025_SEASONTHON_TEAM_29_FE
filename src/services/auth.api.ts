@@ -53,10 +53,10 @@ export function sendSms(phoneNumber: string) {
   });
 }
 
-export function verifySms(code: string) {
+export function verifySms(phoneNumber: string, code: string) {
   return http("/v1/member/verification-phone-code", {
     method: "POST",
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ phoneNumber, code }),
     skipAuth: true,
   });
 }

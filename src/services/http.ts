@@ -10,9 +10,7 @@ export type ApiEnvelope<T> = { status: number; success: boolean; message?: strin
 function absoluteUrl(path: string) {
   if (typeof window !== 'undefined') return path;
   const site =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '') ||
-    'http://localhost:3000';
+    process.env.NEXT_PUBLIC_SITE_URL;
   return new URL(path, site).toString();
 }
 
