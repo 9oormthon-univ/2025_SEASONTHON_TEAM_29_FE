@@ -22,11 +22,8 @@ type ReviewData = {
   vendorLogoUrl: string;
   vendorCategory: 'WEDDING_HALL' | 'DRESS' | 'MAKEUP' | 'STUDIO' | string;
 };
-
-const CATEGORY_KO: Record<
-  string,
-  '웨딩홀' | '드레스' | '메이크업' | '스튜디오' | '기타'
-> = {
+type CompanyType = '웨딩홀' | '드레스' | '메이크업' | '스튜디오';
+const CATEGORY_MAP: Record<ReviewData['vendorCategory'], CompanyType> = {
   WEDDING_HALL: '웨딩홀',
   DRESS: '드레스',
   MAKEUP: '메이크업',
@@ -75,11 +72,9 @@ export default function ReviewDetailPage() {
     setData(MOCK_REVIEW);
   }, []);
 
-  const categoryKo = useMemo(
-    () => (data ? (CATEGORY_KO[data.vendorCategory] ?? '기타') : ''),
-    [data],
-  );
-
+  const categoryKo = useMemo<CompanyType>(() => {
+    return data ? CATEGORY_MAP[data.vendorCategory] : '웨딩홀';
+  }, [data]);
   return (
     <div className="w-full max-w-[420px] mx-auto">
       <Header value="리뷰상세" />
@@ -111,7 +106,7 @@ export default function ReviewDetailPage() {
               title={data.vendorName}
               logoUrl={data.vendorLogoUrl}
               date={fmtDate(data.createdAt)}
-              type={categoryKo as any}
+              type={categoryKo}
               onReport={() => alert('신고하기 눌림')}
             />
           </section>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 
@@ -21,9 +21,17 @@ export default function ImageLightbox({
   const startXRef = useRef<number | null>(null);
   const THRESHOLD = 50;
 
-  const clamp = (v: number) => Math.max(0, Math.min(images.length - 1, v));
-  const nextSlide = () => setIndex((i) => clamp(i + 1));
-  const prevSlide = () => setIndex((i) => clamp(i - 1));
+  const clamp = useCallback(
+    (v: number) => Math.max(0, Math.min(images.length - 1, v)),
+    [images.length],
+  );
+  const nextSlide = useCallback(() => {
+    setIndex((i) => clamp(i + 1));
+  }, [clamp]);
+
+  const prevSlide = useCallback(() => {
+    setIndex((i) => clamp(i - 1));
+  }, [clamp]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -32,6 +40,7 @@ export default function ImageLightbox({
       if (e.key === 'ArrowLeft') prevSlide();
     };
     document.addEventListener('keydown', onKey);
+
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
@@ -39,7 +48,7 @@ export default function ImageLightbox({
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [onClose]);
+  }, [onClose, nextSlide, prevSlide]);
 
   const onTouchStart = (e: React.TouchEvent) => {
     startXRef.current = e.touches[0].clientX;
