@@ -2,18 +2,36 @@
 
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import { tokenStore } from '@/lib/tokenStore';
+
+type Domain = 'VENDOR' | 'REVIEW';
 
 type Props = {
   files: File[];
   total: number;
-  onUpload: (files: File[]) => void;
+  onUploadSelect: (files: File[]) => void;
   className?: string;
-  domain: string;
-  onUrlsChange?: (urls: string[]) => void;
-  keyResolver?: (file: File) => string;
+  domain: Domain;
+  domainId: number;
+  onUploaded?: (s3Keys: string[]) => void;
+  onPresignedUrls?: (urls: string[]) => void;
+  concurrency?: number;
+  acceptMimes?: string[];
+  maxFileSize?: number;
+};
+
+type UploadReqItem = {
+  domainId: number;
+  filename: string;
+  contentType: string;
+  contentLength: number;
+};
+
+type UploadUrlRespItem = {
+  s3Key: string;
+  presignedUrl: string;
 };
 
 function useObjectURL(file?: File) {
@@ -92,26 +110,44 @@ function UploadTile({
   );
 }
 
+function parsePresignedResponse(json: unknown): UploadUrlRespItem[] {
+  const raw: unknown[] = Array.isArray(json)
+    ? json
+    : typeof json === 'object' &&
+        json !== null &&
+        Array.isArray((json as Record<string, unknown>).data)
+      ? (json as { data: unknown[] }).data
+      : [];
+
+  return raw.filter(
+    (x): x is UploadUrlRespItem =>
+      typeof x === 'object' &&
+      x !== null &&
+      typeof (x as Record<string, unknown>).presignedUrl === 'string' &&
+      typeof (x as Record<string, unknown>).s3Key === 'string',
+  );
+}
+
 export default function PhotoCard({
   files,
   total,
-  onUpload,
+  onUploadSelect,
   className,
   domain,
-  onUrlsChange,
-  keyResolver,
+  domainId,
+  onUploaded,
+  onPresignedUrls,
+  concurrency,
+  acceptMimes = ['image/jpeg', 'image/png', 'image/webp'],
+  maxFileSize = 20 * 1024 * 1024,
 }: Props) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const wrapRef = useRef<HTMLDivElement>(null);
 
   const [canRight, setCanRight] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [urls, setUrls] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const resolveKey = useMemo(
-    () => keyResolver ?? ((f: File) => `${f.name}-${f.lastModified}-${f.size}`),
-    [keyResolver],
-  );
+  const [progressText, setProgressText] = useState<string | null>(null);
 
   const getBearer = () => {
     const raw = tokenStore.get();
@@ -134,84 +170,105 @@ export default function PhotoCard({
     if (el) el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
   }, [files.length]);
 
-  const parseUrlList = useCallback((json: unknown): string[] => {
-    type PresignedItem = { presignedUrl: string; s3Key?: string };
-    const isObject = (v: unknown): v is Record<string, unknown> =>
-      typeof v === 'object' && v !== null;
-    const isStringArray = (v: unknown): v is string[] =>
-      Array.isArray(v) && v.every((x) => typeof x === 'string');
-    const isPresignedArray = (v: unknown): v is PresignedItem[] =>
-      Array.isArray(v) &&
-      v.every(
-        (x) =>
-          isObject(x) &&
-          typeof (x as Record<string, unknown>).presignedUrl === 'string',
-      );
-
-    if (isStringArray(json)) return json;
-    if (isPresignedArray(json)) return json.map((x) => x.presignedUrl);
-
-    if (isObject(json) && 'data' in json) {
-      const d = (json as { data: unknown }).data;
-      if (isStringArray(d)) return d;
-      if (isPresignedArray(d)) return d.map((x) => x.presignedUrl);
-    }
-    return [];
-  }, []);
-  const requestDownloadUrls = useCallback(
-    async (keys: string[]) => {
-      const res = await fetch(`${API_URL}/v1/s3/${domain}/download-urls`, {
-        method: 'POST',
+  const getPresignedUploadUrls = useCallback(
+    async (items: UploadReqItem[]): Promise<UploadUrlRespItem[]> => {
+      const res = await fetch(`${API_URL}/v1/s3/${domain}/upload-urls`, {
+        method: 'PUT',
         headers: {
           Authorization: getBearer(),
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(keys),
+        body: JSON.stringify(items),
       });
-      if (!res.ok) {
-        const body = await res.text().catch(() => '');
-        throw new Error(`download-urls 실패 (${res.status}) ${body}`);
-      }
-      const json: unknown = await res.json();
-      const list = parseUrlList(json);
+      const text = await res.text();
+      if (!res.ok) throw new Error(`upload-urls 실패 (${res.status}) ${text}`);
+      const json = text ? JSON.parse(text) : null;
+      const list = parsePresignedResponse(json);
+      onPresignedUrls?.(list.map((x) => x.presignedUrl));
       return list;
     },
-    [API_URL, domain, parseUrlList],
+    [API_URL, domain, onPresignedUrls],
   );
+
+  const putToS3 = async (presignedUrl: string, file: File) => {
+    const res = await fetch(presignedUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type || 'application/octet-stream' },
+      body: file,
+    });
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error(`S3 업로드 실패 ${res.status}: ${t}`);
+    }
+  };
 
   const handleUpload = useCallback(
     async (added: File[]) => {
       setError(null);
 
-      console.log(
-        '[PhotoCard] 선택된 파일들:',
-        added.map((f) => f.name),
+      const bad = added.filter(
+        (f) =>
+          (acceptMimes.length && !acceptMimes.includes(f.type)) ||
+          f.size > maxFileSize,
       );
+      if (bad.length) {
+        setError('허용되지 않는 파일이 있습니다.');
+        return;
+      }
 
-      const nextFiles = [...files, ...added].slice(0, total);
-      onUpload(added);
+      onUploadSelect(added);
 
       try {
         setLoading(true);
-        const keys = nextFiles.map(resolveKey);
-        const list = await requestDownloadUrls(keys);
-        console.log('[PhotoCard] download URLs (from API):', list);
-        setUrls(list);
-        onUrlsChange?.(list);
+        setProgressText('URL 발급 중…');
+
+        const reqItems: UploadReqItem[] = added.map((f) => ({
+          domainId,
+          filename: f.name,
+          contentType: f.type || 'application/octet-stream',
+          contentLength: f.size,
+        }));
+        const presignedList = await getPresignedUploadUrls(reqItems);
+
+        const limit = Math.max(1, concurrency ?? 3);
+        let idx = 0;
+        const workers = Array.from({ length: limit }, async () => {
+          while (idx < presignedList.length) {
+            const i = idx++;
+            const { presignedUrl, s3Key } = presignedList[i];
+            const file = added[i];
+            await putToS3(presignedUrl, file);
+            console.log(
+              `[업로드 완료] file=${file.name}, s3Key=${s3Key}, url=${presignedUrl}`,
+            );
+          }
+        });
+        await Promise.all(workers);
+
+        setProgressText('업로드 완료 정리 중…');
+        const s3Keys = presignedList.map((x) => x.s3Key);
+        console.log('[최종 업로드 리스트]', presignedList);
+        onUploaded?.(s3Keys);
+        setProgressText(null);
       } catch (e) {
-        const msg = e instanceof Error ? e.message : 'URL 동기화에 실패했어요.';
+        const msg = e instanceof Error ? e.message : '업로드에 실패했어요.';
         setError(msg);
-        console.error('[PhotoCard] download-urls error:', e);
+        console.error('[PhotoCard] 업로드 에러:', e);
+        setProgressText(null);
       } finally {
         setLoading(false);
       }
     },
-    [files, total, onUpload, resolveKey, requestDownloadUrls, onUrlsChange],
+    [
+      onUploadSelect,
+      domainId,
+      getPresignedUploadUrls,
+      concurrency,
+      acceptMimes,
+      maxFileSize,
+      onUploaded,
+    ],
   );
-
-  useEffect(() => {
-    console.log('[PhotoCard] download URLs (state):', urls);
-  }, [urls]);
 
   const isFull = files.length >= total;
 
@@ -254,8 +311,11 @@ export default function PhotoCard({
           </svg>
         </button>
       )}
+
       {loading && (
-        <p className="mt-2 text-xs text-text--secondary">사진 업로드 중..</p>
+        <p className="mt-2 text-xs text-text--secondary">
+          {progressText ?? '처리 중…'}
+        </p>
       )}
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
