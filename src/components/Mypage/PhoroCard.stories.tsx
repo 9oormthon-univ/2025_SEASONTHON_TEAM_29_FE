@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import React, { useEffect, useState } from 'react';
 import PhotoCard from '@/components/Mypage/PhotoCard';
 
