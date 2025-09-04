@@ -15,6 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     '/mypage/review',
     '/editorials',
     '/reservation',
+    '/cart',
   ];
 
   const hideBottomNav =

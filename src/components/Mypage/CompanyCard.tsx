@@ -3,9 +3,10 @@
 import { cn } from '@/utills/cn';
 import Image from 'next/image';
 import SvgObject from '../common/atomic/SvgObject';
+import clsx from 'clsx';
 
 type Category = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
-type Variant = 'review' | 'category';
+type Variant = 'review' | 'category' | 'cart';
 
 type Props = {
   name: string;
@@ -18,6 +19,7 @@ type Props = {
   alt?: string;
   className?: string;
   onClick?: () => void;
+  selected?: boolean;
 };
 
 export default function CompanyCard({
@@ -30,9 +32,52 @@ export default function CompanyCard({
   alt,
   className,
   onClick,
+  selected = false,
 }: Props) {
   const altText = alt ?? name;
-  //review
+
+  /** CART */
+  if (variant === 'cart') {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+          'relative w-28 h-44 flex flex-col justify-start',
+          className,
+        )}
+      >
+        <div
+          className={clsx(
+            'w-28 h-28 rounded-lg flex items-center justify-center bg-white overflow-hidden border',
+            selected ? 'border-primary-500' : 'border-box-line',
+          )}
+        >
+          <Image
+            src={imageSrc}
+            alt={altText}
+            width={112}
+            height={112}
+            className="w-28 h-28 object-contain"
+            priority
+          />
+        </div>
+        <div className="mt-2 pl-0.5 text-text-secondary text-sm font-medium leading-normal">
+          {region}
+        </div>
+        <div className="mt-[2px] pl-0.5 text-text--default text-sm font-medium leading-normal truncate">
+          {name}
+        </div>
+        {priceText && (
+          <div className="mt-1 pl-0.5 text-text--default text-xs font-semibold leading-normal">
+            {priceText}
+          </div>
+        )}
+      </button>
+    );
+  }
+
+  /** REVIEW */
   if (variant === 'review') {
     return (
       <button
@@ -81,7 +126,7 @@ export default function CompanyCard({
     );
   }
 
-  // category
+  /** CATEGORY */
   return (
     <button
       type="button"
