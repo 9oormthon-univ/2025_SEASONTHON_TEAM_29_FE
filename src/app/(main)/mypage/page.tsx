@@ -52,8 +52,8 @@ export default function Page() {
 
   return (
     <main className=" min-h-screen bg-background pb-24">
+      <Header value="마이" />
       <section className="px-5 pt-2 max-w-96 mx-auto">
-        <Header value="마이" />
         <div className="flex flex-col items-center gap-2 py-4">
           <SvgObject
             src="/defaultProfile.svg"
