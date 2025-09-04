@@ -6,15 +6,17 @@ import SvgObject from './SvgObject';
 
 type Props = {
   placeholder?: string;
-  showCart?: boolean; // ✅ cart 아이콘 표시 여부
+  showCart?: boolean;
 };
 
-export default function SearchBar({ placeholder = '검색어를 입력해 주세요', showCart = false }: Props) {
+export default function SearchBar({
+  placeholder = '검색어를 입력해 주세요',
+  showCart = false,
+}: Props) {
   const router = useRouter();
 
   return (
     <div className="flex items-center gap-3 py-5">
-      {/* 검색창 자체를 버튼처럼 */}
       <button
         onClick={() => router.push('/search')}
         className={`flex h-11 items-center gap-2 rounded-full bg-gray-100 px-4 text-left 
