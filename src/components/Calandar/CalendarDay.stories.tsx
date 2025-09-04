@@ -39,6 +39,10 @@ export const Types: Story = {
         <span className="text-xs text-gray-500">hover</span>
         <CalendarDay type="hover" day={1} />
       </div>
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-xs text-gray-500">green</span>
+        <CalendarDay type="green" day={1} />
+      </div>
     </div>
   ),
 };
