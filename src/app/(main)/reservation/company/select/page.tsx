@@ -1,12 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ReservationStepLayout from '@/components/reservation/layout/ReservationLayout';
 import ReservationCard from '@/components/reservation/ReservationCard';
-
-type TypeKey = 'consult' | 'company';
 
 const slots = [
   {
@@ -33,7 +31,6 @@ const slots = [
 ];
 
 export default function SlotSelectPage() {
-  const { type } = useParams<{ type: TypeKey }>();
   const router = useRouter();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -63,7 +60,7 @@ export default function SlotSelectPage() {
         mode="double"
         leftText="계약금 결제"
         rightText="견적서 담기"
-        onLeft={() => selectedId && router.push(`/reservation/${type}/finish`)}
+        onLeft={() => selectedId && router.push(`/reservation/company/finish`)}
         onRight={openSheet}
       >
         <div className="flex flex-col gap-4 items-center">

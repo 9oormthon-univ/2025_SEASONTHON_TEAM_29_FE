@@ -1,11 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import ReservationStepLayout from '@/components/reservation/layout/ReservationLayout';
-
-type TypeKey = 'company' | 'consult';
 
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -35,8 +33,7 @@ function MonthChip({
   );
 }
 
-export default function TypeFlowPage({}: { params: { type: TypeKey } }) {
-  const { type } = useParams<{ type: TypeKey }>();
+export default function TypeFlowPage() {
   const router = useRouter();
   const [selected, setSelected] = React.useState<number[]>([]);
   const toggle = (m: number) =>
@@ -58,7 +55,7 @@ export default function TypeFlowPage({}: { params: { type: TypeKey } }) {
       active={selected.length > 0}
       onPrimary={() =>
         router.replace(
-          `/reservation/${type}/select?step=3&months=${selected.join(',')}`,
+          `/reservation/company/select?step=3&months=${selected.join(',')}`,
         )
       }
     >
