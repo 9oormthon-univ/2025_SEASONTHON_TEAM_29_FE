@@ -4,12 +4,8 @@ import { Suspense } from 'react';
 
 export default function Page() {
   return (
-    <Suspense fallback={<ResultsFallback />}>
+    <Suspense fallback={null}>
       <SearchResultsClient />
     </Suspense>
   );
-}
-
-function ResultsFallback() {
-  return <div className="p-4 text-sm text-gray-500">검색 결과 불러오는 중…</div>;
 }

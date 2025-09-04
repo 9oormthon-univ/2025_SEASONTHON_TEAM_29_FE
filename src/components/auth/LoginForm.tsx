@@ -3,7 +3,6 @@
 import Button from '@/components/common/atomic/Button';
 import Input from '@/components/common/atomic/Input';
 import * as api from '@/services/auth.api';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useState } from 'react';
 import { SocialCircle } from '../common/atomic/SocialCircle';
@@ -51,13 +50,10 @@ export default function LoginForm() {
     <div className="pt-30">
       {/* 로고 & 카피 */}
       <div className="flex flex-col items-center">
-        <Image
+        <img
           src="/icons/logoPrimary.svg"
           alt="웨딧"
-          width={120}
-          height={60}
           className="h-12 w-auto"
-          aria-hidden
         />
         <p className="mt-4 text-center text-[15px] text-black font-semibold">
           결혼 준비를 내 마음대로, 편집하다
