@@ -7,15 +7,19 @@ import { notFound } from 'next/navigation';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-type Props = { params: { id: string } };
-type MetaProps = { params: { id: string } };
+type RouteParams = Promise<{ id: string }>;
 
-export async function generateMetadata({ params }: MetaProps): Promise<Metadata> {
-  const ed = getEditorialById(Number(params.id));
+export async function generateMetadata(
+  { params }: { params: RouteParams }
+): Promise<Metadata> {
+  const { id } = await params;
+  const ed = getEditorialById(Number(id));
   if (!ed) return {};
+
   const title = ed.title.replace(/\n/g, ' ');
   const description = ed.sub || '웨딩 에디토리얼';
   const ogImg = ed.heroSrc || ed.thumbnail || '/og-default.jpg';
+
   return {
     title,
     description,
@@ -24,9 +28,11 @@ export async function generateMetadata({ params }: MetaProps): Promise<Metadata>
   };
 }
 
-export default async function EditorialDetailPage({ params }: Props) {
-  const id = Number(params.id);
-  const ed = getEditorialById(id);
+export default async function EditorialDetailPage(
+  { params }: { params: RouteParams }
+) {
+  const { id } = await params;
+  const ed = getEditorialById(Number(id));
   if (!ed) return notFound();
 
   const filePath = path.join(process.cwd(), 'public', ed.contentPath.replace(/^\//, ''));
@@ -35,12 +41,8 @@ export default async function EditorialDetailPage({ params }: Props) {
 
   const isWhite = ed.bannerColor === 'white';
   const overlayTextCls = isWhite ? 'text-white drop-shadow-md' : 'text-black';
-  const logoVariant = ed.logoVariant ?? (isWhite ? 'g' : 'b'); // 기본 추정
+  const logoVariant = ed.logoVariant ?? (isWhite ? 'g' : 'b');
   const logoSrc = `/editorials/logo-${logoVariant}.svg`;
-
-  async function share() {
-    'use server'; // (서버컴포넌트 안이므로 더미. 실제 동작은 아래 onClick 핸들러에서)
-  }
 
   return (
     <main className="mx-auto w-full max-w-[420px] pb-24" data-hide-bottombar>
