@@ -19,11 +19,16 @@ export default function ReservationPage() {
       mode="single"
       primaryText="다음"
       active={!!selected}
-      onPrimary={() =>
-        selected && router.push(`/reservation/${selected}/months?step=2`)
-      }
+      onPrimary={() => {
+        if (!selected) return;
+        if (selected === 'consult') {
+          router.push('/reservation/consult/days?step=2');
+        } else {
+          router.push('/reservation/company/months?step=2');
+        }
+      }}
     >
-      <div className="grid grid-cols-2">
+      <div className="grid grid-cols-2 gap-4">
         <ReservationButton
           variant={selected === 'consult' ? 'primary' : 'default'}
           onClick={() => setSelected('consult')}
