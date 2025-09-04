@@ -2,6 +2,7 @@
 
 import clsx from 'clsx';
 import Image from 'next/image';
+import SvgObject from '../common/atomic/SvgObject';
 
 type CompanyType = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
 
@@ -50,7 +51,7 @@ export default function CompanyLongCard({
             <div className="w-full h-full bg-white" />
           )}
         </div>
-        <Image
+        <SvgObject
           src="/icons/arrowRight.svg"
           alt="arrow-right"
           width={16}

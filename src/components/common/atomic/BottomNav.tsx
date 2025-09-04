@@ -1,9 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import SvgObject from './SvgObject';
 
 type NavItem = {
   href: string;
@@ -64,7 +64,7 @@ export default function BottomNav({
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60',
                 )}
               >
-                <Image
+                <SvgObject
                   src={src}
                   alt=""
                   width={26}
@@ -73,7 +73,6 @@ export default function BottomNav({
                     'h-7 w-7 select-none',
                     !active && 'opacity-90 group-hover:opacity-100',
                   )}
-                  draggable={false}
                 />
               </Link>
             </li>

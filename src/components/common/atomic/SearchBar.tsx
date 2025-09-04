@@ -1,8 +1,8 @@
 'use client';
 
 import { Search } from 'lucide-react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import SvgObject from './SvgObject';
 
 type Props = {
   placeholder?: string;
@@ -30,7 +30,7 @@ export default function SearchBar({ placeholder = '검색어를 입력해 주세
           className="grid h-11 w-11 place-items-center rounded-full active:scale-95"
           onClick={() => router.push('/cart')}
         >
-          <Image src="/icons/Cart.svg" alt="" width={40} height={40} />
+          <SvgObject src="/icons/Cart.svg" alt="" width={40} height={40} />
         </button>
       )}
     </div>

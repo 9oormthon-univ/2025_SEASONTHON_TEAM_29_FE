@@ -3,6 +3,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import SvgObject from './SvgObject';
 
 type CommonItem = {
   id: number;
@@ -52,7 +53,7 @@ export default function VendorCard({ item, href, square = true }: { item: Common
 
       {(item.rating !== undefined || item.count !== undefined) && (
         <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
-          <Image src="/icons/ring.svg" alt="웨딧링" width={16} height={16} />
+          <SvgObject src="/icons/ring.svg" alt="웨딧링" width={16} height={16} />
           <span>
             {item.rating !== undefined ? item.rating.toFixed(1) : '-'}
             {item.count !== undefined ? ` (${item.count})` : ''}

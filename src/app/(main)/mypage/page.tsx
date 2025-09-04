@@ -1,12 +1,12 @@
 'use client';
 
-import Image from 'next/image';
-import { useState } from 'react';
-import Header from '@/components/common/monocules/Header';
-import DdayCard from '@/components/Mypage/D-dayCheck';
-import CompanyCard from '@/components/Mypage/CompanyCard';
 import BottomNav from '@/components/common/atomic/BottomNav';
+import SvgObject from '@/components/common/atomic/SvgObject';
+import Header from '@/components/common/monocules/Header';
+import CompanyCard from '@/components/Mypage/CompanyCard';
+import DdayCard from '@/components/Mypage/D-dayCheck';
 import Link from 'next/link';
+import { useState } from 'react';
 
 type Company = {
   id: string;
@@ -55,13 +55,12 @@ export default function Page() {
       <section className="px-5 pt-2 max-w-96 mx-auto">
         <Header value="마이" />
         <div className="flex flex-col items-center gap-2 py-4">
-          <Image
+          <SvgObject
             src="/defaultProfile.svg"
             alt="profile"
             width={88}
             height={88}
             className="rounded-full"
-            priority
           />
           <div className="text-[17px] font-medium text-foreground">
             김수민 신부님
@@ -139,25 +138,23 @@ export default function Page() {
             <div className="mb-3 flex items-center justify-between px-1">
               <div className="flex items-center gap-1 text-[15px] text-text-default font-medium">
                 <span>최신순</span>
-                <Image
+                <SvgObject
                   src="/icons/arrowDown.svg"
                   alt="arrow-down"
                   width={20}
                   height={20}
-                  priority
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <button className="w-28 h-28 rounded-lg outline outline-1 outline-offset-[-1px] outline-box-line flex flex-col items-center justify-center gap-2 text-text-secondary">
-                <Image
+                <SvgObject
                   src="/icons/plus.svg"
                   alt="plus"
                   width={26}
                   height={26}
                   className="rounded-full"
-                  priority
                 />
                 <span>후기작성</span>
               </button>

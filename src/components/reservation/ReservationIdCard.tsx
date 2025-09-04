@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
 import { cn } from '@/utills/cn';
-import Image from 'next/image';
+import SvgObject from '../common/atomic/SvgObject';
 
 type Props = {
   title: string;
@@ -43,11 +42,11 @@ export default function ReservationIdCard({
         </h3>
         <div className="flex items-center gap-6 text-white/90 text-sm">
           <span className="inline-flex items-center gap-1.5">
-            <Image src="/icons/map.svg" alt="map" width={10} height={14} />
+            <SvgObject src="/icons/map.svg" alt="map" width={10} height={14} />
             {address}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Image src="/icons/watch.svg" alt="watch" width={14} height={14} />
+            <SvgObject src="/icons/watch.svg" alt="watch" width={14} height={14} />
             {dateTime}
           </span>
         </div>

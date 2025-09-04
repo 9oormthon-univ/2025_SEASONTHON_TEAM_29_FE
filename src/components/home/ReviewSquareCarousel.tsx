@@ -2,8 +2,8 @@
 
 import { ReviewItem } from '@/types/review';
 import useEmblaCarousel from 'embla-carousel-react';
-import Image from 'next/image';
 import Section from '../common/Section';
+import SvgObject from '../common/atomic/SvgObject';
 
 export default function ReviewSquareCarousel({items}:{items:ReviewItem[]}) {
   const [ref] = useEmblaCarousel({
@@ -41,7 +41,7 @@ export default function ReviewSquareCarousel({items}:{items:ReviewItem[]}) {
                   <div className="mt-1 flex items-center gap-1.5 py-3">
                     <span className="text-xs text-gray-500">웨딧링</span>
                     {Array.from({ length: it.rings }).map((_, idx) => (
-                      <Image key={idx} src={'/icons/ring.svg'} alt={"웨딧링"} width={16} height={16} />
+                      <SvgObject key={idx} src={'/icons/ring.svg'} alt={"웨딧링"} width={16} height={16} />
                     ))}
                   </div>
                 </div>
