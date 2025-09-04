@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import clsx from 'clsx';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
 
@@ -45,10 +45,7 @@ const TIMES = [
 ];
 
 export default function ConsultTimePage() {
-  const sp = useSearchParams();
   const router = useRouter();
-  const date = sp.get('date') ?? '';
-
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
   const [sheet, setSheet] = React.useState<null | 'book' | 'estimate'>(null);
 
