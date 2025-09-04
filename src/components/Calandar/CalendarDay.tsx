@@ -3,10 +3,15 @@
 import * as React from 'react';
 import clsx from 'clsx';
 
-export type CalendarDayType = 'dd' | 'variant2' | 'hover' | 'green';
+export type CalendarDayType =
+  | 'dd'
+  | 'variant2'
+  | 'hover'
+  | 'green'
+  | 'selected';
 
 export type CalendarDayProps = {
-  day: number | string;
+  day: React.ReactNode;
   weekday?: string;
   type?: CalendarDayType;
   className?: string;
@@ -25,6 +30,7 @@ export default function CalendarDay({
   const isDD = type === 'dd';
   const isHover = type === 'hover';
   const isGreen = type === 'green';
+  const isSelected = type === 'selected';
 
   const wrapClass = clsx('relative w-10', isDD ? 'h-24' : 'h-16', className);
   const boxWrapClass = clsx(
@@ -59,11 +65,13 @@ export default function CalendarDay({
         <div
           className={clsx(
             'absolute inset-0 rounded',
-            isHover
-              ? 'bg-primary-100'
-              : isGreen
-                ? 'opacity-30 bg-[#78D730] border-2 border-[#357107]'
-                : 'opacity-30 bg-box-line',
+            isSelected
+              ? 'opacity-70 bg-primary-300 border-2 border-primary-500'
+              : isHover
+                ? 'bg-primary-100'
+                : isGreen
+                  ? 'opacity-30 bg-[#78D730] border-2 border-[#78D730]'
+                  : 'opacity-30 bg-box-line',
           )}
         />
       </div>
