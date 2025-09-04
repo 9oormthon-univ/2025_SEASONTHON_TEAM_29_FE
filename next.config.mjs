@@ -10,9 +10,10 @@ const withPwa = withPWA({
 
 /** @type {import('next').NextConfig} */
 const baseConfig = {
-  eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
-
+  output: 'standalone',
+  images: {
+    domains: ['wedit.me'],
+  },
   async rewrites() {
     const backend = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
     if (!backend) return [];
