@@ -1,51 +1,68 @@
-'use client';
-
+// 추가: 배지 관련 타입 import
 import clsx from 'clsx';
-import * as React from 'react';
+import InputBadge, {
+  type InputBadgeProps,
+  type InputBadgeVariant,
+} from './InputBadge';
+import React from 'react';
 
-export type InputType =
+export type InputVisualType =
   | 'default'
   | 'hover'
   | 'variant4'
   | 'variant5'
   | 'incorrect';
+export type InputVariant = 'plain' | 'with-badge';
 
 export type InputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   'type'
 > & {
-  type?: InputType;
+  type?: InputVisualType;
+  variant?: InputVariant;
   inputType?: React.HTMLInputTypeAttribute;
   fullWidth?: boolean;
   className?: string;
+  badge?: React.ReactNode | InputBadgeProps;
+  badgeText?: string;
+  badgeVariant?: InputBadgeVariant;
+  onBadgeClick?: () => void;
+  badgeDisabled?: boolean;
 };
 
 export default function Input({
   type: uiType = 'default',
+  variant = 'plain',
   inputType = 'text',
   placeholder = '내용을 입력해 주세요.',
   fullWidth = true,
   className,
   disabled,
+  badge,
+  badgeText,
+  badgeVariant = 'primary',
+  onBadgeClick,
+  badgeDisabled,
   ...rest
 }: InputProps) {
   const base =
-    'w-80 relative inline-flex items-center gap-2.5 overflow-hidden rounded-lg px-4 py-2.5 h-10 outline outline-[1.2px] outline-offset-[-1.2px] bg-transparent';
+    'relative inline-flex items-center gap-2.5 overflow-hidden rounded-lg px-4 py-2.5 h-12 outline outline-[1.2px] outline-offset-[-1.2px] bg-transparent';
+
   const frame =
     uiType === 'incorrect'
       ? 'outline-red-500'
       : uiType === 'hover'
         ? 'outline-box-line'
         : uiType === 'variant4' || uiType === 'variant5'
-          ? 'outline-inputbox-active'
+          ? 'outline-input-box--active'
           : 'outline-gray-100';
 
   const text =
     uiType === 'incorrect'
       ? 'text-red-500'
       : uiType === 'variant4' || uiType === 'variant5'
-        ? 'text-default'
-        : 'text-tertiary';
+        ? 'text-text--default'
+        : 'text-text--tertiary';
 
   const ph =
     uiType === 'incorrect'
@@ -55,6 +72,28 @@ export default function Input({
         : 'placeholder:text-gray-400';
 
   const width = fullWidth ? 'w-full' : 'w-80';
+  const inputClass = clsx(
+    'flex-1 bg-transparent outline-none text-sm leading-7',
+    text,
+    ph,
+    uiType === 'variant5' && 'caret-primary-500',
+  );
+  const badgeNode = badge ? (
+    React.isValidElement(badge) ? (
+      badge
+    ) : (
+      <InputBadge {...(badge as InputBadgeProps)} />
+    )
+  ) : variant === 'with-badge' && badgeText ? (
+    <InputBadge
+      variant={badgeVariant}
+      onClick={onBadgeClick}
+      disabled={badgeDisabled}
+      className="h-8 px-2"
+    >
+      {badgeText}
+    </InputBadge>
+  ) : null;
 
   return (
     <label
@@ -65,13 +104,9 @@ export default function Input({
         type={inputType}
         disabled={disabled}
         placeholder={placeholder}
-        className={clsx(
-          'w-full bg-transparent outline-none text-sm leading-7',
-          text,
-          ph,
-          uiType === 'variant5' && 'caret-primary-500',
-        )}
+        className={inputClass}
       />
+      {badgeNode}
     </label>
   );
 }
