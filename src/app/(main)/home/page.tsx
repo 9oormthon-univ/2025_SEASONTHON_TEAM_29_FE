@@ -4,14 +4,16 @@ import CategoryQuick from "@/components/home/CategoryQuick";
 import ReviewSquareCarousel from "@/components/home/ReviewSquareCarousel";
 import StoryWideCarousel from "@/components/home/StoryWideCarousel";
 import VendorSquareCarousel from "@/components/home/VendorSquareCarousel";
-import { banners, categories, makeupVendors, reviews, stories, studioVendors } from "@/data/homeData";
+import { categories, makeupVendors, reviews, stories, studioVendors } from "@/data/homeData";
+import { getEditorialBanners } from "@/lib/editorials";
 
 
 export default function HomePage() {
+  const banners = getEditorialBanners();
   return (
     <main className="w-full max-w-[420px] mx-auto px-[22px] pb-24">
       <SearchBar showCart={true}/>
-      <BannerSquareCarousel items={banners}/>
+      <BannerSquareCarousel items={banners} />
       <CategoryQuick items={categories}/>
       <ReviewSquareCarousel items={reviews}/>
       <StoryWideCarousel items={stories}/>
