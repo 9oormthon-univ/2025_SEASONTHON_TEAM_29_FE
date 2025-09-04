@@ -42,14 +42,33 @@ export default function CoupleLinkingPage({ onComplete }: Props) {
       setLoadingGen(true);
 
       const bearer = getToken();
-      const res = await fetch(`${API_URL}/v1/couple/generate-code`, {
-        method: 'POST',
+      const res = await fetch(`${API_URL}/v1/couple/code`, {
+        method: 'GET',
         headers: { Authorization: bearer },
       });
 
-      if (!res.ok) throw new Error(`코드 생성 실패 (${res.status})`);
-      const codeText = (await res.text()).replaceAll('"', '');
-      setMyCode(codeText);
+      if (!res.ok) {
+        let serverMsg = '';
+        try {
+          const maybeJson = await res.json();
+          serverMsg =
+            maybeJson?.message || maybeJson?.error || maybeJson?.detail || '';
+        } catch {}
+        throw new Error(
+          `코드 생성 실패 (${res.status})${serverMsg ? ` - ${serverMsg}` : ''}`,
+        );
+      }
+      const contentType = res.headers.get('content-type') || '';
+      let code = '';
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        code = data?.data?.coupleCode || data?.coupleCode || data?.code || '';
+      } else {
+        code = (await res.text()).replaceAll('"', '').trim();
+      }
+
+      if (!code) throw new Error('서버에서 코드가 내려오지 않았어요.');
+      setMyCode(code);
     } catch (e: unknown) {
       setErrorMsg(getErrorMessage(e));
     } finally {
@@ -95,7 +114,7 @@ export default function CoupleLinkingPage({ onComplete }: Props) {
             value={myCode}
             readOnly
             placeholder="본인의 코드를 생성해주세요."
-            type="default"
+            type={myCode ? 'hover' : 'default'}
             variant="with-badge"
             fullWidth
             className="outline-[1.2px] outline-offset-[-1.2px] outline-box-line h-12"
@@ -104,11 +123,6 @@ export default function CoupleLinkingPage({ onComplete }: Props) {
             onBadgeClick={handleGenerate}
             badgeDisabled={loadingGen}
           />
-          {myCode && (
-            <p className="text-xs text-text--secondary">
-              생성된 코드: <span className="font-mono">{myCode}</span>
-            </p>
-          )}
         </section>
 
         <section className="space-y-2">
