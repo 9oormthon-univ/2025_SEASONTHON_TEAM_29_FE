@@ -26,7 +26,7 @@ export default function CompanyLongCard({
   return (
     <div
       className={clsx(
-        'relative w-80 h-20',
+        'relative w-80 h-22',
         'border-y border-box-line',
         className,
       )}
@@ -34,17 +34,19 @@ export default function CompanyLongCard({
       <div className="absolute left-0 top-1.5 text-primary-500 text-xs font-normal leading-loose">
         {type}
       </div>
-      <div className="absolute left-0 top-6 right-20">
+      <div className="absolute left-0 top-7 right-20">
         <p className="truncate text-base font-medium text-text--default leading-loose">
           {title}
         </p>
       </div>
-      <div className="absolute right-2 top-2 flex items-center gap-2">
+      <div className="absolute right-2 top-3 flex items-center gap-2">
         <div className="w-16 h-16 rounded-lg overflow-hidden bg-white outline-1 outline-offset-[-1px] outline-box-line">
           {logoUrl ? (
             <Image
               src={logoUrl}
               alt="company-logo"
+              width={64}
+              height={64}
               className="w-16 h-16 object-cover"
             />
           ) : (
