@@ -1,5 +1,4 @@
 // components/common/Section.tsx
-import clsx from 'clsx';
 import React from 'react';
 
 type SectionProps = {
@@ -31,10 +30,10 @@ export default function Section({
   }[titleSize];
 
   return (
-    <section className={clsx('mt-8', className)}>
+    <section className={className}>
       {/* 1) 타이틀은 항상 중앙 컨테이너 */}
       {title &&
-      <div className="mx-auto w-full max-w-[420px] px-[22px]">
+      <div className="mx-auto w-full max-w-[420px]">
         <div className="mb-3 flex items-center justify-between">
           <h2 className={titleCls}>{title}</h2>
           {onMore && (

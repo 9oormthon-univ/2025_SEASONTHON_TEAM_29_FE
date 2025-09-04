@@ -49,7 +49,7 @@ export default function TextField({
     <div
       className={clsx(
         'relative inline-flex w-80 h-52 items-start justify-start gap-2.5 overflow-hidden rounded-lg px-4 py-3',
-        'outline outline-1 outline-offset-[-1px] outline-box-line',
+        'outline-1 outline-offset-[-1px] outline-box-line',
         className,
       )}
     >

@@ -10,7 +10,7 @@ export default function StoryWideCarousel({
   const [ref] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
 
   return (
-    <Section title="따끈따끈, 신규 스토리" onMore={() => {}} bleed="viewport">
+    <Section title="따끈따끈, 신규 스토리" onMore={() => {}} bleed="viewport" className='mt-8'>
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4 touch-pan-y">
           {items.map((s, i) => (

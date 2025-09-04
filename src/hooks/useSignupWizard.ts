@@ -40,7 +40,7 @@ export function useSignupWizard(): SignupWizardCtx {
   }
 
   async function verifySms(code: string) {
-    await api.verifySms(code); // 성공/실패는 서버 에러로 판별
+    await api.verifySms(phoneDigits, code); // 성공/실패는 서버 에러로 판별
     setCodeVerified(true);
     return true;
   }

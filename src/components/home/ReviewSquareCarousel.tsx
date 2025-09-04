@@ -2,8 +2,8 @@
 
 import { ReviewItem } from '@/types/review';
 import useEmblaCarousel from 'embla-carousel-react';
-import Image from 'next/image';
 import Section from '../common/Section';
+import SvgObject from '../common/atomic/SvgObject';
 
 export default function ReviewSquareCarousel({items}:{items:ReviewItem[]}) {
   const [ref] = useEmblaCarousel({
@@ -13,7 +13,7 @@ export default function ReviewSquareCarousel({items}:{items:ReviewItem[]}) {
   });
 
   return (
-    <Section title="웨딧 유저가 말해주는 솔직 리뷰" onMore={() => {}} bleed="viewport">
+    <Section title="웨딧 유저가 말해주는 솔직 리뷰" onMore={() => {}} bleed="viewport" className='mt-8'>
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4 touch-pan-y">
           {items.map((it, i) => (
@@ -41,7 +41,7 @@ export default function ReviewSquareCarousel({items}:{items:ReviewItem[]}) {
                   <div className="mt-1 flex items-center gap-1.5 py-3">
                     <span className="text-xs text-gray-500">웨딧링</span>
                     {Array.from({ length: it.rings }).map((_, idx) => (
-                      <Image key={idx} src={'/icons/ring.svg'} alt={"웨딧링"} width={16} height={16} />
+                      <SvgObject key={idx} src={'/icons/ring.svg'} alt={"웨딧링"} width={16} height={16} />
                     ))}
                   </div>
                 </div>

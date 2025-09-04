@@ -1,9 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import SvgObject from './SvgObject';
 
 type NavItem = {
   href: string;
@@ -24,6 +24,20 @@ export type BottomNavProps = {
   className?: string;
   innerMax?: string;
 };
+
+function iconSizeClasses(icon: NavItem['iconBase']) {
+  switch (icon) {
+    case 'Home':
+      return { w: 26, h: 26, cls: 'w-[26px] h-[26px]' };
+    case 'Calendar':
+      return { w: 26, h: 28, cls: 'w-[25.51px] h-[28px]' };
+    case 'Review':
+      return { w: 32, h: 31, cls: 'w-[31.44px] h-[30.62px]' };
+    case 'People':
+      return { w: 22, h: 28, cls: 'w-[21.52px] h-[28px]' };
+  }
+}
+
 export default function BottomNav({
   pathname: forcedPathname,
   className,
@@ -53,6 +67,8 @@ export default function BottomNav({
             ? `/icons/FullNav/Full${iconBase}.svg`
             : `/icons/LineNav/Line${iconBase}.svg`;
 
+          const { w, h, cls } = iconSizeClasses(iconBase);
+
           return (
             <li key={href} className="text-center">
               <Link
@@ -64,16 +80,16 @@ export default function BottomNav({
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60',
                 )}
               >
-                <Image
+                <SvgObject
                   src={src}
                   alt=""
-                  width={26}
-                  height={26}
+                  width={w}
+                  height={h}
                   className={clsx(
-                    'h-7 w-7 select-none',
+                    'select-none',
+                    cls,
                     !active && 'opacity-90 group-hover:opacity-100',
                   )}
-                  draggable={false}
                 />
               </Link>
             </li>

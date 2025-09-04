@@ -1,7 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { cn } from '@/utills/cn';
+import Image from 'next/image';
+import SvgObject from '../common/atomic/SvgObject';
 
 type Category = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
 type Variant = 'review' | 'category';
@@ -25,7 +26,6 @@ export default function CompanyCard({
   imageSrc,
   priceText,
   rating,
-  category,
   variant = 'category',
   alt,
   className,
@@ -63,7 +63,7 @@ export default function CompanyCard({
         </div>
         {rating && (
           <div className="mt-1 flex items-center gap-1 text-text-secondary text-xs font-medium leading-normal">
-            <Image
+            <SvgObject
               src="/icons/PinkRing.svg"
               alt="rating-ring"
               width={12}
@@ -91,7 +91,7 @@ export default function CompanyCard({
         className,
       )}
     >
-      <div className="w-28 h-28 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
+      <div className="w-28 h-28 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
         <Image
           src={imageSrc}
           alt={altText}

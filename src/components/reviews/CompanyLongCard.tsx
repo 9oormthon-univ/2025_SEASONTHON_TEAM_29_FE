@@ -2,6 +2,7 @@
 
 import clsx from 'clsx';
 import Image from 'next/image';
+import SvgObject from '../common/atomic/SvgObject';
 
 type CompanyType = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
 
@@ -39,9 +40,9 @@ export default function CompanyLongCard({
         </p>
       </div>
       <div className="absolute right-2 top-2 flex items-center gap-2">
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white outline outline-1 outline-offset-[-1px] outline-box-line">
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white outline-1 outline-offset-[-1px] outline-box-line">
           {logoUrl ? (
-            <img
+            <Image
               src={logoUrl}
               alt="company-logo"
               className="w-16 h-16 object-cover"
@@ -50,7 +51,7 @@ export default function CompanyLongCard({
             <div className="w-full h-full bg-white" />
           )}
         </div>
-        <Image
+        <SvgObject
           src="/icons/arrowRight.svg"
           alt="arrow-right"
           width={16}
