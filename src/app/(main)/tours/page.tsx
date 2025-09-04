@@ -49,7 +49,6 @@ export default function ToursPage() {
     <main className="w-full max-w-[420px] mx-auto">
       <Header
         value="투어일지"
-        className="h-[50px] px-[22px]"
         rightSlot={<PlusButton />}  // ✅ 우측에 + 버튼
       />
       <TourTabs />

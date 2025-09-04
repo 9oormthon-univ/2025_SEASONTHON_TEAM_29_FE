@@ -46,7 +46,7 @@ export default function AuthCallbackPage() {
     })();
   }, [router]);
 
-  return <div className="p-6">로그인 중…</div>;
+  return <div className="p-6"></div>;
 }
 
 export const dynamic = 'force-dynamic';
