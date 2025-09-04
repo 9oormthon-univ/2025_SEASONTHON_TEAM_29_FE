@@ -50,11 +50,11 @@ export default function LoginForm() {
     <div className="pt-30">
       {/* 로고 & 카피 */}
       <div className="flex flex-col items-center">
-        <img
-          src="/icons/logoPrimary.svg"
-          alt="웨딧"
-          className="h-12 w-auto"
-        />
+        <object
+          data="/icons/logoPrimary.svg"
+          type='image/svg+xml'
+          className="h-12 w-auto">
+        </object>
         <p className="mt-4 text-center text-[15px] text-black font-semibold">
           결혼 준비를 내 마음대로, 편집하다
         </p>
