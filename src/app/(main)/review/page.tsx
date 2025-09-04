@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Header from '@/components/common/monocules/Header';
 import CompanyLongCard from '@/components/reviews/CompanyLongCard';
 import RingRating from '@/components/reviews/RingRating';
+import Imagebox from '@/components/reviews/ImageBox';
 
 type ReviewData = {
   reviewId: number;
@@ -49,7 +50,7 @@ const MOCK_REVIEW: ReviewData = {
   contentWorst:
     '하객 수가 많다 보니 대기 공간이 조금 좁게 느껴져서 부모님 친구분들이 잠깐 불편하셨다는 피드백도 들었어요🥹그래도 후회 없는 선택이었습니다!!',
   imagesUrls: [
-    'https://placehold.co/80x100',
+    'https://placehold.co/800x1000',
     'https://placehold.co/80x100',
     'https://placehold.co/80x100',
     'https://placehold.co/80x100',
@@ -66,7 +67,10 @@ const MOCK_REVIEW: ReviewData = {
 
 export default function ReviewDetailPage() {
   const [data, setData] = useState<ReviewData | null>(null);
-
+  const [imagebox, setImagebox] = useState<{ open: boolean; idx: number }>({
+    open: false,
+    idx: 0,
+  });
   useEffect(() => {
     setData(MOCK_REVIEW);
   }, []);
@@ -128,18 +132,27 @@ export default function ReviewDetailPage() {
           {data.imagesUrls?.length > 0 && (
             <section className="px-5 mt-5">
               <div className="flex gap-3">
-                {data.imagesUrls.slice(0, 4).map((src, idx) => (
-                  <div
-                    key={idx}
-                    className="w-20 h-20 rounded-lg outline-[0.5px] outline-offset-[-0.5px] outline-box-line overflow-hidden bg-white"
-                  >
-                    <img
-                      src={src}
-                      alt={`review-${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
+                {data.imagesUrls?.length > 0 && (
+                  <section className="px-5 mt-5">
+                    <div className="flex gap-3">
+                      {data.imagesUrls.slice(0, 4).map((src, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setImagebox({ open: true, idx })}
+                          className="w-20 h-20 rounded-lg outline-[0.5px] outline-offset-[-0.5px] outline-box-line overflow-hidden bg-white"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={src}
+                            alt={`review-${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                )}
               </div>
             </section>
           )}
@@ -163,6 +176,13 @@ export default function ReviewDetailPage() {
               {data.contentWorst}
             </p>
           </section>
+          {imagebox.open && data.imagesUrls?.length ? (
+            <Imagebox
+              images={data.imagesUrls}
+              startIndex={imagebox.idx}
+              onClose={() => setImagebox({ open: false, idx: 0 })}
+            />
+          ) : null}
         </>
       )}
     </div>
