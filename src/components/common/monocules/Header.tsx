@@ -24,9 +24,11 @@ export default function Header({
     // 아래 div로 "뷰포트 풀블리드" 처리 → 부모 padding 무시
     <header className={clsx('sticky top-0 z-50', className)}>
       {/* 풀블리드 래퍼 */}
-      <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen
-                      bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/60
-                      ">
+      <div
+        className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen
+                      bg-[#FDFDFD] backdrop-blur supports-[backdrop-filter]:bg-white/60
+                      "
+      >
         {/* 내부는 중앙 컨테이너 */}
         <div className="relative mx-auto w-full max-w-[420px] h-[50px] px-[22px]">
           {showBack && (
@@ -37,17 +39,27 @@ export default function Header({
               className="absolute left-0 top-1/2 -translate-y-1/2 p-2"
             >
               <svg
-                viewBox="0 0 24 24" width="22" height="22"
-                fill="none" stroke="currentColor" strokeWidth="2"
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
                 className="text-text-secondary"
               >
-                <path d="M15 18L9 12l6-6" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M15 18L9 12l6-6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </button>
           )}
 
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                          text-base font-medium leading-none text-foreground">
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+                          text-base font-medium leading-none text-foreground"
+          >
             {value}
           </div>
 
