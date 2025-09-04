@@ -2,10 +2,10 @@
 'use client';
 
 import Button from '@/components/common/atomic/Button';
+import SvgObject from '@/components/common/atomic/SvgObject';
 import Header from '@/components/common/monocules/Header';
 import { categories } from "@/data/homeData";
 import { CategoryKey } from '@/types/category';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -40,9 +40,9 @@ export default function CategorySelectPage() {
                   active ? 'border-primary-500 ring-2 ring-primary-500/30' : 'border-gray-200',
                 ].join(' ')}
               >
-                <span className="relative h-14 w-14">
-                  <Image src={c.icon} alt={c.label} fill className="object-contain" />
-                </span>
+                <div className="h-14 w-14">
+                  <SvgObject src={c.icon} alt={c.label} className="h-full w-full" />
+                </div>
                 <span className="mt-2 text-[15px] font-semibold text-gray-800">{c.label}</span>
               </button>
             );

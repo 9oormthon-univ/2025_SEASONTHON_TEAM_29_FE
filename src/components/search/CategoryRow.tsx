@@ -2,7 +2,7 @@
 
 import { categories } from '@/data/homeData';
 import { CategoryKey } from '@/types/category';
-import Image from 'next/image';
+import SvgObject from '../common/atomic/SvgObject';
 
 export default function CategoryRow({
   value,
@@ -26,17 +26,13 @@ export default function CategoryRow({
               aria-pressed={active}
               className="relative flex flex-col items-center gap-1 py-3 text-center text-xs"
             >
-              <span className="relative block h-10 w-10">
-                <Image
+              <div className="h-10 w-10">
+                <SvgObject
                   src={c.icon}
                   alt={c.label}
-                  fill
-                  className={[
-                    'object-contain transition',
-                    isDim ? 'grayscale opacity-60' : '', // 아이콘 회색/투명도
-                  ].join(' ')}
+                  className={['h-full w-full transition', isDim ? 'grayscale opacity-60' : ''].join(' ')}
                 />
-              </span>
+              </div>
 
               <span
                 className={[

@@ -2,7 +2,7 @@
 
 import { CategoryItem } from '@/types/category';
 import { cn } from '@/utills/cn';
-import Image from 'next/image';
+import SvgObject from '../common/atomic/SvgObject';
 
 export default function CategoryQuick({ items, bgColor = 'gray' }: { items: CategoryItem[]; bgColor?: 'gray' | 'white' }) {
   return (
@@ -18,9 +18,9 @@ export default function CategoryQuick({ items, bgColor = 'gray' }: { items: Cate
           href={`/search?cat=${c.key}`}
           className="relative flex flex-col items-center gap-2 py-3 text-center text-xs text-gray-700"
         >
-          <span className="relative h-10 w-10">
-            <Image src={c.icon} alt={c.label} fill className="object-contain" />
-          </span>
+         <div className="h-10 w-10">
+           <SvgObject src={c.icon} alt={c.label} className="h-full w-full" />
+         </div>
 
           <span>{c.label}</span>
 
