@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
+import { useState } from 'react';
+import SvgObject from '../common/atomic/SvgObject';
 
 type RingRatingProps = {
   max?: number;
@@ -44,7 +45,7 @@ export default function RingRating({
               onClick={() => handleClick(i)}
               className="w-7 h-6 flex items-center justify-center focus:outline-none"
             >
-              <Image
+              <SvgObject
                 src={i < rating ? '/icons/PinkRing.svg' : '/icons/GrayRing.svg'}
                 alt={`ring-${i + 1}`}
                 width={28}
