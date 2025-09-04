@@ -148,7 +148,10 @@ export default function Page() {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <button className="w-28 h-28 rounded-lg outline-1 outline-offset-[-1px] outline-box-line flex flex-col items-center justify-center gap-2 text-text-secondary">
+              <Link
+                href="/mypage/review"
+                className="w-28 h-28 rounded-lg outline-1 outline-offset-[-1px] outline-box-line flex flex-col items-center justify-center gap-2 text-text-secondary"
+              >
                 <SvgObject
                   src="/icons/plus.svg"
                   alt="plus"
@@ -157,7 +160,7 @@ export default function Page() {
                   className="rounded-full"
                 />
                 <span>후기작성</span>
-              </button>
+              </Link>
               {REVIEW_LIST.map((c) => (
                 <CompanyCard
                   key={c.id}
