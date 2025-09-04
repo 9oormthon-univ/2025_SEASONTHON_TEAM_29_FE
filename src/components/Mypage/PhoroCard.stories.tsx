@@ -1,3 +1,4 @@
+// src/components/Mypage/PhotoCard.stories.tsx
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import React, { useEffect, useState } from 'react';
 import PhotoCard from '@/components/Mypage/PhotoCard';
@@ -6,7 +7,12 @@ const meta = {
   title: 'Mypage/PhotoCard',
   component: PhotoCard,
   parameters: { layout: 'centered' },
-  args: { files: [], total: 5, onUpload: () => {} },
+  args: {
+    files: [],
+    total: 5,
+    domain: 'vendor',
+    onUpload: (_: File[]) => {},
+  },
   argTypes: {
     total: { control: { type: 'number', min: 1, max: 10, step: 1 } },
   },
@@ -31,22 +37,26 @@ async function dataUrlToFile(dataUrl: string, name: string): Promise<File> {
 }
 
 export const Empty: Story = {
-  render: (args) => {
+  render: (storyArgs) => {
     const [files, setFiles] = useState<File[]>([]);
     return (
-      <PhotoCard
-        {...args}
-        files={files}
-        onUpload={(fl) =>
-          setFiles((prev) => [...prev, ...Array.from(fl)].slice(0, args.total))
-        }
-      />
+      <div style={{ width: 420 }}>
+        <PhotoCard
+          {...storyArgs}
+          files={files}
+          onUpload={(fl) =>
+            setFiles((prev) =>
+              [...prev, ...Array.from(fl)].slice(0, storyArgs.total),
+            )
+          }
+        />
+      </div>
     );
   },
 };
 
 export const Prefilled: Story = {
-  render: (args) => {
+  render: (storyArgs) => {
     const [files, setFiles] = useState<File[]>([]);
     useEffect(() => {
       (async () => {
@@ -63,13 +73,17 @@ export const Prefilled: Story = {
       })();
     }, []);
     return (
-      <PhotoCard
-        {...args}
-        files={files}
-        onUpload={(fl) =>
-          setFiles((prev) => [...prev, ...Array.from(fl)].slice(0, args.total))
-        }
-      />
+      <div style={{ width: 420 }}>
+        <PhotoCard
+          {...storyArgs}
+          files={files}
+          onUpload={(fl) =>
+            setFiles((prev) =>
+              [...prev, ...Array.from(fl)].slice(0, storyArgs.total),
+            )
+          }
+        />
+      </div>
     );
   },
 };
