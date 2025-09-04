@@ -15,7 +15,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     HIDE_EXACT.includes(pathname) ||
     HIDE_PREFIX.some((p) => pathname.startsWith(p));
   return (
-    <Suspense fallback={<div className="p-6">인증 확인 중…</div>}>
+    <Suspense fallback={null}>
       <AuthGuard>
         <div className="flex min-h-dvh flex-col overflow-x-hidden touch-manipulation">
           <Container className="flex-1">{children}</Container>
