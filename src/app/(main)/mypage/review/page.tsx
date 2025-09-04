@@ -1,51 +1,118 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Header from '@/components/common/monocules/Header';
 import Button from '@/components/common/atomic/Button';
 import PhotoCard from '@/components/Mypage/PhotoCard';
 import RingRating from '@/components/reviews/RingRating';
 import TextField from '@/components/common/atomic/TextField';
+import { tokenStore } from '@/lib/tokenStore';
 
 const MAX_PHOTOS = 5;
 const MAX_LEN = 250;
 
 export default function ReviewPage() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const [files, setFiles] = useState<File[]>([]);
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [photoUrls] = useState<string[]>([]);
   const [good, setGood] = useState('');
   const [bad, setBad] = useState('');
   const [rating, setRating] = useState<number>(0);
-  const vendor = '그레이스케일';
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [doneMsg, setDoneMsg] = useState<string | null>(null);
 
-  const canSubmit = rating > 0 && good.trim().length > 0;
+  const vendorName = '그레이스케일';
+  const vendorId = 0;
+
+  const canSubmit = rating > 0 && good.trim().length > 0 && !submitting;
+  const imageKeys = useMemo(() => {
+    const toKey = (u: string) => {
+      try {
+        const url = new URL(u);
+        return decodeURIComponent(url.pathname.replace(/^\/+/, ''));
+      } catch {
+        return u;
+      }
+    };
+    return Array.from(new Set(photoUrls.map(toKey))).slice(0, MAX_PHOTOS);
+  }, [photoUrls]);
+
+  const getBearer = () => {
+    const raw = tokenStore.get();
+    if (!raw) throw new Error('로그인이 필요합니다.');
+    return raw.startsWith('Bearer ') ? raw : `Bearer ${raw}`;
+  };
+
+  const submitReview = async () => {
+    if (!canSubmit) return;
+    setSubmitting(true);
+    setErrorMsg(null);
+    setDoneMsg(null);
+
+    try {
+      const res = await fetch(`${API_URL}/v1/review/create`, {
+        method: 'POST',
+        headers: {
+          Authorization: getBearer(),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          vendorId,
+          rating,
+          contentBest: good.trim(),
+          contentWorst: bad.trim(),
+          imageKeys,
+        }),
+      });
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`후기 등록 실패 (${res.status}) ${text}`);
+      }
+
+      setDoneMsg('후기가 등록되었어요!');
+    } catch (e: unknown) {
+      setErrorMsg(
+        e instanceof Error ? e.message : '후기 등록 중 오류가 발생했어요.',
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex justify-center">
       <div className="w-96 px-6 pb-36">
         <Header value="후기" />
+
         <section className="mt-2 text-center">
-          <h1 className="text-sm font-medium text-text--default">{vendor}</h1>
+          <h1 className="text-sm font-medium text-text--default">
+            {vendorName}
+          </h1>
           <p className="mt-1 text-xs text-text--secondary">
-            {vendor}이 만족스러우셨다면 리뷰를 남겨주세요.
+            {vendorName}이 만족스러우셨다면 리뷰를 남겨주세요.
           </p>
           <div className="mt-3 flex justify-center">
             <RingRating max={5} onChange={setRating} />
           </div>
         </section>
+
         <section className="mt-5">
           <PhotoCard
             files={files}
-            total={MAX_PHOTOS}
-            domain="vendor"
-            onUrlsChange={setPhotoUrls}
-            onUpload={(fl) =>
-              setFiles((prev) =>
-                [...prev, ...Array.from(fl)].slice(0, MAX_PHOTOS),
-              )
+            total={5}
+            domain="REVIEW"
+            domainId={1}
+            onUploadSelect={(added) =>
+              setFiles((s) => [...s, ...added].slice(0, 5))
             }
+            onUploaded={(s3Keys) => {
+              console.log('[DONE] s3Keys:', s3Keys);
+            }}
           />
         </section>
+
         <section className="mt-6 space-y-2">
           <h2 className="text-sm font-medium text-text--default">좋았던 점</h2>
           <TextField
@@ -56,6 +123,7 @@ export default function ReviewPage() {
             className="w-80 h-52"
           />
         </section>
+
         <section className="mt-6 space-y-2">
           <h2 className="text-sm font-medium text-text--default">아쉬운 점</h2>
           <TextField
@@ -66,7 +134,10 @@ export default function ReviewPage() {
             className="w-80 h-52"
           />
         </section>
+        {errorMsg && <p className="mt-3 text-xs text-red-500">{errorMsg}</p>}
+        {doneMsg && <p className="mt-3 text-xs text-primary-500">{doneMsg}</p>}
       </div>
+
       <div className="fixed bottom-6 left-0 right-0 flex justify-center">
         <div className="w-96 px-6 pb-[env(safe-area-inset-bottom)]">
           <Button
@@ -74,18 +145,9 @@ export default function ReviewPage() {
             state={canSubmit ? 'default' : 'inactive'}
             disabled={!canSubmit}
             fullWidth
-            onClick={() => {
-              console.log({
-                vendor,
-                rating,
-                good,
-                bad,
-                filesCount: files.length,
-                photoUrls,
-              });
-            }}
+            onClick={submitReview}
           >
-            등록하기
+            {submitting ? '등록 중…' : '등록하기'}
           </Button>
         </div>
       </div>
