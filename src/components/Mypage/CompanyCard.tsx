@@ -90,7 +90,7 @@ export default function CompanyCard({
         className,
       )}
     >
-      <div className="w-28 h-28 bg-white rounded-lg outline outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
+      <div className="w-28 h-28 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
         <Image
           src={imageSrc}
           alt={altText}

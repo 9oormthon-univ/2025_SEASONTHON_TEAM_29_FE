@@ -1,4 +1,3 @@
-// 추가: 배지 관련 타입 import
 import clsx from 'clsx';
 import InputBadge, {
   type InputBadgeProps,

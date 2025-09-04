@@ -39,7 +39,7 @@ export default function CompanyLongCard({
         </p>
       </div>
       <div className="absolute right-2 top-2 flex items-center gap-2">
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white outline outline-1 outline-offset-[-1px] outline-box-line">
+        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white outline-1 outline-offset-[-1px] outline-box-line">
           {logoUrl ? (
             <Image
               src={logoUrl}
