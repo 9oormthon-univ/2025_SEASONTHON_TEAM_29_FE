@@ -21,18 +21,19 @@ export default function ReservationCard({
   selected = false,
   onClick,
 }: ReservationCardProps) {
+  const isPink = selected || variant === 'pink';
+
   return (
     <button
       type="button"
-      role="button"
       aria-pressed={selected}
       onClick={onClick}
       className={cn(
-        'w-[346px] h-28 relative rounded-lg outline outline-1 outline-offset-[-1px] overflow-hidden transition-colors text-sm font-medium',
-        variant === 'white'
-          ? 'bg-white outline-[color:var(--color-box-line)]'
-          : 'bg-primary-200 outline-primary-300',
-        selected && 'ring-2 ring-primary-500',
+        'w-[346px] h-28 relative rounded-lg overflow-hidden transition-colors text-sm font-medium',
+        'outline outline-offset-[-1px]',
+        isPink
+          ? 'bg-primary-200 outline-2 outline-offset-[-2px] outline-primary-300'
+          : 'bg-white outline-1 outline-box-line',
       )}
     >
       <div className="absolute left-[103px] top-[10px] text-text--default text-sm font-medium leading-normal">

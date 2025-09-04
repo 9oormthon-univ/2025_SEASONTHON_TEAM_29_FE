@@ -5,12 +5,17 @@ import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useCallback, useEffect, useState } from 'react';
 import Section from '../common/Section';
+import Image from 'next/image';
 
-export default function BannerSquareCarousel({ items }: { items: BannerItem[] }) {
+export default function BannerSquareCarousel({
+  items,
+}: {
+  items: BannerItem[];
+}) {
   const [, setSelected] = useState(0);
   const [ref, api] = useEmblaCarousel(
     { loop: true, align: 'center', containScroll: 'trimSnaps' },
-    [Autoplay({ delay: 4000, stopOnInteraction: false })]
+    [Autoplay({ delay: 4000, stopOnInteraction: false })],
   );
 
   const onSelect = useCallback(() => {
@@ -34,17 +39,24 @@ export default function BannerSquareCarousel({ items }: { items: BannerItem[] })
                 style={{ aspectRatio: '1/1' }}
                 aria-label={`배너 ${i + 1}`}
               >
-                {/* ✅ 대표이미지 */}
-                <img
+                <Image
                   src={b.src}
                   alt={b.alt}
-                  className="absolute inset-0 h-full w-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 92vw, 420px"
+                  className="object-cover"
                   loading="lazy"
                 />
 
                 {/* 텍스트 오버레이 */}
-                <div className={`absolute bottom-6 left-6 drop-shadow-md ${b.color === 'black' ? 'text-black' : 'text-white'}`}>
-                  <h3 className="whitespace-pre-line text-2xl font-extrabold">{b.title}</h3>
+                <div
+                  className={`absolute bottom-6 left-6 drop-shadow-md ${
+                    b.color === 'black' ? 'text-black' : 'text-white'
+                  }`}
+                >
+                  <h3 className="whitespace-pre-line text-2xl font-extrabold">
+                    {b.title}
+                  </h3>
                   <p className="pt-2 text-sm font-semibold">{b.sub}</p>
                 </div>
               </div>

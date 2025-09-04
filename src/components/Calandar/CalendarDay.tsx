@@ -3,114 +3,21 @@
 import * as React from 'react';
 import clsx from 'clsx';
 
-export type CalendarDayType = 'dd' | 'variant2' | 'hover';
+export type CalendarDayType =
+  | 'dd'
+  | 'variant2'
+  | 'hover'
+  | 'green'
+  | 'selected';
 
 export type CalendarDayProps = {
-  day: number | string;
+  day: React.ReactNode;
   weekday?: string;
   type?: CalendarDayType;
   className?: string;
   onClick?: React.MouseEventHandler<HTMLDivElement>;
   ariaLabel?: string;
-  dashLen?: number;
-  stroke?: number;
-  radius?: number;
 };
-
-function CornerAndCenterDashes({
-  className,
-  dashLen = 10,
-  stroke = 1.5,
-  radius = 8,
-}: {
-  className?: string;
-  dashLen?: number;
-  stroke?: number;
-  radius?: number;
-}) {
-  const w = 40;
-  const h = 40;
-  const inset = stroke / 2;
-
-  const cx = w / 2;
-  const cy = h / 2;
-
-  return (
-    <svg
-      viewBox={`0 0 ${w} ${h}`}
-      width="100%"
-      height="100%"
-      className={clsx('absolute inset-0', className)}
-      aria-hidden
-    >
-      <path
-        d={`M ${inset} ${inset + radius} A ${radius} ${radius} 0 0 1 ${inset + radius} ${inset}`} // TL
-        stroke="currentColor"
-        strokeWidth={stroke}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <path
-        d={`M ${w - inset - radius} ${inset} A ${radius} ${radius} 0 0 1 ${w - inset} ${inset + radius}`} // TR
-        stroke="currentColor"
-        strokeWidth={stroke}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <path
-        d={`M ${w - inset} ${h - inset - radius} A ${radius} ${radius} 0 0 1 ${w - inset - radius} ${h - inset}`} // BR
-        stroke="currentColor"
-        strokeWidth={stroke}
-        fill="none"
-        strokeLinecap="round"
-      />
-      <path
-        d={`M ${inset + radius} ${h - inset} A ${radius} ${radius} 0 0 1 ${inset} ${h - inset - radius}`} // BL
-        stroke="currentColor"
-        strokeWidth={stroke}
-        fill="none"
-        strokeLinecap="round"
-      />
-
-      <line
-        x1={cx - dashLen / 2}
-        y1={inset}
-        x2={cx + dashLen / 2}
-        y2={inset}
-        stroke="currentColor"
-        strokeWidth={stroke}
-        strokeLinecap="round"
-      />
-      <line
-        x1={cx - dashLen / 2}
-        y1={h - inset}
-        x2={cx + dashLen / 2}
-        y2={h - inset}
-        stroke="currentColor"
-        strokeWidth={stroke}
-        strokeLinecap="round"
-      />
-      <line
-        x1={inset}
-        y1={cy - dashLen / 2}
-        x2={inset}
-        y2={cy + dashLen / 2}
-        stroke="currentColor"
-        strokeWidth={stroke}
-        strokeLinecap="round"
-      />
-      <line
-        x1={w - inset}
-        y1={cy - dashLen / 2}
-        x2={w - inset}
-        y2={cy + dashLen / 2}
-        stroke="currentColor"
-        strokeWidth={stroke}
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 export default function CalendarDay({
   day,
@@ -119,12 +26,11 @@ export default function CalendarDay({
   className,
   onClick,
   ariaLabel,
-  dashLen = 10,
-  stroke = 1.5,
-  radius = 8,
 }: CalendarDayProps) {
   const isDD = type === 'dd';
   const isHover = type === 'hover';
+  const isGreen = type === 'green';
+  const isSelected = type === 'selected';
 
   const wrapClass = clsx('relative w-10', isDD ? 'h-24' : 'h-16', className);
   const boxWrapClass = clsx(
@@ -156,16 +62,18 @@ export default function CalendarDay({
       </div>
 
       <div className={boxWrapClass}>
-        {isHover ? (
-          <div className="absolute inset-0 rounded bg-primary-100" />
-        ) : (
-          <CornerAndCenterDashes
-            className="text-stroke-dash/60"
-            dashLen={dashLen}
-            stroke={stroke}
-            radius={radius}
-          />
-        )}
+        <div
+          className={clsx(
+            'absolute inset-0 rounded',
+            isSelected
+              ? 'opacity-70 bg-primary-300 border-2 border-primary-500'
+              : isHover
+                ? 'bg-primary-100'
+                : isGreen
+                  ? 'opacity-30 bg-[#78D730] border-2 border-[#78D730]'
+                  : 'opacity-30 bg-box-line',
+          )}
+        />
       </div>
     </div>
   );
