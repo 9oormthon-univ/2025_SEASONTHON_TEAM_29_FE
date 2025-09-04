@@ -1,4 +1,4 @@
-// src/app/editorials/[id]/page.tsx
+// src/app/(main)/editorials/[id]/page.tsx
 import ShareButton from '@/components/common/atomic/ShareButton';
 import Header from '@/components/common/monocules/Header';
 import { getEditorialById } from '@/lib/editorials';
@@ -6,12 +6,15 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import Image from 'next/image';
 
 type RouteParams = Promise<{ id: string }>;
 
-export async function generateMetadata(
-  { params }: { params: RouteParams }
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: RouteParams;
+}): Promise<Metadata> {
   const { id } = await params;
   const ed = getEditorialById(Number(id));
   if (!ed) return {};
@@ -23,19 +26,35 @@ export async function generateMetadata(
   return {
     title,
     description,
-    openGraph: { title, description, images: [{ url: ogImg }], type: 'article' },
-    twitter: { card: 'summary_large_image', title, description, images: [ogImg] },
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImg }],
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImg],
+    },
   };
 }
 
-export default async function EditorialDetailPage(
-  { params }: { params: RouteParams }
-) {
+export default async function EditorialDetailPage({
+  params,
+}: {
+  params: RouteParams;
+}) {
   const { id } = await params;
   const ed = getEditorialById(Number(id));
   if (!ed) return notFound();
 
-  const filePath = path.join(process.cwd(), 'public', ed.contentPath.replace(/^\//, ''));
+  const filePath = path.join(
+    process.cwd(),
+    'public',
+    ed.contentPath.replace(/^\//, ''),
+  );
   const html = await fs.readFile(filePath, 'utf8').catch(() => null);
   if (html == null) return notFound();
 
@@ -51,13 +70,22 @@ export default async function EditorialDetailPage(
 
       {/* 썸네일 + 오버레이(태그 | 타이틀) */}
       <section className="relative">
-        <img
+        <Image
           src={ed.thumbnail || ed.heroSrc}
           alt={ed.title.replace(/\n/g, ' ')}
-          className="block w-full select-none"
-          loading="eager"
+          width={1600}
+          height={900}
+          priority
+          sizes="(max-width: 420px) 100vw, 420px"
+          className="block w-full h-auto select-none"
         />
-        <img src={logoSrc} alt="W 로고" className="absolute right-3 top-3 h-6 w-6 opacity-90" />
+        <Image
+          src={logoSrc}
+          alt="W 로고"
+          width={24}
+          height={24}
+          className="absolute right-3 top-3 opacity-90"
+        />
         <div className={`absolute bottom-14 left-6 right-6 ${overlayTextCls}`}>
           <div className="text-[11px] tracking-wide opacity-90">
             {ed.tags.join(' | ')}
@@ -73,13 +101,11 @@ export default async function EditorialDetailPage(
           <p className="whitespace-pre-line text-[17px] font-bold text-gray-800 flex-1 line-clamp-2 break-keep">
             {ed.sub}
           </p>
-          <ShareButton title={ed.title} sub={ed.sub} /> 
+          <ShareButton title={ed.title} sub={ed.sub} />
         </div>
         <div className="mt-2 text-sm text-gray-500">{ed.dateISO}</div>
       </section>
 
-
-      {/* 본문 HTML */}
       <article
         className="prose prose-sm max-w-none px-[22px] py-2 prose-img:rounded-md prose-img:w-full"
         dangerouslySetInnerHTML={{ __html: html }}
