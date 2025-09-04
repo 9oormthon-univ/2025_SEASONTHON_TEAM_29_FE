@@ -133,20 +133,31 @@ export default function PhotoCard({
     const el = wrapRef.current;
     if (el) el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
   }, [files.length]);
-  const parseUrlList = (json: any): string[] => {
-    const extract = (arr: any[]): string[] => {
-      if (arr.length === 0) return [];
-      if (typeof arr[0] === 'string') return arr as string[];
-      if (typeof arr[0] === 'object' && arr[0] && 'presignedUrl' in arr[0]) {
-        return arr.map((x: any) => x.presignedUrl as string);
-      }
-      return [];
-    };
-    if (Array.isArray(json)) return extract(json);
-    if (json && Array.isArray(json.data)) return extract(json.data);
-    return [];
-  };
 
+  const parseUrlList = useCallback((json: unknown): string[] => {
+    type PresignedItem = { presignedUrl: string; s3Key?: string };
+    const isObject = (v: unknown): v is Record<string, unknown> =>
+      typeof v === 'object' && v !== null;
+    const isStringArray = (v: unknown): v is string[] =>
+      Array.isArray(v) && v.every((x) => typeof x === 'string');
+    const isPresignedArray = (v: unknown): v is PresignedItem[] =>
+      Array.isArray(v) &&
+      v.every(
+        (x) =>
+          isObject(x) &&
+          typeof (x as Record<string, unknown>).presignedUrl === 'string',
+      );
+
+    if (isStringArray(json)) return json;
+    if (isPresignedArray(json)) return json.map((x) => x.presignedUrl);
+
+    if (isObject(json) && 'data' in json) {
+      const d = (json as { data: unknown }).data;
+      if (isStringArray(d)) return d;
+      if (isPresignedArray(d)) return d.map((x) => x.presignedUrl);
+    }
+    return [];
+  }, []);
   const requestDownloadUrls = useCallback(
     async (keys: string[]) => {
       const res = await fetch(`${API_URL}/v1/s3/${domain}/download-urls`, {
@@ -161,11 +172,11 @@ export default function PhotoCard({
         const body = await res.text().catch(() => '');
         throw new Error(`download-urls 실패 (${res.status}) ${body}`);
       }
-      const json = await res.json();
+      const json: unknown = await res.json();
       const list = parseUrlList(json);
       return list;
     },
-    [API_URL, domain],
+    [API_URL, domain, parseUrlList],
   );
 
   const handleUpload = useCallback(
@@ -187,7 +198,7 @@ export default function PhotoCard({
         console.log('[PhotoCard] download URLs (from API):', list);
         setUrls(list);
         onUrlsChange?.(list);
-      } catch (e: unknown) {
+      } catch (e) {
         const msg = e instanceof Error ? e.message : 'URL 동기화에 실패했어요.';
         setError(msg);
         console.error('[PhotoCard] download-urls error:', e);
@@ -242,6 +253,9 @@ export default function PhotoCard({
             />
           </svg>
         </button>
+      )}
+      {loading && (
+        <p className="mt-2 text-xs text-text--secondary">사진 업로드 중..</p>
       )}
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
     </div>
