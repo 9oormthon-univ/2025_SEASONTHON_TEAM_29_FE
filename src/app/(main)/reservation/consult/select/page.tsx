@@ -2,29 +2,34 @@
 
 import * as React from 'react';
 import clsx from 'clsx';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
+import { tokenStore } from '@/lib/tokenStore';
 
 function TimeChip({
   label,
   selected,
+  disabled,
   onClick,
 }: {
   label: string;
   selected: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={clsx(
         'h-14 w-full rounded-[100px] px-6 text-sm font-medium inline-flex items-center justify-center',
-        'outline outline-offset-[-1px]',
+        'outline outline-offset-[-1px] transition-opacity',
         selected
           ? 'bg-primary-200 outline-2 outline-primary-300'
           : 'outline-1 outline-box-line',
+        disabled && 'opacity-40 pointer-events-none',
       )}
     >
       {label}
@@ -32,22 +37,62 @@ function TimeChip({
   );
 }
 
-const TIMES = [
-  '10:00',
-  '10:30',
-  '11:00',
-  '13:30',
-  '14:00',
-  '14:30',
-  '15:00',
-  '15:30',
-  '16:00',
-];
+type TimeSlot = {
+  time: string;
+  timeDisplay: string;
+  reservationId: number;
+  available: boolean;
+};
+
+type ApiResponseTimeSlots = {
+  status: number;
+  success: boolean;
+  message: string;
+  data: { timeSlots: TimeSlot[] } | null;
+};
+
+const getErrorMessage = (e: unknown) =>
+  e instanceof Error ? e.message : typeof e === 'string' ? e : '시간 조회 실패';
+
+const VENDOR_ID = 3;
 
 export default function ConsultTimePage() {
   const router = useRouter();
+  const sp = useSearchParams();
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+  const rawDate = sp.get('date') ?? new Date().toISOString().slice(0, 10);
+  const [yy, mm, dd] = rawDate.split('-').map(Number);
+
+  const [slots, setSlots] = React.useState<TimeSlot[]>([]);
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [posting, setPosting] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [sheet, setSheet] = React.useState<null | 'book' | 'estimate'>(null);
+
+  React.useEffect(() => {
+    if (!API_BASE) return;
+    const fetchDetail = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = tokenStore.get();
+        const url = `${API_BASE}/v1/reservation/${VENDOR_ID}/detail?year=${yy}&month=${mm}&day=${dd}`;
+        const res = await fetch(url, {
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          cache: 'no-store',
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = (await res.json()) as ApiResponseTimeSlots;
+        setSlots(json.data?.timeSlots ?? []);
+      } catch (e: unknown) {
+        setError(getErrorMessage(e));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDetail();
+  }, [API_BASE, yy, mm, dd]);
 
   React.useEffect(() => {
     if (!sheet) return;
@@ -55,15 +100,34 @@ export default function ConsultTimePage() {
     return () => clearTimeout(t);
   }, [sheet, router]);
 
-  const openSheet = (kind: 'book' | 'estimate') => {
-    if (!selectedTime) return;
-    setSheet(kind);
+  const handleReserve = async () => {
+    if (!selectedTime || !API_BASE) return;
+    try {
+      setPosting(true);
+      setError(null);
+      const token = tokenStore.get();
+      const url = `${API_BASE}/v1/reservation/${VENDOR_ID}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ date: rawDate, time: selectedTime }),
+      });
+      if (!res.ok) throw new Error(`예약 실패 (HTTP ${res.status})`);
+      setSheet('book');
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
+    } finally {
+      setPosting(false);
+    }
   };
-  const closeSheet = () => setSheet(null);
 
-  const sheetImage = sheet === 'book' ? '/congratu.png' : '/cartCheck.png';
-  const sheetText =
-    sheet === 'book' ? '예약이 완료 되었어요!' : '견적서에 잘 담았어요!';
+  const handleAddToEstimate = () => {
+    if (!selectedTime) return;
+    setSheet('estimate');
+  };
 
   return (
     <ReservationLayout
@@ -71,41 +135,56 @@ export default function ConsultTimePage() {
       step={3}
       headline="시간을 선택해 주세요."
       mode="double"
-      leftText="예약하기"
+      leftText={posting ? '예약 중...' : '예약하기'}
       rightText="견적서 담기"
-      onLeft={() => openSheet('book')}
-      onRight={() => openSheet('estimate')}
+      onLeft={handleReserve}
+      onRight={handleAddToEstimate}
+      activeLeft={!!selectedTime && !posting}
+      activeRight={!!selectedTime}
     >
+      {loading && (
+        <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>
+      )}
+      {error && <div className="text-sm text-red-500">오류: {error}</div>}
+
       <div className="grid grid-cols-3 gap-4">
-        {TIMES.map((t) => (
+        {slots.map((s) => (
           <TimeChip
-            key={t}
-            label={t}
-            selected={selectedTime === t}
-            onClick={() => setSelectedTime(t)}
+            key={`${s.time}-${s.reservationId}`}
+            label={s.timeDisplay || s.time}
+            selected={selectedTime === s.time}
+            disabled={!s.available}
+            onClick={() => setSelectedTime(s.time)}
           />
         ))}
       </div>
+
       {sheet && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-[60]">
           <button
             aria-label="닫기"
             className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
-            onClick={closeSheet}
+            onClick={() => setSheet(null)}
           />
           <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[420px] h-96 bg-white rounded-t-xl overflow-hidden">
             <div className="w-11 h-0.5 mx-auto mt-3 rounded-full bg-neutral-300" />
             <div className="h-full flex flex-col items-center justify-center gap-6">
               <Image
-                src={sheetImage}
-                alt={sheetText}
+                src={sheet === 'book' ? '/congratu.png' : '/cartCheck.png'}
+                alt={
+                  sheet === 'book'
+                    ? '예약이 완료 되었어요!'
+                    : '견적서에 잘 담았어요!'
+                }
                 width={160}
                 height={160}
                 priority
                 className="w-[160px] h-[160px] select-none pointer-events-none"
               />
               <p className="text-[16px] font-semibold text-text--default">
-                {sheetText}
+                {sheet === 'book'
+                  ? '예약이 완료 되었어요!'
+                  : '견적서에 잘 담았어요!'}
               </p>
             </div>
           </div>

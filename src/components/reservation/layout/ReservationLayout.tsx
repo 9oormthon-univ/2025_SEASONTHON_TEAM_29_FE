@@ -21,6 +21,8 @@ type DoubleButtons = {
   rightText: string;
   onLeft?: () => void;
   onRight?: () => void;
+  activeLeft?: boolean;
+  activeRight?: boolean;
 };
 
 type BaseProps = {
@@ -82,18 +84,20 @@ export default function ReservationStepLayout(
             <div className="grid grid-cols-2 gap-1">
               <Button
                 size="md"
-                state="default"
+                state={'default'}
                 fullWidth
-                onClick={props.onLeft}
+                onClick={props.activeLeft === false ? undefined : props.onLeft}
                 ariaLabel={props.leftText}
               >
                 {props.leftText}
               </Button>
               <Button
                 size="md"
-                state="hover"
+                state={'hover'}
                 fullWidth
-                onClick={props.onRight}
+                onClick={
+                  props.activeRight === false ? undefined : props.onRight
+                }
                 ariaLabel={props.rightText}
               >
                 {props.rightText}

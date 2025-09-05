@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Header from '@/components/common/monocules/Header';
 import Button from '@/components/common/atomic/Button';
 import PhotoCard from '@/components/Mypage/PhotoCard';
@@ -13,30 +14,34 @@ const MAX_LEN = 250;
 
 export default function ReviewPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
+  const router = useRouter();
+  const redirectTimerRef = useRef<number | null>(null);
+
+  const searchParams = useSearchParams();
+  const vendorIdFromUrl = Number(searchParams.get('vendorId') ?? '0');
+  const vendorNameFromUrl = searchParams.get('vendorName')
+    ? decodeURIComponent(searchParams.get('vendorName')!)
+    : '업체명';
+
   const [files, setFiles] = useState<File[]>([]);
-  const [photoUrls] = useState<string[]>([]);
   const [good, setGood] = useState('');
   const [bad, setBad] = useState('');
-  const [rating, setRating] = useState<number>(0);
+  const [rating, setRating] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [doneMsg, setDoneMsg] = useState<string | null>(null);
+  const [imageKeys, setImageKeys] = useState<string[]>([]);
 
-  const vendorName = '그레이스케일';
-  const vendorId = 0;
-
-  const canSubmit = rating > 0 && good.trim().length > 0 && !submitting;
-  const imageKeys = useMemo(() => {
-    const toKey = (u: string) => {
-      try {
-        const url = new URL(u);
-        return decodeURIComponent(url.pathname.replace(/^\/+/, ''));
-      } catch {
-        return u;
-      }
+  useEffect(() => {
+    if (!vendorIdFromUrl) setErrorMsg('존재하지 않는 업체입니다.');
+    return () => {
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     };
-    return Array.from(new Set(photoUrls.map(toKey))).slice(0, MAX_PHOTOS);
-  }, [photoUrls]);
+  }, [vendorIdFromUrl]);
+
+  const vendorName = vendorNameFromUrl || '업체명';
+  const vendorId = vendorIdFromUrl || 0;
+  const canSubmit = rating !== null && good.trim().length > 0 && !submitting;
 
   const getBearer = () => {
     const raw = tokenStore.get();
@@ -59,7 +64,7 @@ export default function ReviewPage() {
         },
         body: JSON.stringify({
           vendorId,
-          rating,
+          rating: rating!,
           contentBest: good.trim(),
           contentWorst: bad.trim(),
           imageKeys,
@@ -71,7 +76,10 @@ export default function ReviewPage() {
         throw new Error(`후기 등록 실패 (${res.status}) ${text}`);
       }
 
-      setDoneMsg('후기가 등록되었어요!');
+      setDoneMsg('후기가 등록되었어요! 5초 후 홈으로 이동합니다.');
+      redirectTimerRef.current = window.setTimeout(() => {
+        router.replace('/home');
+      }, 5000);
     } catch (e: unknown) {
       setErrorMsg(
         e instanceof Error ? e.message : '후기 등록 중 오류가 발생했어요.',
@@ -94,20 +102,24 @@ export default function ReviewPage() {
             {vendorName}이 만족스러우셨다면 리뷰를 남겨주세요.
           </p>
           <div className="mt-3 flex justify-center">
-            <RingRating max={5} onChange={setRating} />
+            <RingRating max={5} value={rating} onChange={setRating} />
           </div>
         </section>
 
         <section className="mt-5">
           <PhotoCard
             files={files}
-            total={5}
+            total={MAX_PHOTOS}
             domain="REVIEW"
-            domainId={1}
+            domainId={vendorId}
             onUploadSelect={(added) =>
-              setFiles((s) => [...s, ...added].slice(0, 5))
+              setFiles((s) => [...s, ...added].slice(0, MAX_PHOTOS))
             }
             onUploaded={(s3Keys) => {
+              setImageKeys((prev) => {
+                const next = Array.from(new Set([...prev, ...s3Keys]));
+                return next.slice(0, MAX_PHOTOS);
+              });
               console.log('[DONE] s3Keys:', s3Keys);
             }}
           />
@@ -134,6 +146,7 @@ export default function ReviewPage() {
             className="w-80 h-52"
           />
         </section>
+
         {errorMsg && <p className="mt-3 text-xs text-red-500">{errorMsg}</p>}
         {doneMsg && <p className="mt-3 text-xs text-primary-500">{doneMsg}</p>}
       </div>
