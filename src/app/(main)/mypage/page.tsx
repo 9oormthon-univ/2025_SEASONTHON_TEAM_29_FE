@@ -33,6 +33,10 @@ type MyReservation = {
   reservationTime: string;
   createdAt: string;
   updatedAt: string;
+  vendorName?: string;
+  mainImageUrl?: string;
+  vendorDescription?: string;
+  vendorCategory?: string;
 };
 
 function isRecord(v: unknown): v is Record<string, unknown> {
@@ -44,12 +48,6 @@ function pickList(json: unknown): unknown[] {
   if (isRecord(json) && Array.isArray(json.content))
     return json.content as unknown[];
   return [];
-}
-function toVendorItem(raw: VendorApiItem, i: number): VendorItem {
-  const id = raw.id ?? raw.vendorId ?? raw.weddingHallId ?? i;
-  const name = raw.name ?? raw.hallName ?? raw.vendorName ?? '업체';
-  const region = raw.region ?? raw.area ?? raw.location ?? undefined;
-  return { id, name, region };
 }
 function labelFromISODate(iso: string) {
   const [, mm, dd] = iso.split('-');
@@ -63,9 +61,7 @@ export default function Page() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const [vendors, setVendors] = useState<VendorItem[]>([]);
-  const [vendorsLoading, setVendorsLoading] = useState(false);
-  const [vendorsErr, setVendorsErr] = useState<string | null>(null);
+  const [vendors] = useState<VendorItem[]>([]);
 
   const [myReservations, setMyReservations] = useState<MyReservation[]>([]);
   const [resLoading, setResLoading] = useState(false);
@@ -92,6 +88,18 @@ export default function Page() {
           reservationTime: String((r as any).reservationTime ?? ''),
           createdAt: String((r as any).createdAt ?? ''),
           updatedAt: String((r as any).updatedAt ?? ''),
+          vendorName: (r as any).vendorName
+            ? String((r as any).vendorName)
+            : undefined,
+          mainImageUrl: (r as any).mainImageUrl
+            ? String((r as any).mainImageUrl)
+            : undefined,
+          vendorDescription: (r as any).vendorDescription
+            ? String((r as any).vendorDescription)
+            : undefined,
+          vendorCategory: (r as any).vendorCategory
+            ? String((r as any).vendorCategory)
+            : undefined,
         }));
         if (!aborted) setMyReservations(data);
       } catch (e: any) {
@@ -105,35 +113,6 @@ export default function Page() {
       aborted = true;
     };
   }, [API_URL]);
-
-  useEffect(() => {
-    if (!sheetOpen) return;
-    let aborted = false;
-    (async () => {
-      try {
-        setVendorsLoading(true);
-        setVendorsErr(null);
-        const res = await fetch(`${API_URL}/v1/vendor/wedding_hall`, {
-          cache: 'no-store',
-        });
-        if (!res.ok) throw new Error(`목록 조회 실패 (${res.status})`);
-        const json: unknown = await res.json();
-        const list = pickList(json)
-          .filter(isRecord)
-          .map((v, idx) => toVendorItem(v as VendorApiItem, idx));
-        if (!aborted) setVendors(list);
-      } catch (e: unknown) {
-        const msg =
-          e instanceof Error ? e.message : '목록을 불러오지 못했어요.';
-        if (!aborted) setVendorsErr(msg);
-      } finally {
-        if (!aborted) setVendorsLoading(false);
-      }
-    })();
-    return () => {
-      aborted = true;
-    };
-  }, [sheetOpen, API_URL]);
 
   const vendorMap: Record<string, VendorItem> = useMemo(() => {
     const m: Record<string, VendorItem> = {};
@@ -150,8 +129,6 @@ export default function Page() {
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [myReservations]);
-
-  const hasVendors = useMemo(() => vendors.length > 0, [vendors]);
 
   return (
     <main className="min-h-screen bg-background pb-24">
@@ -220,12 +197,15 @@ export default function Page() {
                 <div className="grid grid-cols-3 gap-3">
                   {items.map((r) => {
                     const v = vendorMap[String(r.vendorId)];
+                    const name =
+                      r.vendorName ?? v?.name ?? `업체 #${r.vendorId}`;
+                    const img = r.mainImageUrl ?? '/logos/placeholder.png';
                     return (
                       <CompanyCard
                         key={r.id}
                         region={v?.region ?? '-'}
-                        name={v?.name ?? `업체 #${r.vendorId}`}
-                        imageSrc="/logos/placeholder.png"
+                        name={name}
+                        imageSrc={img}
                       />
                     );
                   })}
@@ -301,54 +281,88 @@ export default function Page() {
           업체 선택
         </h3>
 
-        {vendorsLoading && (
-          <div className="mt-3 grid gap-2">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="h-10 animate-pulse rounded-md bg-gray-100"
-              />
-            ))}
+        <div className="mt-3">
+          <div className="mb-2 text-sm font-medium text-foreground">
+            내 예약에서 선택
           </div>
-        )}
 
-        {vendorsErr && (
-          <p className="mt-3 text-sm text-red-500">{vendorsErr}</p>
-        )}
+          {resLoading && (
+            <div className="grid gap-2">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-10 animate-pulse rounded-md bg-gray-100"
+                />
+              ))}
+            </div>
+          )}
 
-        {hasVendors && (
-          <ul className="mt-2 max-h-[60vh] overflow-y-auto">
-            {vendors.map((v) => (
-              <li key={String(v.id)}>
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between rounded-md px-2 py-2 hover:bg-gray-50"
-                  onClick={() => {
-                    setSheetOpen(false);
-                    const q = new URLSearchParams({
-                      vendorId: String(v.id),
-                      vendorName: v.name,
-                    }).toString();
-                    router.push(`/mypage/review?${q}`);
-                  }}
-                >
-                  <span className="text-sm text-foreground">{v.name}</span>
-                  {v.region && (
-                    <span className="text-xs text-text-secondary">
-                      {v.region}
-                    </span>
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+          {resErr && <p className="text-sm text-red-500">{resErr}</p>}
 
-        {!vendorsLoading && !vendorsErr && !hasVendors && (
-          <p className="mt-3 text-sm text-text-secondary">
-            표시할 업체가 없습니다.
-          </p>
-        )}
+          {!resLoading && !resErr && myReservations.length === 0 && (
+            <p className="text-sm text-text-secondary">예약된 내역이 없어요.</p>
+          )}
+
+          {myReservations.length > 0 && (
+            <ul className="max-h-[60vh] overflow-y-auto rounded-md border border-gray-100">
+              {myReservations
+                .slice()
+                .sort((a, b) =>
+                  b.reservationDate.localeCompare(a.reservationDate),
+                )
+                .map((r) => {
+                  const v = vendorMap[String(r.vendorId)];
+                  const vendorName =
+                    r.vendorName ?? v?.name ?? `업체 #${r.vendorId}`;
+                  const vendorRegion = v?.region ?? '-';
+                  const logo = r.mainImageUrl ?? '/logos/placeholder.png';
+                  const when =
+                    `${labelFromISODate(r.reservationDate)} ${r.reservationTime || ''}`.trim();
+
+                  return (
+                    <li key={r.id}>
+                      <button
+                        type="button"
+                        className="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-gray-50"
+                        onClick={() => {
+                          setSheetOpen(false);
+                          const q = new URLSearchParams({
+                            vendorId: String(r.vendorId),
+                            vendorName,
+                            reservationId: String(r.id),
+                            date: r.reservationDate,
+                            time: r.reservationTime,
+                          }).toString();
+                          router.push(`/mypage/review?${q}`);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={logo}
+                            alt={vendorName}
+                            width={28}
+                            height={28}
+                            className="h-7 w-7 rounded-md object-cover"
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-sm text-foreground">
+                              {vendorName}
+                            </span>
+                            <span className="text-xs text-text-secondary">
+                              {when}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-xs text-text-tertiary">
+                          {vendorRegion}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+            </ul>
+          )}
+        </div>
       </CompanyModal>
     </main>
   );
