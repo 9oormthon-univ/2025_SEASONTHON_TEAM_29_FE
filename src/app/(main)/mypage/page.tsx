@@ -8,20 +8,10 @@ import DdayCard from '@/components/Mypage/D-dayCheck';
 import CompanyModal from './CompanyModal';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { tokenStore } from '@/lib/tokenStore';
 
 type Company = { id: string; region: string; name: string; imageSrc: string };
 type ReviewCompany = Company & { rating: { score: number; count?: number } };
-
-const RESERVE_0830: Company[] = [
-  {
-    id: '1',
-    region: '선릉',
-    name: '그레이스케일',
-    imageSrc: '/logos/grayscale.png',
-  },
-  { id: '2', region: '서초', name: '제니하우스', imageSrc: '/logos/jh.png' },
-  { id: '3', region: '청담', name: 'ST정우', imageSrc: '/logos/stj.png' },
-];
 
 type VendorItem = { id: number | string; name: string; region?: string };
 type VendorApiItem = Partial<{
@@ -36,10 +26,18 @@ type VendorApiItem = Partial<{
   location: string;
 }>;
 
+type MyReservation = {
+  id: number;
+  vendorId: number;
+  reservationDate: string;
+  reservationTime: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
-
 function pickList(json: unknown): unknown[] {
   if (Array.isArray(json)) return json;
   if (isRecord(json) && Array.isArray(json.data)) return json.data as unknown[];
@@ -47,12 +45,15 @@ function pickList(json: unknown): unknown[] {
     return json.content as unknown[];
   return [];
 }
-
 function toVendorItem(raw: VendorApiItem, i: number): VendorItem {
   const id = raw.id ?? raw.vendorId ?? raw.weddingHallId ?? i;
   const name = raw.name ?? raw.hallName ?? raw.vendorName ?? '업체';
   const region = raw.region ?? raw.area ?? raw.location ?? undefined;
   return { id, name, region };
+}
+function labelFromISODate(iso: string) {
+  const [, mm, dd] = iso.split('-');
+  return `${Number(mm)}월 ${Number(dd)}일`;
 }
 
 export default function Page() {
@@ -61,43 +62,94 @@ export default function Page() {
   const router = useRouter();
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const [sheetOpen, setSheetOpen] = useState(false);
+
   const [vendors, setVendors] = useState<VendorItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [vendorsLoading, setVendorsLoading] = useState(false);
+  const [vendorsErr, setVendorsErr] = useState<string | null>(null);
+
+  const [myReservations, setMyReservations] = useState<MyReservation[]>([]);
+  const [resLoading, setResLoading] = useState(false);
+  const [resErr, setResErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    let aborted = false;
+    const loadReservations = async () => {
+      try {
+        setResLoading(true);
+        setResErr(null);
+        const token = tokenStore.get();
+        const res = await fetch(`${API_URL}/v1/reservation/`, {
+          cache: 'no-store',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        });
+        if (!res.ok) throw new Error(`예약 조회 실패 (${res.status})`);
+        const json: any = await res.json();
+        const list = pickList(json).filter(isRecord) as any[];
+        const data: MyReservation[] = list.map((r) => ({
+          id: Number(r.id),
+          vendorId: Number((r as any).vendorId),
+          reservationDate: String((r as any).reservationDate),
+          reservationTime: String((r as any).reservationTime ?? ''),
+          createdAt: String((r as any).createdAt ?? ''),
+          updatedAt: String((r as any).updatedAt ?? ''),
+        }));
+        if (!aborted) setMyReservations(data);
+      } catch (e: any) {
+        if (!aborted) setResErr(e?.message ?? '예약을 불러오지 못했어요.');
+      } finally {
+        if (!aborted) setResLoading(false);
+      }
+    };
+    loadReservations();
+    return () => {
+      aborted = true;
+    };
+  }, [API_URL]);
 
   useEffect(() => {
     if (!sheetOpen) return;
     let aborted = false;
-
     (async () => {
       try {
-        setLoading(true);
-        setErr(null);
-
+        setVendorsLoading(true);
+        setVendorsErr(null);
         const res = await fetch(`${API_URL}/v1/vendor/wedding_hall`, {
           cache: 'no-store',
         });
         if (!res.ok) throw new Error(`목록 조회 실패 (${res.status})`);
-
         const json: unknown = await res.json();
         const list = pickList(json)
           .filter(isRecord)
           .map((v, idx) => toVendorItem(v as VendorApiItem, idx));
-
         if (!aborted) setVendors(list);
       } catch (e: unknown) {
         const msg =
           e instanceof Error ? e.message : '목록을 불러오지 못했어요.';
-        if (!aborted) setErr(msg);
+        if (!aborted) setVendorsErr(msg);
       } finally {
-        if (!aborted) setLoading(false);
+        if (!aborted) setVendorsLoading(false);
       }
     })();
-
     return () => {
       aborted = true;
     };
   }, [sheetOpen, API_URL]);
+
+  const vendorMap: Record<string, VendorItem> = useMemo(() => {
+    const m: Record<string, VendorItem> = {};
+    for (const v of vendors) m[String(v.id)] = v;
+    return m;
+  }, [vendors]);
+
+  const groupedReservations = useMemo(() => {
+    const map = new Map<string, MyReservation[]>();
+    for (const r of myReservations) {
+      const key = r.reservationDate;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [myReservations]);
 
   const hasVendors = useMemo(() => vendors.length > 0, [vendors]);
 
@@ -144,39 +196,42 @@ export default function Page() {
 
         {tab === 'reserve' ? (
           <div className="mt-4 space-y-6">
-            <div>
-              <div className="mb-3 text-sm font-medium text-foreground">
-                8월 30일
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {RESERVE_0830.map((c) => (
-                  <CompanyCard
-                    key={c.id}
-                    region={c.region}
-                    name={c.name}
-                    imageSrc={c.imageSrc}
+            {resLoading && (
+              <div className="grid gap-3">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-28 w-80 mx-auto rounded-lg bg-gray-100 animate-pulse"
                   />
                 ))}
               </div>
-            </div>
-
-            <div>
-              <div className="mb-3 text-sm font-medium text-foreground">
-                8월 29일
+            )}
+            {resErr && <p className="text-sm text-red-500">{resErr}</p>}
+            {!resLoading && !resErr && groupedReservations.length === 0 && (
+              <p className="text-sm text-text-secondary">
+                예약 내역이 없습니다.
+              </p>
+            )}
+            {groupedReservations.map(([isoDate, items]) => (
+              <div key={isoDate}>
+                <div className="mb-3 text-sm font-medium text-foreground">
+                  {labelFromISODate(isoDate)}
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {items.map((r) => {
+                    const v = vendorMap[String(r.vendorId)];
+                    return (
+                      <CompanyCard
+                        key={r.id}
+                        region={v?.region ?? '-'}
+                        name={v?.name ?? `업체 #${r.vendorId}`}
+                        imageSrc="/logos/placeholder.png"
+                      />
+                    );
+                  })}
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-3 opacity-40">
-                <CompanyCard
-                  region="압구정"
-                  name="정샘물"
-                  imageSrc="/logos/jsm.png"
-                />
-                <CompanyCard
-                  region="청담"
-                  name="순수"
-                  imageSrc="/logos/soonsoo.png"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         ) : (
           <div className="mt-4">
@@ -246,7 +301,7 @@ export default function Page() {
           업체 선택
         </h3>
 
-        {loading && (
+        {vendorsLoading && (
           <div className="mt-3 grid gap-2">
             {[...Array(6)].map((_, i) => (
               <div
@@ -257,7 +312,9 @@ export default function Page() {
           </div>
         )}
 
-        {err && <p className="mt-3 text-sm text-red-500">{err}</p>}
+        {vendorsErr && (
+          <p className="mt-3 text-sm text-red-500">{vendorsErr}</p>
+        )}
 
         {hasVendors && (
           <ul className="mt-2 max-h-[60vh] overflow-y-auto">
@@ -287,7 +344,7 @@ export default function Page() {
           </ul>
         )}
 
-        {!loading && !err && !hasVendors && (
+        {!vendorsLoading && !vendorsErr && !hasVendors && (
           <p className="mt-3 text-sm text-text-secondary">
             표시할 업체가 없습니다.
           </p>
