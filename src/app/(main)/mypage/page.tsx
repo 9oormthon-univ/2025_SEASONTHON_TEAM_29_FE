@@ -7,52 +7,164 @@ import CompanyCard from '@/components/Mypage/CompanyCard';
 import DdayCard from '@/components/Mypage/D-dayCheck';
 import CompanyModal from './CompanyModal';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { tokenStore } from '@/lib/tokenStore';
+import type { VendorItem } from '@/types/reservation';
+import Image from 'next/image';
 
 type Company = { id: string; region: string; name: string; imageSrc: string };
 type ReviewCompany = Company & { rating: { score: number; count?: number } };
 
-const RESERVE_0830: Company[] = [
-  {
-    id: '1',
-    region: '선릉',
-    name: '그레이스케일',
-    imageSrc: '/logos/grayscale.png',
-  },
-  { id: '2', region: '서초', name: '제니하우스', imageSrc: '/logos/jh.png' },
-  { id: '3', region: '청담', name: 'ST정우', imageSrc: '/logos/stj.png' },
-];
+type MyReservation = {
+  id: number;
+  vendorId: number;
+  reservationDate: string;
+  reservationTime: string;
+  createdAt: string;
+  updatedAt: string;
+  vendorName?: string;
+  vendorLogoUrl?: string;
+  mainImageUrl?: string;
+  vendorDescription?: string;
+  vendorCategory?: string;
+};
 
-type VendorItem = { id: number | string; name: string; region?: string };
-type VendorApiItem = Partial<{
+type ReservationApiItem = {
   id: number | string;
   vendorId: number | string;
-  weddingHallId: number | string;
-  name: string;
-  hallName: string;
-  vendorName: string;
-  region: string;
-  area: string;
-  location: string;
-}>;
+  reservationDate: string;
+  reservationTime?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  vendorName?: string;
+  vendorLogoUrl?: string;
+  mainImageUrl?: string;
+  vendorDescription?: string;
+  vendorCategory?: string;
+};
 
+type MyReviewCard = ReviewCompany;
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
-
 function pickList(json: unknown): unknown[] {
   if (Array.isArray(json)) return json;
   if (isRecord(json) && Array.isArray(json.data)) return json.data as unknown[];
   if (isRecord(json) && Array.isArray(json.content))
     return json.content as unknown[];
+  if (isRecord(json) && isRecord(json.data) && Array.isArray(json.data.content))
+    return json.data.content as unknown[];
   return [];
 }
+function getHasNext(json: unknown): boolean {
+  if (!isRecord(json)) return false;
+  if (typeof json.last === 'boolean') return !json.last;
+  if (typeof json.number === 'number' && typeof json.totalPages === 'number') {
+    return json.number + 1 < json.totalPages;
+  }
+  if (isRecord(json.data)) {
+    const d = json.data;
+    if (typeof d.last === 'boolean') return !d.last;
+    if (typeof d.number === 'number' && typeof d.totalPages === 'number') {
+      return (d.number as number) + 1 < (d.totalPages as number);
+    }
+  }
+  return false;
+}
+function isReservationApiItem(v: unknown): v is ReservationApiItem {
+  if (!isRecord(v)) return false;
+  return 'id' in v && 'vendorId' in v && 'reservationDate' in v;
+}
+function toMyReservation(r: ReservationApiItem): MyReservation {
+  return {
+    id: Number(r.id),
+    vendorId: Number(r.vendorId),
+    reservationDate: String(r.reservationDate),
+    reservationTime: String(r.reservationTime ?? ''),
+    createdAt: String(r.createdAt ?? ''),
+    updatedAt: String(r.updatedAt ?? ''),
+    vendorName: r.vendorName ? String(r.vendorName) : undefined,
+    vendorLogoUrl: r.vendorLogoUrl ? String(r.vendorLogoUrl) : undefined,
+    mainImageUrl: r.mainImageUrl ? String(r.mainImageUrl) : undefined,
+    vendorDescription: r.vendorDescription
+      ? String(r.vendorDescription)
+      : undefined,
+    vendorCategory: r.vendorCategory ? String(r.vendorCategory) : undefined,
+  };
+}
+function toMyReviewCard(v: unknown): MyReviewCard | null {
+  if (!isRecord(v)) return null;
+  const id =
+    (typeof v.reviewId === 'number' || typeof v.reviewId === 'string'
+      ? v.reviewId
+      : typeof v.id === 'number' || typeof v.id === 'string'
+        ? v.id
+        : null) ?? null;
+  const name =
+    typeof v.vendorName === 'string'
+      ? v.vendorName
+      : `업체 #${String(id ?? '')}`;
+  const region = typeof v.vendorRegion === 'string' ? v.vendorRegion : '-';
+  const imageSrc =
+    typeof v.vendorLogoUrl === 'string'
+      ? v.vendorLogoUrl
+      : '/logos/placeholder.png';
+  const pickNumber = (
+    obj: Record<string, unknown>,
+    keys: string[],
+  ): number | undefined => {
+    for (const k of keys) {
+      const val = obj[k];
+      if (typeof val === 'number' && Number.isFinite(val)) return val;
+      if (typeof val === 'string') {
+        const n = Number(val);
+        if (!Number.isNaN(n)) return n;
+      }
+    }
+    return undefined;
+  };
 
-function toVendorItem(raw: VendorApiItem, i: number): VendorItem {
-  const id = raw.id ?? raw.vendorId ?? raw.weddingHallId ?? i;
-  const name = raw.name ?? raw.hallName ?? raw.vendorName ?? '업체';
-  const region = raw.region ?? raw.area ?? raw.location ?? undefined;
-  return { id, name, region };
+  const score =
+    pickNumber(v as Record<string, unknown>, ['myRating', 'rating', 'score']) ??
+    0;
+
+  if (id == null) return null;
+  return {
+    id: String(id),
+    name,
+    region,
+    imageSrc,
+    rating: { score, count: undefined },
+  };
+}
+
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === 'string') return e;
+  return '요청에 실패했어요.';
+}
+function labelFromISODate(iso: string) {
+  const [, mm, dd] = iso.split('-');
+  return `${Number(mm)}월 ${Number(dd)}일`;
+}
+
+function getStringProp(obj: unknown, key: string): string | undefined {
+  if (!obj || typeof obj !== 'object') return undefined;
+  const v = (obj as Record<string, unknown>)[key];
+  return typeof v === 'string' && v.length > 0 ? v : undefined;
+}
+function pickVendorLogo(
+  vendor: VendorItem | undefined,
+  res?: MyReservation,
+): string {
+  return (
+    res?.vendorLogoUrl ??
+    getStringProp(vendor, 'logoImageUrl') ??
+    getStringProp(vendor, 'logoUrl') ??
+    getStringProp(vendor, 'logo') ??
+    res?.mainImageUrl ??
+    '/logos/placeholder.png'
+  );
 }
 
 export default function Page() {
@@ -61,45 +173,101 @@ export default function Page() {
   const router = useRouter();
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [vendors, setVendors] = useState<VendorItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
 
+  const [vendors] = useState<VendorItem[]>([]);
+
+  const [myReservations, setMyReservations] = useState<MyReservation[]>([]);
+  const [resLoading, setResLoading] = useState(false);
+  const [resErr, setResErr] = useState<string | null>(null);
+
+  const [myReviews, setMyReviews] = useState<MyReviewCard[]>([]);
+  const [revLoading, setRevLoading] = useState(false);
+  const [revErr, setRevErr] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const SIZE = 9;
   useEffect(() => {
-    if (!sheetOpen) return;
     let aborted = false;
-
-    (async () => {
+    const loadReservations = async () => {
       try {
-        setLoading(true);
-        setErr(null);
-
-        const res = await fetch(`${API_URL}/v1/vendor/wedding_hall`, {
+        setResLoading(true);
+        setResErr(null);
+        const token = tokenStore.get();
+        const res = await fetch(`${API_URL}/v1/reservation/`, {
           cache: 'no-store',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         });
-        if (!res.ok) throw new Error(`목록 조회 실패 (${res.status})`);
-
-        const json: unknown = await res.json();
-        const list = pickList(json)
-          .filter(isRecord)
-          .map((v, idx) => toVendorItem(v as VendorApiItem, idx));
-
-        if (!aborted) setVendors(list);
+        if (!res.ok) throw new Error(`예약 조회 실패 (${res.status})`);
+        const json = (await res.json()) as unknown;
+        const list = pickList(json).filter(isReservationApiItem);
+        const data = list.map(toMyReservation);
+        if (!aborted) setMyReservations(data);
       } catch (e: unknown) {
-        const msg =
-          e instanceof Error ? e.message : '목록을 불러오지 못했어요.';
-        if (!aborted) setErr(msg);
+        if (!aborted) setResErr(getErrorMessage(e));
       } finally {
-        if (!aborted) setLoading(false);
+        if (!aborted) setResLoading(false);
       }
-    })();
-
+    };
+    loadReservations();
     return () => {
       aborted = true;
     };
-  }, [sheetOpen, API_URL]);
+  }, [API_URL]);
 
-  const hasVendors = useMemo(() => vendors.length > 0, [vendors]);
+  const vendorMap: Record<string, VendorItem> = useMemo(() => {
+    const m: Record<string, VendorItem> = {};
+    for (const v of vendors) m[String(v.id)] = v;
+    return m;
+  }, [vendors]);
+
+  const groupedReservations = useMemo(() => {
+    const map = new Map<string, MyReservation[]>();
+    for (const r of myReservations) {
+      const key = r.reservationDate;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(r);
+    }
+    return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
+  }, [myReservations]);
+  const loadMyReviews = useCallback(
+    async (p: number, append: boolean) => {
+      setRevLoading(true);
+      setRevErr(null);
+      try {
+        const token = tokenStore.get();
+        const url = `${API_URL}/v1/review/my-reviews?page=${p}&size=${SIZE}`;
+        const res = await fetch(url, {
+          cache: 'no-store',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        });
+        if (!res.ok) throw new Error(`후기 조회 실패 (${res.status})`);
+
+        const json = (await res.json()) as unknown;
+        const list = pickList(json);
+        const parsed = list
+          .map(toMyReviewCard)
+          .filter((v): v is MyReviewCard => v !== null);
+
+        setMyReviews((prev) => (append ? [...prev, ...parsed] : parsed));
+        setHasMore(getHasNext(json));
+        setPage(p);
+      } catch (e: unknown) {
+        setRevErr(getErrorMessage(e));
+        if (!append) setMyReviews([]);
+        setHasMore(false);
+      } finally {
+        setRevLoading(false);
+      }
+    },
+    [API_URL, SIZE],
+  );
+
+  useEffect(() => {
+    if (tab !== 'review') return;
+    if (myReviews.length === 0 && !revLoading) {
+      void loadMyReviews(0, false);
+    }
+  }, [tab, myReviews.length, revLoading, loadMyReviews]);
 
   return (
     <main className="min-h-screen bg-background pb-24">
@@ -144,39 +312,47 @@ export default function Page() {
 
         {tab === 'reserve' ? (
           <div className="mt-4 space-y-6">
-            <div>
-              <div className="mb-3 text-sm font-medium text-foreground">
-                8월 30일
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {RESERVE_0830.map((c) => (
-                  <CompanyCard
-                    key={c.id}
-                    region={c.region}
-                    name={c.name}
-                    imageSrc={c.imageSrc}
+            {resLoading && (
+              <div className="grid gap-3">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-28 w-80 mx-auto rounded-lg bg-gray-100 animate-pulse"
                   />
                 ))}
               </div>
-            </div>
+            )}
+            {resErr && <p className="text-sm text-red-500">{resErr}</p>}
+            {!resLoading && !resErr && groupedReservations.length === 0 && (
+              <p className="text-sm text-text-secondary">
+                예약 내역이 없습니다.
+              </p>
+            )}
+            {groupedReservations.map(([isoDate, items]) => (
+              <div key={isoDate}>
+                <div className="mb-3 text-sm font-medium text-foreground">
+                  {labelFromISODate(isoDate)}
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {items.map((r) => {
+                    const v = vendorMap[String(r.vendorId)];
+                    const name =
+                      r.vendorName ?? v?.name ?? `업체 #${r.vendorId}`;
 
-            <div>
-              <div className="mb-3 text-sm font-medium text-foreground">
-                8월 29일
+                    const logo = pickVendorLogo(v, r);
+
+                    return (
+                      <CompanyCard
+                        key={r.id}
+                        region={v?.region ?? '-'}
+                        name={name}
+                        imageSrc={logo}
+                      />
+                    );
+                  })}
+                </div>
               </div>
-              <div className="grid grid-cols-3 gap-3 opacity-40">
-                <CompanyCard
-                  region="압구정"
-                  name="정샘물"
-                  imageSrc="/logos/jsm.png"
-                />
-                <CompanyCard
-                  region="청담"
-                  name="순수"
-                  imageSrc="/logos/soonsoo.png"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         ) : (
           <div className="mt-4">
@@ -191,7 +367,6 @@ export default function Page() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-3 gap-3">
               <button
                 type="button"
@@ -208,22 +383,7 @@ export default function Page() {
                 <span>후기작성</span>
               </button>
 
-              {[
-                {
-                  id: 'w1',
-                  region: '압구정',
-                  name: '정샘물',
-                  imageSrc: '/logos/jsm.png',
-                  rating: { score: 4.8, count: 164 },
-                },
-                {
-                  id: 'w2',
-                  region: '청담',
-                  name: '순수',
-                  imageSrc: '/logos/soonsoo.png',
-                  rating: { score: 4.5, count: 92 },
-                },
-              ].map((c: ReviewCompany) => (
+              {myReviews.map((c) => (
                 <CompanyCard
                   key={c.id}
                   variant="review"
@@ -231,9 +391,37 @@ export default function Page() {
                   name={c.name}
                   imageSrc={c.imageSrc}
                   rating={c.rating}
+                  onClick={() => router.push(`/review/${c.id}`)}
                 />
               ))}
             </div>
+            {revLoading && (
+              <div className="mt-4 grid gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-10 rounded-md bg-gray-100 animate-pulse"
+                  />
+                ))}
+              </div>
+            )}
+            {revErr && <p className="mt-3 text-sm text-red-500">{revErr}</p>}
+            {!revLoading && !revErr && myReviews.length === 0 && (
+              <p className="mt-3 text-sm text-text-secondary">
+                작성한 후기가 없습니다.
+              </p>
+            )}
+            {!revLoading && hasMore && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  className="px-4 h-10 rounded-lg outline-1 outline-box-line text-sm"
+                  onClick={() => loadMyReviews(page + 1, true)}
+                >
+                  더 보기
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -246,52 +434,89 @@ export default function Page() {
           업체 선택
         </h3>
 
-        {loading && (
-          <div className="mt-3 grid gap-2">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="h-10 animate-pulse rounded-md bg-gray-100"
-              />
-            ))}
+        <div className="mt-3">
+          <div className="mb-2 text-sm font-medium text-foreground">
+            내 예약에서 선택
           </div>
-        )}
 
-        {err && <p className="mt-3 text-sm text-red-500">{err}</p>}
+          {resLoading && (
+            <div className="grid gap-2">
+              {[...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-10 animate-pulse rounded-md bg-gray-100"
+                />
+              ))}
+            </div>
+          )}
 
-        {hasVendors && (
-          <ul className="mt-2 max-h-[60vh] overflow-y-auto">
-            {vendors.map((v) => (
-              <li key={String(v.id)}>
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between rounded-md px-2 py-2 hover:bg-gray-50"
-                  onClick={() => {
-                    setSheetOpen(false);
-                    const q = new URLSearchParams({
-                      vendorId: String(v.id),
-                      vendorName: v.name,
-                    }).toString();
-                    router.push(`/mypage/review?${q}`);
-                  }}
-                >
-                  <span className="text-sm text-foreground">{v.name}</span>
-                  {v.region && (
-                    <span className="text-xs text-text-secondary">
-                      {v.region}
-                    </span>
-                  )}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+          {resErr && <p className="text-sm text-red-500">{resErr}</p>}
 
-        {!loading && !err && !hasVendors && (
-          <p className="mt-3 text-sm text-text-secondary">
-            표시할 업체가 없습니다.
-          </p>
-        )}
+          {!resLoading && !resErr && myReservations.length === 0 && (
+            <p className="text-sm text-text-secondary">예약된 내역이 없어요.</p>
+          )}
+
+          {myReservations.length > 0 && (
+            <ul className="max-h-[60vh] overflow-y-auto rounded-md border border-gray-100">
+              {myReservations
+                .slice()
+                .sort((a, b) =>
+                  b.reservationDate.localeCompare(a.reservationDate),
+                )
+                .map((r) => {
+                  const v = vendorMap[String(r.vendorId)];
+                  const vendorName =
+                    r.vendorName ?? v?.name ?? `업체 #${r.vendorId}`;
+                  const vendorRegion = v?.region ?? '-';
+                  const logo = pickVendorLogo(v, r);
+
+                  const when =
+                    `${labelFromISODate(r.reservationDate)} ${r.reservationTime || ''}`.trim();
+
+                  return (
+                    <li key={r.id}>
+                      <button
+                        type="button"
+                        className="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-gray-50"
+                        onClick={() => {
+                          setSheetOpen(false);
+                          const q = new URLSearchParams({
+                            vendorId: String(r.vendorId),
+                            vendorName,
+                            reservationId: String(r.id),
+                            date: r.reservationDate,
+                            time: r.reservationTime,
+                          }).toString();
+                          router.push(`/mypage/review?${q}`);
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={logo}
+                            alt={vendorName}
+                            width={28}
+                            height={28}
+                            className="h-7 w-7 rounded-md object-cover"
+                          />
+                          <div className="flex flex-col">
+                            <span className="text-sm text-foreground">
+                              {vendorName}
+                            </span>
+                            <span className="text-xs text-text-secondary">
+                              {when}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-xs text-text-tertiary">
+                          {vendorRegion}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+            </ul>
+          )}
+        </div>
       </CompanyModal>
     </main>
   );

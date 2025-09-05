@@ -12,9 +12,14 @@ const withPwa = withPWA({
 const baseConfig = {
   output: 'standalone',
   images: {
-    domains: [
-      'wedit.me',
-      'wedit-bucket.s3.ap-northeast-2.amazonaws.com', // ✅ presigned URL 호스트 추가
+    domains: ['wedit.me'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'wedit-bucket.s3.ap-northeast-2.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   async rewrites() {
