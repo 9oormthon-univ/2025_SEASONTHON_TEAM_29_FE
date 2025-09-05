@@ -7,7 +7,7 @@ import CompanyCard from '@/components/Mypage/CompanyCard';
 import DdayCard from '@/components/Mypage/D-dayCheck';
 import CompanyModal from './CompanyModal';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { tokenStore } from '@/lib/tokenStore';
 import type { VendorItem } from '@/types/reservation';
 import Image from 'next/image';
@@ -229,42 +229,45 @@ export default function Page() {
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [myReservations]);
-  const loadMyReviews = async (p: number, append: boolean) => {
-    setRevLoading(true);
-    setRevErr(null);
-    try {
-      const token = tokenStore.get();
-      const url = `${API_URL}/v1/review/my-reviews?page=${p}&size=${SIZE}`;
-      const res = await fetch(url, {
-        cache: 'no-store',
-        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      });
-      if (!res.ok) throw new Error(`후기 조회 실패 (${res.status})`);
+  const loadMyReviews = useCallback(
+    async (p: number, append: boolean) => {
+      setRevLoading(true);
+      setRevErr(null);
+      try {
+        const token = tokenStore.get();
+        const url = `${API_URL}/v1/review/my-reviews?page=${p}&size=${SIZE}`;
+        const res = await fetch(url, {
+          cache: 'no-store',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        });
+        if (!res.ok) throw new Error(`후기 조회 실패 (${res.status})`);
 
-      const json = (await res.json()) as unknown;
-      const list = pickList(json);
-      const parsed = list
-        .map(toMyReviewCard)
-        .filter((v): v is MyReviewCard => v !== null);
+        const json = (await res.json()) as unknown;
+        const list = pickList(json);
+        const parsed = list
+          .map(toMyReviewCard)
+          .filter((v): v is MyReviewCard => v !== null);
 
-      setMyReviews((prev) => (append ? [...prev, ...parsed] : parsed));
-      setHasMore(getHasNext(json));
-      setPage(p);
-    } catch (e: unknown) {
-      setRevErr(getErrorMessage(e));
-      if (!append) setMyReviews([]);
-      setHasMore(false);
-    } finally {
-      setRevLoading(false);
-    }
-  };
+        setMyReviews((prev) => (append ? [...prev, ...parsed] : parsed));
+        setHasMore(getHasNext(json));
+        setPage(p);
+      } catch (e: unknown) {
+        setRevErr(getErrorMessage(e));
+        if (!append) setMyReviews([]);
+        setHasMore(false);
+      } finally {
+        setRevLoading(false);
+      }
+    },
+    [API_URL, SIZE],
+  );
 
   useEffect(() => {
     if (tab !== 'review') return;
     if (myReviews.length === 0 && !revLoading) {
       void loadMyReviews(0, false);
     }
-  }, [tab, API_URL, myReviews.length, revLoading]);
+  }, [tab, myReviews.length, revLoading, loadMyReviews]);
 
   return (
     <main className="min-h-screen bg-background pb-24">
