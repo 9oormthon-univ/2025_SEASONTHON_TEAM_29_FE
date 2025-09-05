@@ -23,6 +23,7 @@ type MyReservation = {
   createdAt: string;
   updatedAt: string;
   vendorName?: string;
+  vendorLogoUrl?: string;
   mainImageUrl?: string;
   vendorDescription?: string;
   vendorCategory?: string;
@@ -36,11 +37,13 @@ type ReservationApiItem = {
   createdAt?: string;
   updatedAt?: string;
   vendorName?: string;
+  vendorLogoUrl?: string;
   mainImageUrl?: string;
   vendorDescription?: string;
   vendorCategory?: string;
 };
 
+type MyReviewCard = ReviewCompany;
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
@@ -49,16 +52,28 @@ function pickList(json: unknown): unknown[] {
   if (isRecord(json) && Array.isArray(json.data)) return json.data as unknown[];
   if (isRecord(json) && Array.isArray(json.content))
     return json.content as unknown[];
+  if (isRecord(json) && isRecord(json.data) && Array.isArray(json.data.content))
+    return json.data.content as unknown[];
   return [];
+}
+function getHasNext(json: unknown): boolean {
+  if (!isRecord(json)) return false;
+  if (typeof json.last === 'boolean') return !json.last;
+  if (typeof json.number === 'number' && typeof json.totalPages === 'number') {
+    return json.number + 1 < json.totalPages;
+  }
+  if (isRecord(json.data)) {
+    const d = json.data;
+    if (typeof d.last === 'boolean') return !d.last;
+    if (typeof d.number === 'number' && typeof d.totalPages === 'number') {
+      return (d.number as number) + 1 < (d.totalPages as number);
+    }
+  }
+  return false;
 }
 function isReservationApiItem(v: unknown): v is ReservationApiItem {
   if (!isRecord(v)) return false;
-  return (
-    'id' in v &&
-    'vendorId' in v &&
-    'reservationDate' in v &&
-    typeof v.reservationDate === 'string'
-  );
+  return 'id' in v && 'vendorId' in v && 'reservationDate' in v;
 }
 function toMyReservation(r: ReservationApiItem): MyReservation {
   return {
@@ -69,6 +84,7 @@ function toMyReservation(r: ReservationApiItem): MyReservation {
     createdAt: String(r.createdAt ?? ''),
     updatedAt: String(r.updatedAt ?? ''),
     vendorName: r.vendorName ? String(r.vendorName) : undefined,
+    vendorLogoUrl: r.vendorLogoUrl ? String(r.vendorLogoUrl) : undefined, // 👈 매핑
     mainImageUrl: r.mainImageUrl ? String(r.mainImageUrl) : undefined,
     vendorDescription: r.vendorDescription
       ? String(r.vendorDescription)
@@ -76,14 +92,66 @@ function toMyReservation(r: ReservationApiItem): MyReservation {
     vendorCategory: r.vendorCategory ? String(r.vendorCategory) : undefined,
   };
 }
+function toMyReviewCard(v: unknown): MyReviewCard | null {
+  if (!isRecord(v)) return null;
+  const id =
+    (typeof v.reviewId === 'number' || typeof v.reviewId === 'string'
+      ? v.reviewId
+      : typeof v.id === 'number' || typeof v.id === 'string'
+        ? v.id
+        : null) ?? null;
+  const name =
+    typeof v.vendorName === 'string'
+      ? v.vendorName
+      : `업체 #${String(id ?? '')}`;
+  const region = typeof v.vendorRegion === 'string' ? v.vendorRegion : '-';
+  const imageSrc =
+    typeof v.vendorLogoUrl === 'string'
+      ? v.vendorLogoUrl
+      : '/logos/placeholder.png';
+  const score =
+    typeof v.rating === 'number'
+      ? v.rating
+      : typeof v.score === 'number'
+        ? v.score
+        : 0;
+
+  if (id == null) return null;
+  return {
+    id: String(id),
+    name,
+    region,
+    imageSrc,
+    rating: { score, count: undefined },
+  };
+}
 function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;
   if (typeof e === 'string') return e;
-  return '예약을 불러오지 못했어요.';
+  return '요청에 실패했어요.';
 }
 function labelFromISODate(iso: string) {
   const [, mm, dd] = iso.split('-');
   return `${Number(mm)}월 ${Number(dd)}일`;
+}
+
+function getStringProp(obj: unknown, key: string): string | undefined {
+  if (!obj || typeof obj !== 'object') return undefined;
+  const v = (obj as Record<string, unknown>)[key];
+  return typeof v === 'string' && v.length > 0 ? v : undefined;
+}
+function pickVendorLogo(
+  vendor: VendorItem | undefined,
+  res?: MyReservation,
+): string {
+  return (
+    res?.vendorLogoUrl ??
+    getStringProp(vendor, 'logoImageUrl') ??
+    getStringProp(vendor, 'logoUrl') ??
+    getStringProp(vendor, 'logo') ??
+    res?.mainImageUrl ??
+    '/logos/placeholder.png'
+  );
 }
 
 export default function Page() {
@@ -99,6 +167,12 @@ export default function Page() {
   const [resLoading, setResLoading] = useState(false);
   const [resErr, setResErr] = useState<string | null>(null);
 
+  const [myReviews, setMyReviews] = useState<MyReviewCard[]>([]);
+  const [revLoading, setRevLoading] = useState(false);
+  const [revErr, setRevErr] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const SIZE = 9;
   useEffect(() => {
     let aborted = false;
     const loadReservations = async () => {
@@ -111,11 +185,9 @@ export default function Page() {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         });
         if (!res.ok) throw new Error(`예약 조회 실패 (${res.status})`);
-
         const json = (await res.json()) as unknown;
         const list = pickList(json).filter(isReservationApiItem);
         const data = list.map(toMyReservation);
-
         if (!aborted) setMyReservations(data);
       } catch (e: unknown) {
         if (!aborted) setResErr(getErrorMessage(e));
@@ -144,6 +216,42 @@ export default function Page() {
     }
     return Array.from(map.entries()).sort((a, b) => b[0].localeCompare(a[0]));
   }, [myReservations]);
+  const loadMyReviews = async (p: number, append: boolean) => {
+    setRevLoading(true);
+    setRevErr(null);
+    try {
+      const token = tokenStore.get();
+      const url = `${API_URL}/v1/review/my-reviews?page=${p}&size=${SIZE}`;
+      const res = await fetch(url, {
+        cache: 'no-store',
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      if (!res.ok) throw new Error(`후기 조회 실패 (${res.status})`);
+
+      const json = (await res.json()) as unknown;
+      const list = pickList(json);
+      const parsed = list
+        .map(toMyReviewCard)
+        .filter((v): v is MyReviewCard => v !== null);
+
+      setMyReviews((prev) => (append ? [...prev, ...parsed] : parsed));
+      setHasMore(getHasNext(json));
+      setPage(p);
+    } catch (e: unknown) {
+      setRevErr(getErrorMessage(e));
+      if (!append) setMyReviews([]);
+      setHasMore(false);
+    } finally {
+      setRevLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (tab !== 'review') return;
+    if (myReviews.length === 0 && !revLoading) {
+      void loadMyReviews(0, false);
+    }
+  }, [tab, API_URL, myReviews.length, revLoading]);
 
   return (
     <main className="min-h-screen bg-background pb-24">
@@ -214,13 +322,15 @@ export default function Page() {
                     const v = vendorMap[String(r.vendorId)];
                     const name =
                       r.vendorName ?? v?.name ?? `업체 #${r.vendorId}`;
-                    const img = r.mainImageUrl ?? '/logos/placeholder.png';
+
+                    const logo = pickVendorLogo(v, r);
+
                     return (
                       <CompanyCard
                         key={r.id}
                         region={v?.region ?? '-'}
                         name={name}
-                        imageSrc={img}
+                        imageSrc={logo}
                       />
                     );
                   })}
@@ -241,7 +351,6 @@ export default function Page() {
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-3 gap-3">
               <button
                 type="button"
@@ -257,23 +366,7 @@ export default function Page() {
                 />
                 <span>후기작성</span>
               </button>
-
-              {[
-                {
-                  id: 'w1',
-                  region: '압구정',
-                  name: '정샘물',
-                  imageSrc: '/logos/jsm.png',
-                  rating: { score: 4.8, count: 164 },
-                },
-                {
-                  id: 'w2',
-                  region: '청담',
-                  name: '순수',
-                  imageSrc: '/logos/soonsoo.png',
-                  rating: { score: 4.5, count: 92 },
-                },
-              ].map((c: ReviewCompany) => (
+              {myReviews.map((c) => (
                 <CompanyCard
                   key={c.id}
                   variant="review"
@@ -284,6 +377,33 @@ export default function Page() {
                 />
               ))}
             </div>
+            {revLoading && (
+              <div className="mt-4 grid gap-2">
+                {[...Array(3)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-10 rounded-md bg-gray-100 animate-pulse"
+                  />
+                ))}
+              </div>
+            )}
+            {revErr && <p className="mt-3 text-sm text-red-500">{revErr}</p>}
+            {!revLoading && !revErr && myReviews.length === 0 && (
+              <p className="mt-3 text-sm text-text-secondary">
+                작성한 후기가 없습니다.
+              </p>
+            )}
+            {!revLoading && hasMore && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  className="px-4 h-10 rounded-lg outline outline-1 outline-box-line text-sm"
+                  onClick={() => loadMyReviews(page + 1, true)}
+                >
+                  더 보기
+                </button>
+              </div>
+            )}
           </div>
         )}
       </section>
@@ -330,7 +450,8 @@ export default function Page() {
                   const vendorName =
                     r.vendorName ?? v?.name ?? `업체 #${r.vendorId}`;
                   const vendorRegion = v?.region ?? '-';
-                  const logo = r.mainImageUrl ?? '/logos/placeholder.png';
+                  const logo = pickVendorLogo(v, r);
+
                   const when =
                     `${labelFromISODate(r.reservationDate)} ${r.reservationTime || ''}`.trim();
 
