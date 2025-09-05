@@ -2,29 +2,35 @@
 
 import * as React from 'react';
 import clsx from 'clsx';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
+import { tokenStore } from '@/lib/tokenStore';
 
 function TimeChip({
   label,
   selected,
+  disabled,
   onClick,
 }: {
   label: string;
   selected: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
+      aria-disabled={disabled}
       className={clsx(
         'h-14 w-full rounded-[100px] px-6 text-sm font-medium inline-flex items-center justify-center',
-        'outline outline-offset-[-1px]',
+        'outline outline-offset-[-1px] transition-opacity',
         selected
           ? 'bg-primary-200 outline-2 outline-primary-300'
           : 'outline-1 outline-box-line',
+        disabled && 'opacity-40 pointer-events-none',
       )}
     >
       {label}
@@ -32,22 +38,70 @@ function TimeChip({
   );
 }
 
-const TIMES = [
-  '10:00',
-  '10:30',
-  '11:00',
-  '13:30',
-  '14:00',
-  '14:30',
-  '15:00',
-  '15:30',
-  '16:00',
-];
+type TimeSlot = {
+  time: string;
+  timeDisplay: string;
+  reservationId: number;
+  available: boolean;
+};
+
+type DetailResp = {
+  status: number;
+  success: boolean;
+  message: string;
+  data: {
+    date: string;
+    timeSlots: TimeSlot[];
+    totalSlots: number;
+    availableSlots: number;
+    reservedSlots: number;
+  };
+};
+
+const VENDOR_ID = 3;
 
 export default function ConsultTimePage() {
   const router = useRouter();
+  const sp = useSearchParams();
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+  const rawDate = sp.get('date') ?? new Date().toISOString().slice(0, 10);
+  const [yy, mm, dd] = rawDate.split('-').map(Number);
+
+  const [slots, setSlots] = React.useState<TimeSlot[]>([]);
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
   const [sheet, setSheet] = React.useState<null | 'book' | 'estimate'>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (!API_BASE) return;
+    setSelectedTime(null);
+    const fetchDetail = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = tokenStore.get();
+        const url = `${API_BASE}/v1/reservation/${encodeURIComponent(
+          String(VENDOR_ID),
+        )}/detail?year=${yy}&month=${mm}&day=${dd}`;
+        const res = await fetch(url, {
+          cache: 'no-store',
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json: DetailResp = await res.json();
+        setSlots(json.data?.timeSlots ?? []);
+      } catch (e: any) {
+        setError(e?.message ?? '시간 조회 실패');
+        setSlots([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDetail();
+  }, [API_BASE, yy, mm, dd]);
 
   React.useEffect(() => {
     if (!sheet) return;
@@ -76,16 +130,29 @@ export default function ConsultTimePage() {
       onLeft={() => openSheet('book')}
       onRight={() => openSheet('estimate')}
     >
+      {loading && (
+        <div className="mb-2 text-sm text-text--secondary">
+          시간을 불러오는 중…
+        </div>
+      )}
+      {error && <div className="mb-2 text-sm text-red-500">오류: {error}</div>}
+
       <div className="grid grid-cols-3 gap-4">
-        {TIMES.map((t) => (
-          <TimeChip
-            key={t}
-            label={t}
-            selected={selectedTime === t}
-            onClick={() => setSelectedTime(t)}
-          />
-        ))}
+        {slots.map((s) => {
+          const label = s.timeDisplay?.trim() || s.time;
+          const selected = selectedTime === s.time;
+          return (
+            <TimeChip
+              key={`${s.time}-${s.reservationId}`}
+              label={label}
+              selected={selected}
+              disabled={!s.available}
+              onClick={() => setSelectedTime(s.time)}
+            />
+          );
+        })}
       </div>
+
       {sheet && (
         <div role="dialog" aria-modal="true" className="fixed inset-0 z-[60]">
           <button
