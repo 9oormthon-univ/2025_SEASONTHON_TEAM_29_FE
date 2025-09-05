@@ -63,15 +63,33 @@ export default function ToursPage() {
 
 function ToursSkeleton() {
   return (
-    <ul className="divide-y animate-pulse">
+    <ul>
       {Array.from({ length: 4 }).map((_, i) => (
-        <li key={i} className="flex items-center gap-3 px-4 py-4">
-          <div className="h-10 w-10 rounded bg-gray-200" />
-          <div className="flex-1">
-            <div className="h-4 w-40 rounded bg-gray-200" />
-            <div className="mt-2 h-3 w-24 rounded bg-gray-200" />
+        <li
+          key={i}
+          className="relative select-none px-[22px] py-4"
+          aria-hidden="true"
+        >
+          <div className="flex items-center gap-3">
+            {/* 로고 자리 */}
+            <div className="h-[50px] w-[50px] rounded-2xl bg-gray-100 ring-1 ring-gray-100 animate-pulse" />
+
+            {/* 이름 + 배지 */}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                {/* 이름 자리 */}
+                <div className="h-4 w-40 rounded bg-gray-200 animate-pulse" />
+                {/* 배지 자리 */}
+                <div className="h-5 w-16 rounded-lg bg-gray-200 animate-pulse" />
+              </div>
+            </div>
+
+            {/* > 아이콘 자리 */}
+            <div className="h-5 w-5 rounded bg-gray-200 animate-pulse" />
           </div>
-          <div className="h-5 w-14 rounded-full bg-gray-200" />
+
+          {/* 얇고 연한 inset 구분선 (좌우 여백 맞춤) */}
+          <div className="pointer-events-none absolute bottom-0 left-[22px] right-[22px] h-px bg-gray-200/60" />
         </li>
       ))}
     </ul>

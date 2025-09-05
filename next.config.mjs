@@ -25,7 +25,6 @@ const baseConfig = {
   async rewrites() {
     const backend = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
     if (!backend) return [];
-    // /api/* → https://wedit.me/api/* 로 “그대로” 프록시
     return [{ source: '/api/:path*', destination: `${backend}/:path*` }];
   },
 };

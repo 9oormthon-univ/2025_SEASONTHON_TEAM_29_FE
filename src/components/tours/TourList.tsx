@@ -6,15 +6,16 @@ import TourItem from './TourItem';
 
 export default function TourList({ data }: { data: ToursBundle }) {
   const router = useRouter();
+  console.log(data);
 
   return (
     <ul>
       {data.dressTour.map((it) => (
         <TourItem
           key={it.id}
-          name={it.brandName}
-          logo={it.logoUrl}
-          status={it.status === 'PENDING' ? '기록 대기' : '기록 완료'}
+          name={it.vendorName}
+          logo={it.logoImageUrl}
+          status={it.status === 'WAITING' ? '기록 대기' : '기록 완료'}
           onClick={() => router.push(`/tours/${it.id}`)}
         />
       ))}

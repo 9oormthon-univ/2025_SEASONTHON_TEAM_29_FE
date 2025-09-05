@@ -1,30 +1,55 @@
 // src/components/auth/AuthGuard.tsx
 'use client';
 
+import { isExpired } from '@/lib/jwt';
+import { refreshStore } from '@/lib/refreshStore';
 import { tokenStore } from '@/lib/tokenStore';
+import { reissueOnce } from '@/services/http';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-/** 보호 페이지를 감싸서, 토큰 없으면 /login 으로 튕김 */
+/** 보호 페이지를 감싸서, 토큰 만료/부재 시 리이슈 또는 홈('/') 이동 */
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!mounted) return;
+    let alive = true;
 
-    const t = tokenStore.get();
-    if (!t) {
-      // ✅ 쿼리는 window.location.search로 읽기 (useSearchParams 사용 금지)
-      const qs = typeof window !== 'undefined' ? window.location.search : '';
-      const nextPath = qs ? `${pathname}${qs}` : (pathname || '/');
-      router.replace(`/login?next=${encodeURIComponent(nextPath)}`);
+    (async () => {
+      const at = tokenStore.get();
+
+      // 1) 액세스 토큰 없음 → 홈으로
+      if (!at) return goHome();
+
+      // 2) 유효하면 통과
+      if (!isExpired(at)) {
+        if (alive) setReady(true);
+        return;
+      }
+
+      // 3) 만료면 1회 재발급
+      const ok = await reissueOnce().catch(() => false);
+      if (!ok) return goHome();
+
+      // 4) 재발급 성공 → 통과
+      if (alive) setReady(true);
+    })();
+
+    function goHome() {
+      tokenStore.clear?.();
+      refreshStore.clear?.();
+      router.replace('/'); // 요구사항: 실패시 '/'로
     }
-  }, [mounted, pathname, router]);
 
-  if (!mounted) return null;
+    return () => { alive = false; };
+  }, [pathname, router]);
+
+  if (!ready) {
+    // 검증중 UI (원하면 바꿔도 됨)
+    return <div className="grid min-h-dvh place-items-center text-sm text-text-secondary">인증 확인 중…</div>;
+  }
+
   return <>{children}</>;
 }

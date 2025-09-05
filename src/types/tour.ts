@@ -1,12 +1,18 @@
+// src/types/tour.ts
 export type TourTab = 'dressTour' | 'dressRomance';
-
-export type TourStatus = 'PENDING' | 'DONE'; // 기록 대기 / 완료
+export type TourStatus = 'WAITING' | 'COMPLETE';
+export type Category = 'WEDDING_HALL';
 
 export interface DressTourItem {
-  id: string;
-  brandName: string;
-  logoUrl: string;
+  id: number;
   status: TourStatus;
+  vendorName: string;
+  vendorDescription: string;
+  vendorCategory: Category;
+  logoImageUrl: string;
+  materialOrder?: number;
+  neckLineOrder?: number;
+  lineOrder?: number;
 }
 
 export interface DressRomanceItem {
