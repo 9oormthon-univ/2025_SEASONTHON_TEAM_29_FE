@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
 import CalendarDay from '@/components/Calandar/CalendarDay';
 import { tokenStore } from '@/lib/tokenStore';
-
+import type { ReservationDay } from '@/types/reservation';
 const weekdayLabels = ['월', '화', '수', '목', '금', '토', '일'];
 const mondayFirst = (jsDay: number) => (jsDay + 6) % 7;
 
@@ -23,13 +23,15 @@ function getYearMonth(sp: ReturnType<typeof useSearchParams>) {
     label: `${year}.${String(month1).padStart(2, '0')}`,
   };
 }
-
-type ReservationDay = {
-  date: string;
-  totalSlots: number;
-  reservedSlots: number;
-  available: boolean;
+type ApiResponseDays = {
+  status: number;
+  success: boolean;
+  message: string;
+  data: ReservationDay[];
 };
+
+const getErrorMessage = (e: unknown) =>
+  e instanceof Error ? e.message : typeof e === 'string' ? e : '날짜 조회 실패';
 
 export default function ConsultDaysPage() {
   const router = useRouter();
@@ -48,7 +50,6 @@ export default function ConsultDaysPage() {
     ...Array.from({ length: startIdx }, () => null),
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ];
-
   const [selectedDay, setSelectedDay] = React.useState<number | null>(null);
   const [availableDays, setAvailableDays] = React.useState<Set<number>>(
     new Set(),
@@ -62,6 +63,7 @@ export default function ConsultDaysPage() {
       return;
     }
 
+    // useEffect 내부 fetchDays 교체
     const fetchDays = async () => {
       setLoading(true);
       setError(null);
@@ -73,30 +75,22 @@ export default function ConsultDaysPage() {
 
         const res = await fetch(url, {
           cache: 'no-store',
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}), // 토큰 있으면 헤더 추가
-          },
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         });
 
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json: {
-          status: number;
-          success: boolean;
-          message: string;
-          data: ReservationDay[];
-        } = await res.json();
+
+        const json = (await res.json()) as ApiResponseDays;
 
         const set = new Set<number>();
         for (const item of json.data ?? []) {
           const [yy, mm, dd] = item.date.split('-').map(Number);
-          if (yy === year && mm === month1 && item.available) {
-            set.add(dd);
-          }
+          if (yy === year && mm === month1 && item.available) set.add(dd);
         }
         setAvailableDays(set);
-      } catch (e: any) {
-        setError(e?.message ?? '날짜 조회 실패');
-        setAvailableDays(new Set());
+      } catch (e: unknown) {
+        setError(getErrorMessage(e));
+        setAvailableDays(new Set<number>());
       } finally {
         setLoading(false);
       }

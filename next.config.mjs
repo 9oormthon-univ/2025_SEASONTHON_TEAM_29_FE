@@ -13,6 +13,14 @@ const baseConfig = {
   output: 'standalone',
   images: {
     domains: ['wedit.me'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'wedit-bucket.s3.ap-northeast-2.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   async rewrites() {
     const backend = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');

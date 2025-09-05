@@ -73,7 +73,7 @@ export default function ReviewDetailPage() {
   }, []);
 
   const categoryKo = useMemo<CompanyType>(() => {
-    return data ? CATEGORY_MAP[data.vendorCategory] : '웨딩홀';
+    return data ? (CATEGORY_MAP[data.vendorCategory] ?? '웨딩홀') : '웨딩홀';
   }, [data]);
   return (
     <div className="w-full max-w-[420px] mx-auto">
@@ -124,33 +124,31 @@ export default function ReviewDetailPage() {
               </div>
             </div>
           </section>
-          {data.imagesUrls?.length > 0 && (
+
+          {data.imagesUrls.length > 0 && (
             <section className="px-5 mt-5">
               <div className="flex gap-3">
-                {data.imagesUrls?.length > 0 && (
-                  <section className="px-5 mt-5">
-                    <div className="flex gap-3">
-                      {data.imagesUrls.slice(0, 4).map((src, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => setImagebox({ open: true, idx })}
-                          className="w-20 h-20 rounded-lg outline-[0.5px] outline-offset-[-0.5px] outline-box-line overflow-hidden bg-white"
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={src}
-                            alt={`review-${idx + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </section>
-                )}
+                {data.imagesUrls.slice(0, 4).map((src, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setImagebox({ open: true, idx })}
+                    className="w-20 h-20 rounded-lg outline-[0.5px] outline-offset-[-0.5px] outline-box-line overflow-hidden bg-white"
+                  >
+                    <Image
+                      src={src}
+                      alt={`review-${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      width={80}
+                      height={80}
+                      priority
+                    />
+                  </button>
+                ))}
               </div>
             </section>
           )}
+
           <section className="px-5 mt-6">
             <div className="inline-flex px-2.5 py-1 rounded-lg bg-primary-200">
               <span className="text-xs font-medium text-text--default">
@@ -161,6 +159,7 @@ export default function ReviewDetailPage() {
               {data.contentBest}
             </p>
           </section>
+
           <section className="px-5 mt-6 mb-10">
             <div className="inline-flex px-2.5 py-1 rounded-lg bg-box-line">
               <span className="text-xs font-medium text-text--default">
@@ -171,7 +170,8 @@ export default function ReviewDetailPage() {
               {data.contentWorst}
             </p>
           </section>
-          {imagebox.open && data.imagesUrls?.length ? (
+
+          {imagebox.open && data.imagesUrls.length ? (
             <Imagebox
               images={data.imagesUrls}
               startIndex={imagebox.idx}

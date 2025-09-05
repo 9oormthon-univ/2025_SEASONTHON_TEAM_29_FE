@@ -9,22 +9,11 @@ import CompanyModal from './CompanyModal';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { tokenStore } from '@/lib/tokenStore';
+import type { VendorItem } from '@/types/reservation';
+import Image from 'next/image';
 
 type Company = { id: string; region: string; name: string; imageSrc: string };
 type ReviewCompany = Company & { rating: { score: number; count?: number } };
-
-type VendorItem = { id: number | string; name: string; region?: string };
-type VendorApiItem = Partial<{
-  id: number | string;
-  vendorId: number | string;
-  weddingHallId: number | string;
-  name: string;
-  hallName: string;
-  vendorName: string;
-  region: string;
-  area: string;
-  location: string;
-}>;
 
 type MyReservation = {
   id: number;
@@ -33,6 +22,19 @@ type MyReservation = {
   reservationTime: string;
   createdAt: string;
   updatedAt: string;
+  vendorName?: string;
+  mainImageUrl?: string;
+  vendorDescription?: string;
+  vendorCategory?: string;
+};
+
+type ReservationApiItem = {
+  id: number | string;
+  vendorId: number | string;
+  reservationDate: string;
+  reservationTime?: string;
+  createdAt?: string;
+  updatedAt?: string;
   vendorName?: string;
   mainImageUrl?: string;
   vendorDescription?: string;
@@ -48,6 +50,36 @@ function pickList(json: unknown): unknown[] {
   if (isRecord(json) && Array.isArray(json.content))
     return json.content as unknown[];
   return [];
+}
+function isReservationApiItem(v: unknown): v is ReservationApiItem {
+  if (!isRecord(v)) return false;
+  return (
+    'id' in v &&
+    'vendorId' in v &&
+    'reservationDate' in v &&
+    typeof v.reservationDate === 'string'
+  );
+}
+function toMyReservation(r: ReservationApiItem): MyReservation {
+  return {
+    id: Number(r.id),
+    vendorId: Number(r.vendorId),
+    reservationDate: String(r.reservationDate),
+    reservationTime: String(r.reservationTime ?? ''),
+    createdAt: String(r.createdAt ?? ''),
+    updatedAt: String(r.updatedAt ?? ''),
+    vendorName: r.vendorName ? String(r.vendorName) : undefined,
+    mainImageUrl: r.mainImageUrl ? String(r.mainImageUrl) : undefined,
+    vendorDescription: r.vendorDescription
+      ? String(r.vendorDescription)
+      : undefined,
+    vendorCategory: r.vendorCategory ? String(r.vendorCategory) : undefined,
+  };
+}
+function getErrorMessage(e: unknown): string {
+  if (e instanceof Error) return e.message;
+  if (typeof e === 'string') return e;
+  return '예약을 불러오지 못했어요.';
 }
 function labelFromISODate(iso: string) {
   const [, mm, dd] = iso.split('-');
@@ -79,31 +111,14 @@ export default function Page() {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         });
         if (!res.ok) throw new Error(`예약 조회 실패 (${res.status})`);
-        const json: any = await res.json();
-        const list = pickList(json).filter(isRecord) as any[];
-        const data: MyReservation[] = list.map((r) => ({
-          id: Number(r.id),
-          vendorId: Number((r as any).vendorId),
-          reservationDate: String((r as any).reservationDate),
-          reservationTime: String((r as any).reservationTime ?? ''),
-          createdAt: String((r as any).createdAt ?? ''),
-          updatedAt: String((r as any).updatedAt ?? ''),
-          vendorName: (r as any).vendorName
-            ? String((r as any).vendorName)
-            : undefined,
-          mainImageUrl: (r as any).mainImageUrl
-            ? String((r as any).mainImageUrl)
-            : undefined,
-          vendorDescription: (r as any).vendorDescription
-            ? String((r as any).vendorDescription)
-            : undefined,
-          vendorCategory: (r as any).vendorCategory
-            ? String((r as any).vendorCategory)
-            : undefined,
-        }));
+
+        const json = (await res.json()) as unknown;
+        const list = pickList(json).filter(isReservationApiItem);
+        const data = list.map(toMyReservation);
+
         if (!aborted) setMyReservations(data);
-      } catch (e: any) {
-        if (!aborted) setResErr(e?.message ?? '예약을 불러오지 못했어요.');
+      } catch (e: unknown) {
+        if (!aborted) setResErr(getErrorMessage(e));
       } finally {
         if (!aborted) setResLoading(false);
       }
@@ -337,7 +352,7 @@ export default function Page() {
                         }}
                       >
                         <div className="flex items-center gap-2">
-                          <img
+                          <Image
                             src={logo}
                             alt={vendorName}
                             width={28}

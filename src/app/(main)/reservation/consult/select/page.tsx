@@ -44,6 +44,16 @@ type TimeSlot = {
   available: boolean;
 };
 
+type ApiResponseTimeSlots = {
+  status: number;
+  success: boolean;
+  message: string;
+  data: { timeSlots: TimeSlot[] } | null;
+};
+
+const getErrorMessage = (e: unknown) =>
+  e instanceof Error ? e.message : typeof e === 'string' ? e : '시간 조회 실패';
+
 const VENDOR_ID = 3;
 
 export default function ConsultTimePage() {
@@ -73,10 +83,10 @@ export default function ConsultTimePage() {
           cache: 'no-store',
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
+        const json = (await res.json()) as ApiResponseTimeSlots;
         setSlots(json.data?.timeSlots ?? []);
-      } catch (e: any) {
-        setError(e?.message ?? '시간 조회 실패');
+      } catch (e: unknown) {
+        setError(getErrorMessage(e));
       } finally {
         setLoading(false);
       }
@@ -107,8 +117,8 @@ export default function ConsultTimePage() {
       });
       if (!res.ok) throw new Error(`예약 실패 (HTTP ${res.status})`);
       setSheet('book');
-    } catch (e: any) {
-      setError(e?.message ?? '예약 실패');
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setPosting(false);
     }
