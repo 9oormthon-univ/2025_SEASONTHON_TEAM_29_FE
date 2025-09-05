@@ -2,6 +2,7 @@
 'use client';
 
 import { STICKER_SRC } from '@/components/calendar/stickers';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect } from 'react';
 
@@ -67,16 +68,11 @@ export default function CalSheet({
 
         <ul className="mt-5 space-y-3">
           {items.map((it) => (
-            <li key={it.id} className="flex items-center gap-3">
-              <img
-                src={STICKER_SRC[it.sticker]}
-                alt=""
-                width={28}
-                height={28}
-                className="h-7 w-7"
-                draggable={false}
-              />
-              <span className="text-[15px] text-gray-700">{it.title}</span>
+            <li key={it.id}>
+              <Link href="/coming-soon" className="flex items-center gap-3 active:opacity-90">
+                <Image src={STICKER_SRC[it.sticker]} alt="" width={28} height={28} className="h-7 w-7" />
+                <span className="text-[15px] text-gray-700">{it.title}</span>
+              </Link>
             </li>
           ))}
           {!items.length && (

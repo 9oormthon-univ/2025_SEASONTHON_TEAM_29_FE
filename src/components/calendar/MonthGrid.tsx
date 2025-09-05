@@ -5,6 +5,7 @@ import { STICKER_SRC } from '@/components/calendar/stickers';
 import { daysMatrix5, toYMD } from '@/lib/calendar';
 import type { EventItem } from '@/types/calendar';
 import clsx from 'clsx';
+import Image from 'next/image';
 
 type Props = {
   monthBase: Date;
@@ -53,7 +54,7 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
                   aria-label={`${cell.getMonth() + 1}월 ${cell.getDate()}일`}
                   className="absolute left-0 top-[18px] h-9 w-9 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
                 >
-                  <img
+                  <Image
                     src={STICKER_SRC[primary.sticker]}
                     alt=""
                     width={36}
