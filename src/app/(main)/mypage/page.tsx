@@ -366,15 +366,23 @@ export default function Page() {
                 />
                 <span>후기작성</span>
               </button>
+
               {myReviews.map((c) => (
-                <CompanyCard
+                <button
                   key={c.id}
-                  variant="review"
-                  region={c.region}
-                  name={c.name}
-                  imageSrc={c.imageSrc}
-                  rating={c.rating}
-                />
+                  type="button"
+                  onClick={() => router.push(`/review/${c.id}`)}
+                  className="block text-left focus:outline-none focus:ring-2 focus:ring-primary-300 rounded-lg"
+                  aria-label={`${c.name} 후기 상세로 이동`}
+                >
+                  <CompanyCard
+                    variant="review"
+                    region={c.region}
+                    name={c.name}
+                    imageSrc={c.imageSrc}
+                    rating={c.rating}
+                  />
+                </button>
               ))}
             </div>
             {revLoading && (
@@ -397,7 +405,7 @@ export default function Page() {
               <div className="mt-4 flex justify-center">
                 <button
                   type="button"
-                  className="px-4 h-10 rounded-lg outline outline-1 outline-box-line text-sm"
+                  className="px-4 h-10 rounded-lg outline-1 outline-box-line text-sm"
                   onClick={() => loadMyReviews(page + 1, true)}
                 >
                   더 보기

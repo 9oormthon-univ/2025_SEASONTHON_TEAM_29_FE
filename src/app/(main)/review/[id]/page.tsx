@@ -1,11 +1,13 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Header from '@/components/common/monocules/Header';
 import CompanyLongCard from '@/components/reviews/CompanyLongCard';
 import RingRating from '@/components/reviews/RingRating';
 import Imagebox from '@/components/reviews/ImageBox';
+import { tokenStore } from '@/lib/tokenStore';
 
 type ReviewData = {
   reviewId: number;
@@ -22,8 +24,19 @@ type ReviewData = {
   vendorLogoUrl: string;
   vendorCategory: 'WEDDING_HALL' | 'DRESS' | 'MAKEUP' | 'STUDIO' | string;
 };
+
+type ApiResponse<T> = {
+  status: number;
+  success: boolean;
+  message: string;
+  data: T;
+};
+
 type CompanyType = '웨딩홀' | '드레스' | '메이크업' | '스튜디오';
-const CATEGORY_MAP: Record<ReviewData['vendorCategory'], CompanyType> = {
+const CATEGORY_MAP: Record<
+  'WEDDING_HALL' | 'DRESS' | 'MAKEUP' | 'STUDIO',
+  CompanyType
+> = {
   WEDDING_HALL: '웨딩홀',
   DRESS: '드레스',
   MAKEUP: '메이크업',
@@ -39,47 +52,92 @@ const fmtDate = (iso?: string) => {
   return `${y}.${m}.${day}`;
 };
 
-const MOCK_REVIEW: ReviewData = {
-  reviewId: 125,
-  rating: 4,
-  contentBest:
-    '아펠가모 반포에서 예식을 진행했는데 만족스러웠어요!\n우선 홀에 처음 입장할 때부터 조명이랑 음악이 어우러져서 저도 모르게 울컥하더라고요. 홀 자체가 천장이 높고 채광이 좋아서 화사한 분위기가 연출됐고, 플라워 데코도 사진으로 보던 것보다 훨씬 풍성해서 만족했어요💛',
-  contentWorst:
-    '하객 수가 많다 보니 대기 공간이 조금 좁게 느껴져서 부모님 친구분들이 잠깐 불편하셨다는 피드백도 들었어요🥹그래도 후회 없는 선택이었습니다!!',
-  imagesUrls: [
-    'https://placehold.co/800x1000',
-    'https://placehold.co/80x100',
-    'https://placehold.co/80x100',
-    'https://placehold.co/80x100',
-  ],
-  createdAt: '2025-08-31T12:00:00',
-  writerName: '이유빈',
-  writerType: 'BRIDE',
-  weddingDday: 'D-278',
-  vendorId: 42,
-  vendorName: '아펠가모 반포',
-  vendorLogoUrl: '/apelgamo.jpg',
-  vendorCategory: 'WEDDING_HALL',
-};
+const getErrorMessage = (e: unknown) =>
+  e instanceof Error
+    ? e.message
+    : typeof e === 'string'
+      ? e
+      : '리뷰를 불러오지 못했어요.';
 
 export default function ReviewDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
   const [data, setData] = useState<ReviewData | null>(null);
   const [imagebox, setImagebox] = useState<{ open: boolean; idx: number }>({
     open: false,
     idx: 0,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    setData(MOCK_REVIEW);
-  }, []);
+    if (!API_BASE || !id) return;
+
+    const reviewId = Number(id);
+    if (!Number.isFinite(reviewId)) {
+      setError('잘못된 리뷰 ID 입니다.');
+      return;
+    }
+
+    const fetchReview = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = tokenStore.get();
+        const res = await fetch(
+          `${API_BASE}/v1/review/${encodeURIComponent(String(reviewId))}`,
+          {
+            cache: 'no-store',
+            headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          },
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const json = (await res.json()) as ApiResponse<ReviewData>;
+        if (!json?.data) throw new Error('데이터가 없습니다.');
+        const d = json.data;
+        const normalized: ReviewData = {
+          ...d,
+          reviewId: Number(d.reviewId),
+          vendorId: Number(d.vendorId),
+          imagesUrls: Array.isArray(d.imagesUrls)
+            ? d.imagesUrls.map(String)
+            : [],
+          vendorLogoUrl: d.vendorLogoUrl || '/logos/placeholder.png',
+        };
+        setData(normalized);
+      } catch (e: unknown) {
+        setError(getErrorMessage(e));
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchReview();
+  }, [API_BASE, id]);
 
   const categoryKo = useMemo<CompanyType>(() => {
-    return data ? (CATEGORY_MAP[data.vendorCategory] ?? '웨딩홀') : '웨딩홀';
+    if (!data) return '웨딩홀';
+    return (
+      CATEGORY_MAP[data.vendorCategory as keyof typeof CATEGORY_MAP] ?? '웨딩홀'
+    );
   }, [data]);
+
   return (
     <div className="w-full max-w-[420px] mx-auto">
       <Header value="리뷰상세" />
 
-      {data && (
+      {loading && (
+        <div className="px-5 mt-5 text-sm text-text--secondary">
+          리뷰를 불러오는 중…
+        </div>
+      )}
+      {error && (
+        <div className="px-5 mt-5 text-sm text-red-500">오류: {error}</div>
+      )}
+
+      {data && !loading && !error && (
         <>
           <section className="px-5 mt-3 flex items-center gap-3">
             <div className="w-14 h-16 rounded-full overflow-hidden flex items-center justify-center">
@@ -94,17 +152,16 @@ export default function ReviewDetailPage() {
             </div>
             <div className="flex flex-col">
               <div className="text-sm font-medium text-text--default">
-                {`${data.writerName} ${
-                  data.writerType === 'BRIDE' ? '신부님' : '신랑님'
-                }`}
+                {`${data.writerName} ${data.writerType === 'BRIDE' ? '신부님' : '신랑님'}`}
               </div>
             </div>
           </section>
+
           <section className="px-5 mt-5">
             <CompanyLongCard
               className="w-full"
               title={data.vendorName}
-              logoUrl={data.vendorLogoUrl}
+              logoUrl={data.vendorLogoUrl || '/logos/placeholder.png'}
               date={fmtDate(data.createdAt)}
               type={categoryKo}
               onReport={() => alert('신고하기 눌림')}
