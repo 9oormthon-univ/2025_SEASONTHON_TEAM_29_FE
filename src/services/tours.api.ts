@@ -13,7 +13,7 @@ export type TourListItemApi = {
   vendorName: string;
   vendorDescription: string;
   vendorCategory: 'WEDDING_HALL';
-  mainImageUrl: string;          // presigned URL
+  logoImageUrl: string;          // presigned URL
 };
 
 export type TourDetailApi = TourListItemApi & {
@@ -70,7 +70,7 @@ function toDressTourItemFromList(x: TourListItemApi): DressTourItem {
     vendorName: x.vendorName,
     vendorDescription: x.vendorDescription,
     vendorCategory: x.vendorCategory,
-    mainImageUrl: x.mainImageUrl,
+    logoImageUrl: x.logoImageUrl,
   };
 }
 

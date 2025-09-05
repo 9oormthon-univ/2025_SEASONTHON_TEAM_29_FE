@@ -9,7 +9,7 @@ export interface DressTourItem {
   vendorName: string;
   vendorDescription: string;
   vendorCategory: Category;
-  mainImageUrl: string;
+  logoImageUrl: string;
   materialOrder?: number;
   neckLineOrder?: number;
   lineOrder?: number;
