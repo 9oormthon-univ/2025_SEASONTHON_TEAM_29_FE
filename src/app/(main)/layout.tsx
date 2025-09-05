@@ -1,3 +1,4 @@
+// src/app/(main)/layout.tsx
 'use client';
 
 import AuthGuard from '@/components/auth/AuthGuard';
@@ -5,23 +6,14 @@ import BottomNav from '@/components/common/atomic/BottomNav';
 import { Container } from '@/components/common/atomic/Container';
 import { usePathname } from 'next/navigation';
 import { Suspense } from 'react';
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? '';
 
   const HIDE_EXACT = ['/search', '/search/filters'];
-  const HIDE_PREFIX = [
-    '/tours/',
-    '/mypage/connection',
-    '/mypage/review',
-    '/editorials',
-    '/reservation',
-    '/cart',
-    '/review',
-  ];
+  const HIDE_PREFIX = ['/tours/', '/mypage/connection', '/mypage/review', '/editorials', '/reservation', '/cart', '/review'];
+  const hideBottomNav = HIDE_EXACT.includes(pathname) || HIDE_PREFIX.some((p) => pathname.startsWith(p));
 
-  const hideBottomNav =
-    HIDE_EXACT.includes(pathname) ||
-    HIDE_PREFIX.some((p) => pathname.startsWith(p));
   return (
     <Suspense fallback={null}>
       <AuthGuard>

@@ -24,7 +24,7 @@ function toHeaderRecord(h?: HeadersInit): Record<string, string> {
 /** ---------- 동시 리프레시 제어 (stampede 방지) ---------- */
 let refreshPromise: Promise<boolean> | null = null;
 
-async function reissueOnce(): Promise<boolean> {
+export async function reissueOnce(): Promise<boolean> {
   if (refreshPromise) return refreshPromise; // 이미 진행 중이면 공유
 
   refreshPromise = (async () => {
