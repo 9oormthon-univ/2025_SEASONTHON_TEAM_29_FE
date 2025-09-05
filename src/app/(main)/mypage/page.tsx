@@ -84,7 +84,7 @@ function toMyReservation(r: ReservationApiItem): MyReservation {
     createdAt: String(r.createdAt ?? ''),
     updatedAt: String(r.updatedAt ?? ''),
     vendorName: r.vendorName ? String(r.vendorName) : undefined,
-    vendorLogoUrl: r.vendorLogoUrl ? String(r.vendorLogoUrl) : undefined, // 👈 매핑
+    vendorLogoUrl: r.vendorLogoUrl ? String(r.vendorLogoUrl) : undefined,
     mainImageUrl: r.mainImageUrl ? String(r.mainImageUrl) : undefined,
     vendorDescription: r.vendorDescription
       ? String(r.vendorDescription)
@@ -109,12 +109,24 @@ function toMyReviewCard(v: unknown): MyReviewCard | null {
     typeof v.vendorLogoUrl === 'string'
       ? v.vendorLogoUrl
       : '/logos/placeholder.png';
+  const pickNumber = (
+    obj: Record<string, unknown>,
+    keys: string[],
+  ): number | undefined => {
+    for (const k of keys) {
+      const val = obj[k];
+      if (typeof val === 'number' && Number.isFinite(val)) return val;
+      if (typeof val === 'string') {
+        const n = Number(val);
+        if (!Number.isNaN(n)) return n;
+      }
+    }
+    return undefined;
+  };
+
   const score =
-    typeof v.rating === 'number'
-      ? v.rating
-      : typeof v.score === 'number'
-        ? v.score
-        : 0;
+    pickNumber(v as Record<string, unknown>, ['myRating', 'rating', 'score']) ??
+    0;
 
   if (id == null) return null;
   return {
@@ -125,6 +137,7 @@ function toMyReviewCard(v: unknown): MyReviewCard | null {
     rating: { score, count: undefined },
   };
 }
+
 function getErrorMessage(e: unknown): string {
   if (e instanceof Error) return e.message;
   if (typeof e === 'string') return e;
@@ -368,21 +381,15 @@ export default function Page() {
               </button>
 
               {myReviews.map((c) => (
-                <button
+                <CompanyCard
                   key={c.id}
-                  type="button"
+                  variant="review"
+                  region={c.region}
+                  name={c.name}
+                  imageSrc={c.imageSrc}
+                  rating={c.rating}
                   onClick={() => router.push(`/review/${c.id}`)}
-                  className="block text-left focus:outline-none focus:ring-2 focus:ring-primary-300 rounded-lg"
-                  aria-label={`${c.name} 후기 상세로 이동`}
-                >
-                  <CompanyCard
-                    variant="review"
-                    region={c.region}
-                    name={c.name}
-                    imageSrc={c.imageSrc}
-                    rating={c.rating}
-                  />
-                </button>
+                />
               ))}
             </div>
             {revLoading && (
