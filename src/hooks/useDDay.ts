@@ -9,15 +9,15 @@ export function useDDayFromToken(
   token?: string | null,
   opts?: { clampPastToZero?: boolean; tz?: string },
 ) {
+  const { clampPastToZero, tz } = opts ?? {};
   return useMemo(() => {
     const j = parseJwt(token);
-    const dateStr = j?.weddingDate;
-    const d = dateStr ? getDDay(dateStr, opts) : null;
+    const dateStr = j?.weddingDate ?? null;
+    const d = dateStr ? getDDay(dateStr, { clampPastToZero, tz }) : null;
     return {
-      date: dateStr ?? null,
+      date: dateStr,
       dday: d,
       label: d == null ? '' : formatDDayLabel(d),
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, opts?.clampPastToZero, opts?.tz]);
+  }, [token, clampPastToZero, tz]);
 }
