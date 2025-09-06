@@ -1,9 +1,11 @@
+// src/app/(main)/mypage/connection/page.tsx
 'use client';
 
 import Button from '@/components/common/atomic/Button';
 import Input from '@/components/common/atomic/Input';
 import Header from '@/components/common/monocules/Header';
 import { connectCouple, generateCoupleCode } from '@/services/couple.api';
+import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
 type Props = {
@@ -13,7 +15,8 @@ type Props = {
 const getErrorMessage = (e: unknown) =>
   e instanceof Error ? e.message : typeof e === 'string' ? e : '알 수 없는 오류가 발생했어요.';
 
-export default function CoupleLinkingPage({ onComplete }: Props) {
+/** 실제 화면 컴포넌트(기본 내보내기 아님) */
+function CoupleLinkingView({ onComplete }: Props) {
   const [myCode, setMyCode] = React.useState('');
   const [partnerCode, setPartnerCode] = React.useState('');
   const [isConnected, setIsConnected] = React.useState(false);
@@ -52,7 +55,6 @@ export default function CoupleLinkingPage({ onComplete }: Props) {
   return (
     <div className="min-h-screen bg-background flex justify-center">
       <div className="w-96 px-6 py-5 space-y-8 pb-28">
-        {/* pb-28: 버튼 fixed라 겹치지 않도록 하단 여백 확보 */}
         <Header value="계정연동" />
 
         <section className="space-y-2">
@@ -93,7 +95,6 @@ export default function CoupleLinkingPage({ onComplete }: Props) {
         {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
       </div>
 
-      {/* 하단 완료 버튼 */}
       <div className="fixed bottom-6 left-0 right-0 flex justify-center">
         <div className="w-96 px-6">
           <Button
@@ -109,4 +110,10 @@ export default function CoupleLinkingPage({ onComplete }: Props) {
       </div>
     </div>
   );
+}
+
+/** ✅ page.tsx의 기본 내보내기는 props를 받지 않는 래퍼여야 함 */
+export default function Page() {
+  const router = useRouter();
+  return <CoupleLinkingView onComplete={() => router.push('/mypage')} />;
 }
