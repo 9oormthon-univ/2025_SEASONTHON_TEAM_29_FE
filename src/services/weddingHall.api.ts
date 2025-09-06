@@ -6,10 +6,11 @@ export type HallStyle = 'CHAPEL' | 'HOTEL' | 'CONVENTION' | 'HOUSE';
 export type HallMeal  = 'BUFFET' | 'COURSE' | 'ONE' | 'TABLE_SETTING';
 
 export type HallSearchReq = {
-  style?: HallStyle;
-  meal?: HallMeal;
-  minGuestCount?: number;
-  minPrice?: number;   // 원
+  districts?: string[];          // ["강남구", "마포구"]
+  maxPrice?: number;             // 최대 금액(원)
+  styles?: HallStyle[];          // 다중 선택
+  meals?: HallMeal[];            // 다중 선택
+  requiredGuests?: number;       // 최소 하객 수
   page?: number;
   size?: number;
 };
@@ -19,21 +20,16 @@ type HallSearchRes = {
   totalPages: number;
   size: number;
   content: Array<{
-    id: number;
+    vendorId: number;
     name: string;
     category: 'WEDDING_HALL';
-    style: HallStyle;
-    meal: HallMeal;
-    description: string;
-    minimumAmount: number;
-    maximumGuest: number;
-    vendorImageResponses: Array<{
-      id: number;
-      imageUrl: string;
-      vendorImageType: 'WEDDING_HALL_MAIN' | string;
-      sortOrder: number;
-    }>;
+    dong: string;
+    logoImageUrl?: string;
+    totalReviewCount: number;
+    averageRating: number;
+    price: number;               // 정렬 기준 가격
   }>;
+  number: number;
 };
 
 export async function searchWeddingHalls(
@@ -45,28 +41,37 @@ export async function searchWeddingHalls(
   totalElements: number;
   totalPages: number;
 }> {
+  const page = body.page ?? 0;
+  const size = body.size ?? 12;
+
   const res = await http<ApiEnvelope<HallSearchRes>>(
-    '/v1/vendor/wedding_hall/search',
-    { method: 'POST', body: JSON.stringify(body), skipAuth: opts?.skipAuth }
+    `/v1/vendor/search/wedding-halls?page=${page}&size=${size}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        districts: body.districts,
+        maxPrice: body.maxPrice,
+        styles: body.styles,
+        meals: body.meals,
+        requiredGuests: body.requiredGuests,
+      }),
+      skipAuth: opts?.skipAuth,
+    }
   );
 
-  const data = res.data ?? { totalElements: 0, totalPages: 0, size: 0, content: [] };
+  const data = res.data ?? { totalElements: 0, totalPages: 0, size, content: [], number: page };
 
-  const items: SearchItem[] = data.content.map(it => {
-    const main =
-      it.vendorImageResponses?.find(v => v.vendorImageType === 'WEDDING_HALL_MAIN')
-      ?? it.vendorImageResponses?.[0];
-
-    return {
-      id: it.id,
-      name: it.name,
-      region: '',
-      cat: 'hall',
-      price: it.minimumAmount,
-      logo: main?.imageUrl,
-      tags: [it.style, it.meal].filter(Boolean),
-    };
-  });
+  const items: SearchItem[] = data.content.map((it) => ({
+    id: it.vendorId,
+    name: it.name,
+    region: it.dong ?? '',
+    cat: 'hall',
+    price: it.price,
+    logo: it.logoImageUrl,
+    rating: it.averageRating,
+    count: it.totalReviewCount,
+    // 필요하면 tags에 한글 라벨 넣기
+  }));
 
   return {
     items,

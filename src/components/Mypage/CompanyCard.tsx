@@ -60,6 +60,7 @@ export default function CompanyCard({
             height={112}
             className="w-28 h-28 object-contain"
             priority
+            unoptimized
           />
         </div>
         <div className="mt-2 pl-0.5 text-text-secondary text-sm font-medium leading-normal">
@@ -96,6 +97,7 @@ export default function CompanyCard({
             height={112}
             className="object-contain"
             priority
+            unoptimized
           />
         </div>
         <div className="mt-2 flex items-center gap-1">
@@ -144,6 +146,7 @@ export default function CompanyCard({
           height={112}
           className="w-28 h-28 object-cover"
           priority
+          unoptimized
         />
       </div>
       <div className="mt-2 flex items-center gap-1 pl-0.5">

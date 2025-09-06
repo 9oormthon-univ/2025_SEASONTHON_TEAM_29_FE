@@ -32,7 +32,7 @@ export function PillRadio({
             className={clsx(
               'rounded-full px-4 py-2 text-sm transition-colors border border-gray-200 focus:outline-none',
               selected
-                ? 'bg-primary-100 text-black'
+                ? 'bg-primary-200 text-black'
                 : 'bg-white text-black'
             )}
           >
