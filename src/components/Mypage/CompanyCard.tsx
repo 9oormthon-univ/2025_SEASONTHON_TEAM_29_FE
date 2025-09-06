@@ -63,12 +63,20 @@ export default function CompanyCard({
             unoptimized
           />
         </div>
-        <div className="mt-2 pl-0.5 text-text-secondary text-sm font-medium leading-normal">
-          {region}
-        </div>
-        <div className="mt-[2px] pl-0.5 text-text--default text-sm font-medium leading-normal truncate">
-          {name}
-        </div>
+        {(region || name) && (
+          <div className="mt-2 pl-0.5 flex items-center gap-1 text-sm leading-normal">
+            {region && (
+              <span className="text-text--secondary shrink-0">{region}</span>
+            )}
+            {region && name && <span className="text-text--secondary">·</span>}
+            {name && (
+              <span className="text-text--default font-medium truncate">
+                {name}
+              </span>
+            )}
+          </div>
+        )}
+
         {priceText && (
           <div className="mt-1 pl-0.5 text-text--default text-xs font-semibold leading-normal">
             {priceText}
