@@ -28,6 +28,7 @@
 
 <img width="633" height="897" alt="KakaoTalk_Photo_2025-09-07-07-23-15 001" src="https://github.com/user-attachments/assets/de9ac4ac-dd8b-495c-97fe-a5336b519728" />
 <img width="633" height="897" alt="KakaoTalk_Photo_2025-09-07-07-23-16 002" src="https://github.com/user-attachments/assets/40fdce1d-cde0-48fc-b793-936671f614cb" />
+
 [웨딧 입장하기](https://wedit.me)
 
 ---
