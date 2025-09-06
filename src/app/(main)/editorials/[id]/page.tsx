@@ -5,7 +5,7 @@ import { EDITORIAL_COMPONENTS } from '@/data/editorials';
 import { getEditorialById } from '@/lib/editorials';
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { notFound, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 type RouteParams = { id: string };
 
@@ -58,14 +58,12 @@ export default async function EditorialDetailPage({
   const logoVariant = ed.logoVariant ?? (isWhite ? 'g' : 'b');
   const logoSrc = `/editorials/logo-${logoVariant}.svg`;
 
-  const router = useRouter();
-
   return (
     <main className="mx-auto w-full max-w-[420px] pb-24" data-hide-bottombar>
-      <Header 
-        showBack
-        onBack={()=>router.back()}
-        value="매거진" className="h-[50px] px-[22px]" />
+      <Header
+        value="매거진"
+        className="h-[50px] px-[22px]"
+      />
 
       {/* 썸네일 + 오버레이 */}
       <section className="relative">

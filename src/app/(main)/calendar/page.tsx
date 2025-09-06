@@ -70,7 +70,7 @@ export default function CalendarPage() {
     <main className="mx-auto w-full max-w-[420px]">
       <Header
         showBack
-        onBack={()=>{()=>router.back()}}
+        onBack={()=>router.back()}
         value={`${base.getMonth() + 1}월`}
         rightSlot={
           <CalendarToggle
