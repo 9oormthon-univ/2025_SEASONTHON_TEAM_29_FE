@@ -10,7 +10,7 @@ import VendorInfo from './VendorInfo';
 export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail }) {
   return (
     <main className="mx-auto w-full max-w-[420px] pb-[calc(env(safe-area-inset-bottom)+24px)]">
-      <Header value={vendor.title} />
+      <Header value={vendor.title+' '+vendor.address?.dong} />
       <VendorHero src={vendor.mainImage} alt={vendor.title} />
       <VendorInfo
         title={vendor.title}
