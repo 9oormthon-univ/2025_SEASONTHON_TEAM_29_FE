@@ -1,76 +1,95 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Header from '@/components/common/monocules/Header';
 import CompanyCard from '@/components/Mypage/CompanyCard';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import Chip from '@/components/common/atomic/Chips';
 import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { tokenStore } from '@/lib/tokenStore';
 
-type StudioItem = {
-  id: string | number;
+type VendorItem = {
+  vendorId: number;
   name: string;
-  region: string;
-  imageSrc: string;
-  rating: { score: number; count?: number };
-  priceText: string;
+  address?: {
+    city?: string;
+    district?: string;
+  };
+  rating?: {
+    score: number;
+    count?: number;
+  };
+  minimumAmount?: number;
+  logoImageUrl?: string | null;
+  mainImageUrl?: string | null;
 };
 
-const STUDIOS: StudioItem[] = [
-  {
-    id: 1,
-    name: '그레이스케일',
-    region: '선릉',
-    imageSrc: '/logos/grayscale.png',
-    rating: { score: 4.8, count: 164 },
-    priceText: '101만원~',
-  },
-  {
-    id: 2,
-    name: '203사진',
-    region: '신림',
-    imageSrc: '/logos/203.png',
-    rating: { score: 4.8, count: 200 },
-    priceText: '190만원~',
-  },
-  {
-    id: 3,
-    name: 'ST정우',
-    region: '청담',
-    imageSrc: '/logos/stj.png',
-    rating: { score: 4.7, count: 186 },
-    priceText: '102만원~',
-  },
-  {
-    id: 4,
-    name: 'S 스튜디오',
-    region: '강남',
-    imageSrc: '/logos/sstudio.png',
-    rating: { score: 4.8, count: 293 },
-    priceText: '124만원~',
-  },
-  {
-    id: 5,
-    name: '노우드',
-    region: '서초',
-    imageSrc: '/logos/noud.png',
-    rating: { score: 4.9, count: 124 },
-    priceText: '49만원~',
-  },
-  {
-    id: 6,
-    name: '노블스튜디오',
-    region: '광주',
-    imageSrc: '/logos/noble.png',
-    rating: { score: 4.8, count: 164 },
-    priceText: '124만원~',
-  },
-];
+type ApiResp = {
+  status: number;
+  success: boolean;
+  message: string;
+  data: {
+    vendors: VendorItem[];
+    page: number;
+    size: number;
+    totalElements: number;
+    totalPages: number;
+  } | null;
+};
+
+const PAGE_SIZE = 30;
 
 export default function StudioListPage() {
+  const router = useRouter();
   const [selRegion, setSelRegion] = useState(false);
   const [selOutdoor, setSelOutdoor] = useState(false);
   const [selNight, setSelNight] = useState(false);
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+  const [page, setPage] = useState(0);
+  const [items, setItems] = useState<VendorItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [_err, setErr] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+
+  const endpoint = useMemo(() => {
+    return `${API_BASE}/v1/vendor/list/STUDIO?page=${page}&size=${PAGE_SIZE}`;
+  }, [API_BASE, page]);
+
+  useEffect(() => {
+    if (!API_BASE) return;
+    const fetchVendors = async () => {
+      setLoading(true);
+      setErr(null);
+      try {
+        const token = tokenStore.get();
+        const res = await fetch(endpoint, {
+          cache: 'no-store',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = (await res.json()) as ApiResp;
+        const list = json.data?.vendors ?? [];
+        setItems((prev) => (page === 0 ? list : [...prev, ...list]));
+        const totalPages = json.data?.totalPages ?? 0;
+        setHasMore(page + 1 < totalPages);
+      } catch (e) {
+        setErr(e instanceof Error ? e.message : '업체 조회 실패');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchVendors();
+  }, [API_BASE, endpoint, page]);
+
+  const loadMore = () => {
+    if (loading || !hasMore) return;
+    setPage((p) => p + 1);
+  };
+
+  const toPriceText = (won?: number) =>
+    typeof won === 'number' ? `${Math.round(won / 10000)}만원~` : '가격문의';
 
   return (
     <main className="relative mx-auto w-full max-w-[420px]">
@@ -125,19 +144,46 @@ export default function StudioListPage() {
 
       <section className="px-5 pt-4 pb-20">
         <div className="grid grid-cols-3 gap-x-3 gap-y-6">
-          {STUDIOS.map((s) => (
-            <CompanyCard
-              key={s.id}
-              variant="category"
-              name={s.name}
-              region={s.region}
-              imageSrc={s.imageSrc}
-              rating={s.rating}
-              priceText={s.priceText}
-              onClick={() => {}}
-              alt={`${s.region} ${s.name}`}
-            />
-          ))}
+          {items.map((s) => {
+            const imageSrc =
+              s.mainImageUrl || s.logoImageUrl || '/logos/placeholder.png';
+            const region =
+              s.address?.district ?? s.address?.city ?? '지역정보 없음';
+            const rating = s.rating ?? { score: 0, count: 0 };
+
+            return (
+              <CompanyCard
+                key={s.vendorId}
+                variant="category"
+                name={s.name}
+                region={region}
+                imageSrc={imageSrc}
+                rating={rating}
+                priceText={toPriceText(s.minimumAmount)}
+                alt={`${region} ${s.name}`}
+                onClick={() =>
+                  router.push(
+                    `/reservation/company/months?step=2&vendorId=${s.vendorId}`,
+                  )
+                }
+              />
+            );
+          })}
+        </div>
+
+        <div className="mt-6 flex items-center justify-center">
+          {hasMore ? (
+            <button
+              type="button"
+              onClick={loadMore}
+              disabled={loading}
+              className="px-4 h-10 rounded-full text-sm font-medium outline-1 outline-box-line disabled:opacity-50"
+            >
+              {loading ? '불러오는 중…' : '더 보기'}
+            </button>
+          ) : (
+            <p className="text-sm text-text-secondary">마지막 페이지예요</p>
+          )}
         </div>
       </section>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
 import ReservationButton from '@/components/reservation/ReservationButton';
 
@@ -10,6 +10,8 @@ type TypeKey = 'consult' | 'company';
 export default function ReservationPage() {
   const [selected, setSelected] = useState<TypeKey | null>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const vendorId = searchParams.get('vendor');
 
   return (
     <ReservationLayout
@@ -21,10 +23,16 @@ export default function ReservationPage() {
       active={!!selected}
       onPrimary={() => {
         if (!selected) return;
+        if (!vendorId) {
+          alert('vendorId가 없습니다.');
+          return;
+        }
         if (selected === 'consult') {
-          router.push('/reservation/consult/days?step=2');
+          router.push(`/reservation/consult/days?step=2&vendorId=${vendorId}`);
         } else {
-          router.push('/reservation/company/months?step=2');
+          router.push(
+            `/reservation/company/months?step=2&vendorId=${vendorId}`,
+          );
         }
       }}
     >
