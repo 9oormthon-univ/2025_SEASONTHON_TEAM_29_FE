@@ -3,19 +3,18 @@ import ShareButton from '@/components/common/atomic/ShareButton';
 import Header from '@/components/common/monocules/Header';
 import { EDITORIAL_COMPONENTS } from '@/data/editorials';
 import { getEditorialById } from '@/lib/editorials';
-import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
-// ✅ params는 Promise 아님! (await 제거)
 type RouteParams = { id: string };
 
 export async function generateMetadata({
   params,
 }: {
-  params: RouteParams;
+  params: Promise<RouteParams>;
 }): Promise<Metadata> {
-  const { id } = params; // ✅ await 제거
+  const { id } = await params;
   const ed = getEditorialById(Number(id));
   if (!ed) return {};
 
@@ -41,17 +40,16 @@ export async function generateMetadata({
   };
 }
 
-export default function EditorialDetailPage({
+export default async function EditorialDetailPage({
   params,
 }: {
-  params: RouteParams;
+  params: Promise<RouteParams>;
 }) {
-  const { id } = params; // ✅ await 제거
+  const { id } = await params;
   const numId = Number(id);
   const ed = getEditorialById(numId);
   if (!ed) return notFound();
 
-  // id → 컴포넌트
   const Body = EDITORIAL_COMPONENTS[numId];
   if (!Body) return notFound();
 
@@ -92,9 +90,9 @@ export default function EditorialDetailPage({
         </div>
       </section>
 
-      <section className="px-[22px] py-4 bg-white">
+      <section className="bg-white px-[22px] py-4">
         <div className="flex items-start gap-3">
-          <p className="whitespace-pre-line text-[17px] font-bold text-gray-800 flex-1 line-clamp-2 break-keep">
+          <p className="flex-1 whitespace-pre-line text-[17px] font-bold text-gray-800 line-clamp-2 break-keep">
             {ed.sub}
           </p>
           <ShareButton title={ed.title} sub={ed.sub} />
@@ -102,13 +100,13 @@ export default function EditorialDetailPage({
         <div className="mt-2 text-sm text-gray-500">{ed.dateISO}</div>
       </section>
 
-      {/* ✅ 컴포넌트로 본문 렌더링 (dangerouslySetInnerHTML 제거) */}
+      {/* 본문 */}
       <article className="prose prose-sm max-w-none px-[22px] py-2 prose-img:rounded-md prose-img:w-full">
         <Body />
       </article>
 
       {(ed.photoSource || ed.editor) && (
-        <footer className="px-[22px] pb-8 pt-20 text-right space-y-1">
+        <footer className="space-y-1 px-[22px] pb-8 pt-20 text-right">
           {ed.photoSource && (
             <div>
               <span className="text-text--default text-base font-medium font-['Inter'] leading-loose">
@@ -135,7 +133,7 @@ export default function EditorialDetailPage({
   );
 }
 
-// SSG용: 그대로 유지
+// SSG
 export async function generateStaticParams() {
   const { editorials } = await import('@/data/editorialsData');
   return editorials.map((e) => ({ id: String(e.id) }));
