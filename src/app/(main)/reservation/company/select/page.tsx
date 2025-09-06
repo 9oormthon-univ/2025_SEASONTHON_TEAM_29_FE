@@ -38,7 +38,7 @@ export default function SlotSelectPage() {
   const [addErr, setAddErr] = useState<string | null>(null);
   useEffect(() => {
     if (!sheetOpen) return;
-    const t = setTimeout(() => router.push('/home'), 5000);
+    const t = setTimeout(() => router.push('/home'), 2000);
     return () => clearTimeout(t);
   }, [sheetOpen, router]);
 
