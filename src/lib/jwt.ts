@@ -1,15 +1,12 @@
 // src/lib/jwt.ts
-
-/** 표준 + 서비스 커스텀 클레임 */
 export interface JwtPayload {
-  // 표준
-  exp: number;           // 만료(Epoch sec)
-  iat: number;           // 발급(Epoch sec)
-  sub: string;           // 사용자 id
-  // 서비스 커스텀
+  exp: number;
+  iat: number;
+  sub: string;
   email: string;
   role: 'ROLE_USER' | 'ROLE_ADMIN' | string;
   type: 'ACCESS' | 'REFRESH' | string;
+  weddingDate: string; // ← 반드시 있어야 함
 }
 
 /** 런타임 타입가드: 구조가 맞는지 안전 확인 */
@@ -21,7 +18,8 @@ export function isJwtPayload(v: unknown): v is JwtPayload {
     && typeof o.sub === 'string'
     && typeof o.email === 'string'
     && typeof o.role === 'string'
-    && typeof o.type === 'string';
+    && typeof o.type === 'string'
+    && typeof o.weddingDate === 'string';
 }
 
 function b64urlToStr(b64url: string) {
@@ -41,6 +39,7 @@ export function parseJwt(token: string | undefined | null): JwtPayload | null {
   if (parts.length < 2) return null;
   try {
     const raw = JSON.parse(b64urlToStr(parts[1]));
+    console.log(raw);
     return isJwtPayload(raw) ? raw : null;
   } catch {
     return null;

@@ -39,9 +39,9 @@ export default function LoginForm() {
     }
   }, [canSubmit, email, pw, router]);
 
-  const API = process.env.NEXT_PUBLIC_API_URL!;   // 예: https://wedit.me/api
-  const APP = process.env.NEXT_PUBLIC_SITE_URL!;  // 예: https://wed-it.me (또는 http://localhost:3000)
-  
+  const API = process.env.NEXT_PUBLIC_API_URL!; // 예: https://wedit.me/api
+  const APP = process.env.NEXT_PUBLIC_SITE_URL!; // 예: https://wed-it.me (또는 http://localhost:3000)
+
   const startOAuth = (provider: 'kakao' | 'naver' | 'google') => {
     const redirect = encodeURIComponent(`${APP}/auth/callback`);
     window.location.href = `${API}/oauth2/authorization/${provider}?redirect_uri=${redirect}`;
@@ -54,9 +54,9 @@ export default function LoginForm() {
         <SvgObject
           src="/icons/logoPrimary.svg"
           alt="웨딧"
-          width={120}
-          height={60}
-          className="h-12 w-auto"
+          width={107}
+          height={73}
+          className="w-auto"
           aria-hidden
         />
         <p className="mt-4 text-center text-[15px] text-black font-semibold">
@@ -65,7 +65,7 @@ export default function LoginForm() {
       </div>
 
       <form
-        className="mt-8 space-y-4"
+        className="mt-13 space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
           onSubmit();
@@ -114,18 +114,18 @@ export default function LoginForm() {
         {err && <p className="text-center text-sm text-red-500">{err}</p>}
 
         {/* 부가 링크 */}
-        <div className="text-center text-xs text-black">
+        <div className="text-center text-text-default">
           <button
             type="button"
-            className="px-2 hover:underline"
+            className="px-2 hover:underline !text-[13px] text-medium"
             onClick={() => router.push('/auth/find-id')}
           >
             아이디 찾기
           </button>
-          <span className="text-black">|</span>
+          <span className="text-text-default !text-[13px]">|</span>
           <button
             type="button"
-            className="px-2 hover:underline"
+            className="px-2 hover:underline !text-[13px] text-medium"
             onClick={() => router.push('/auth/reset-password')}
           >
             비밀번호 찾기

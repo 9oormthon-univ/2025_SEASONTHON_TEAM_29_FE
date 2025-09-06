@@ -1,19 +1,18 @@
 // src/app/(main)/editorials/[id]/page.tsx
 import ShareButton from '@/components/common/atomic/ShareButton';
 import Header from '@/components/common/monocules/Header';
+import { EDITORIAL_COMPONENTS } from '@/data/editorials';
 import { getEditorialById } from '@/lib/editorials';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 
-type RouteParams = Promise<{ id: string }>;
+type RouteParams = { id: string };
 
 export async function generateMetadata({
   params,
 }: {
-  params: RouteParams;
+  params: Promise<RouteParams>;
 }): Promise<Metadata> {
   const { id } = await params;
   const ed = getEditorialById(Number(id));
@@ -44,19 +43,15 @@ export async function generateMetadata({
 export default async function EditorialDetailPage({
   params,
 }: {
-  params: RouteParams;
+  params: Promise<RouteParams>;
 }) {
   const { id } = await params;
-  const ed = getEditorialById(Number(id));
+  const numId = Number(id);
+  const ed = getEditorialById(numId);
   if (!ed) return notFound();
 
-  const filePath = path.join(
-    process.cwd(),
-    'public',
-    ed.contentPath.replace(/^\//, ''),
-  );
-  const html = await fs.readFile(filePath, 'utf8').catch(() => null);
-  if (html == null) return notFound();
+  const Body = EDITORIAL_COMPONENTS[numId];
+  if (!Body) return notFound();
 
   const isWhite = ed.bannerColor === 'white';
   const overlayTextCls = isWhite ? 'text-white drop-shadow-md' : 'text-black';
@@ -65,10 +60,12 @@ export default async function EditorialDetailPage({
 
   return (
     <main className="mx-auto w-full max-w-[420px] pb-24" data-hide-bottombar>
-      {/* 상단 헤더(항상 고정 높이) */}
-      <Header value="매거진" className="h-[50px] px-[22px]" />
+      <Header
+        value="매거진"
+        className="h-[50px] px-[22px]"
+      />
 
-      {/* 썸네일 + 오버레이(태그 | 타이틀) */}
+      {/* 썸네일 + 오버레이 */}
       <section className="relative">
         <Image
           src={ed.thumbnail || ed.heroSrc}
@@ -96,9 +93,9 @@ export default async function EditorialDetailPage({
         </div>
       </section>
 
-      <section className="px-[22px] py-4 bg-white">
+      <section className="bg-white px-[22px] py-4">
         <div className="flex items-start gap-3">
-          <p className="whitespace-pre-line text-[17px] font-bold text-gray-800 flex-1 line-clamp-2 break-keep">
+          <p className="flex-1 whitespace-pre-line text-[17px] font-bold text-gray-800 line-clamp-2 break-keep">
             {ed.sub}
           </p>
           <ShareButton title={ed.title} sub={ed.sub} />
@@ -106,13 +103,13 @@ export default async function EditorialDetailPage({
         <div className="mt-2 text-sm text-gray-500">{ed.dateISO}</div>
       </section>
 
-      <article
-        className="prose prose-sm max-w-none px-[22px] py-2 prose-img:rounded-md prose-img:w-full"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      {/* 본문 */}
+      <article className="prose prose-sm max-w-none px-[22px] py-2 prose-img:rounded-md prose-img:w-full">
+        <Body />
+      </article>
 
       {(ed.photoSource || ed.editor) && (
-        <footer className="px-[22px] pb-8 pt-20 text-right space-y-1">
+        <footer className="space-y-1 px-[22px] pb-8 pt-20 text-right">
           {ed.photoSource && (
             <div>
               <span className="text-text--default text-base font-medium font-['Inter'] leading-loose">
@@ -139,6 +136,7 @@ export default async function EditorialDetailPage({
   );
 }
 
+// SSG
 export async function generateStaticParams() {
   const { editorials } = await import('@/data/editorialsData');
   return editorials.map((e) => ({ id: String(e.id) }));

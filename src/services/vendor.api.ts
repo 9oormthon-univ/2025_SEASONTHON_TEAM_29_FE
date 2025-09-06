@@ -1,6 +1,68 @@
 // src/services/vendor.api.ts
 import { http, type ApiEnvelope } from '@/services/http';
-import type { PlaceSection, VendorAddress, VendorDetail, VendorHallDetails } from '@/types/vendor';
+import type { PlaceSection, VendorAddress, VendorDetail, VendorHallDetails, VendorItem } from '@/types/vendor';
+
+/** ====== 공통 타입 ====== */
+export type VendorCategory = 'WEDDING_HALL' | 'STUDIO' | 'DRESS' | 'MAKEUP';
+
+type ApiVendorListItem = {
+  vendorId: number;
+  name: string;
+  category: VendorCategory;
+  dong?: string;                  // 지역(동)
+  logoImageUrl?: string;          // S3 presigned URL
+  totalReviewCount?: number;
+  averageRating?: number;
+};
+
+type ApiVendorListPage = {
+  content: ApiVendorListItem[];
+  number: number;           // 현재 페이지
+  size: number;             // 페이지 크기
+  totalPages: number;
+  totalElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+};
+
+/** API -> UI 카드 타입 매핑 */
+function mapListItem(v: ApiVendorListItem): VendorItem {
+  return {
+    id: v.vendorId,
+    name: v.name,
+    region: v.dong ?? '-',                     // UI에서 쓰는 지역 문자열
+    rating: Number(v.averageRating ?? 0),
+    count: Number(v.totalReviewCount ?? 0),
+    logo: v.logoImageUrl ?? '/logos/placeholder.png',
+    href: `/vendor/${v.vendorId}`,
+    price: 0,                                  // 백엔드가 없으면 0으로
+  };
+}
+
+/** 카테고리별 목록 조회 */
+export async function getVendorsByCategory(
+  category: VendorCategory,
+  page = 0,
+  size = 10,
+  opts?: { skipAuth?: boolean }
+): Promise<{ items: VendorItem[]; page: number; size: number; hasNext: boolean }> {
+  const res = await http<ApiEnvelope<ApiVendorListPage>>(
+    `/v1/vendor/list/${category}?page=${page}&size=${size}`,
+    { method: 'GET', skipAuth: opts?.skipAuth }
+  );
+
+  const data = res?.data;
+  const content = data?.content ?? [];
+  return {
+    items: content.map(mapListItem),
+    page: data?.number ?? page,
+    size: data?.size ?? size,
+    hasNext: typeof data?.last === 'boolean' ? !data.last : false,
+  };
+}
+
+/* ====== (기존) 상세 API 유지 ====== */
 
 type ApiVendorDetail = {
   vendorId: number;
@@ -58,9 +120,6 @@ export async function getVendorDetail(
     `/v1/vendor/${vendorId}`,
     { method: 'GET', skipAuth: opts?.skipAuth }
   );
-
-  if (!res.data) {
-    throw new Error('업체 상세 데이터가 없습니다.');
-  }
+  if (!res.data) throw new Error('업체 상세 데이터가 없습니다.');
   return mapToVendorDetail(res.data);
 }

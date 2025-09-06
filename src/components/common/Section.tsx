@@ -24,7 +24,7 @@ export default function Section({
 }: SectionProps) {
   const titleCls = {
     sm: 'text-sm font-bold',
-    md: 'text-base font-bold',
+    md: 'text-[14px] font-extrabold text-text-default',
     lg: 'text-lg font-extrabold',
     xl: 'text-xl font-extrabold',
   }[titleSize];
@@ -32,18 +32,21 @@ export default function Section({
   return (
     <section className={className}>
       {/* 1) 타이틀은 항상 중앙 컨테이너 */}
-      {title &&
-      <div className="mx-auto w-full max-w-[420px]">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className={titleCls}>{title}</h2>
-          {onMore && (
-            <button onClick={onMore} className="text-sm text-gray-500">
-              더보기
-            </button>
-          )}
+      {title && (
+        <div className="mx-auto w-full max-w-[420px]">
+          <div className="mx-[22px] mb-3 flex items-center justify-between">
+            <h2 className={titleCls}>{title}</h2>
+            {onMore && (
+              <button
+                onClick={onMore}
+                className="text-[14px] text-semibold text-text-default"
+              >
+                더보기
+              </button>
+            )}
+          </div>
         </div>
-      </div>
-      }
+      )}
 
       {/* 2) 콘텐츠 */}
       {bleed === 'viewport' ? (
@@ -51,9 +54,7 @@ export default function Section({
         <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
           {contentAlign === 'container' ? (
             // 전폭 배경/터치영역 + 내부는 여전히 중앙 컨테이너
-            <div className="mx-auto w-full max-w-[420px]">
-              {children}
-            </div>
+            <div className="mx-auto w-full max-w-[420px]">{children}</div>
           ) : (
             // 진짜 edge까지 붙이고 싶을 때(가로 스크롤 등)
             <div className="px-[22px]">{children}</div>
@@ -61,9 +62,7 @@ export default function Section({
         </div>
       ) : (
         // 일반 섹션
-        <div className="mx-auto w-full max-w-[420px] px-[22px]">
-          {children}
-        </div>
+        <div className="mx-auto w-full max-w-[420px] px-[22px]">{children}</div>
       )}
     </section>
   );

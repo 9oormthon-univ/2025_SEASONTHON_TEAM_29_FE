@@ -22,7 +22,17 @@ function formatManwon(v?: number) {
   return `${man.toLocaleString()}만원~`;
 }
 
-export default function VendorCard({ item, href, square = true }: { item: CommonItem; href?: string; square?: boolean }) {
+export default function VendorCard({
+  item,
+  href,
+  square = true,
+  showPrice = true,   // ✅ 새 prop, 기본값 true
+}: {
+  item: CommonItem;
+  href?: string;
+  square?: boolean;
+  showPrice?: boolean;
+}) {
   const displayRegion = item.region ?? '';
 
   const content = (
@@ -38,6 +48,7 @@ export default function VendorCard({ item, href, square = true }: { item: Common
             fill
             className="object-contain p-2"
             sizes="(max-width:768px) 44vw, 320px"
+            unoptimized
           />
         ) : (
           <div className="absolute inset-0 grid place-items-center text-xs text-gray-400">이미지 없음</div>
@@ -61,7 +72,7 @@ export default function VendorCard({ item, href, square = true }: { item: Common
         </div>
       )}
       
-      {item.price != null && (
+      {showPrice && item.price != null && (
         <div className="mt-1 text-[13px] font-extrabold text-gray-900">
           {formatManwon(item.price)}
         </div>

@@ -13,18 +13,22 @@ export default function WelcomeClient() {
       "
     >
       {/* 배경 */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 bg-onboarding-gradient" />
+      <div
+        aria-hidden
+        className="
+    pointer-events-none absolute inset-0 z-0
+    bg-gradient-to-bl from-[#FFC6C9] to-[#FFFFFF]
+  "
+      />
 
       {/* 콘텐츠 */}
-      <div className="relative z-10 flex-1 pt-6">
-        {/* 슬라이더에만 터치 허용 */}
+      <div className="relative z-10 flex flex-col flex-1 pt-22">
         <div className="touch-pan-y">
           <OnboardingSlider />
         </div>
-      </div>
-
-      <div className="relative z-10 px-4 pb-[calc(env(safe-area-inset-bottom)+50px)]">
-        <AuthCtas />
+        <div className="mt-[46px] px-4 pb-[calc(env(safe-area-inset-bottom)+50px)]">
+          <AuthCtas />
+        </div>
       </div>
     </main>
   );

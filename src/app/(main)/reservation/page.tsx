@@ -47,7 +47,7 @@ export default function ReservationPage() {
           variant={selected === 'company' ? 'primary' : 'default'}
           onClick={() => setSelected('company')}
         >
-          업체 예약하기
+          업체 계약하기
         </ReservationButton>
       </div>
     </ReservationLayout>

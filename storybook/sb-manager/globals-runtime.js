@@ -8866,7 +8866,7 @@ var ee, Io, jr, bp = k(() => {
     // hover state for items in a list
     // Notification, error, and warning backgrounds
     positive: "#E1FFD4",
-    negative: "#FEDED2",
+    negative: "#FDFDFD",
     warning: "#FFF5CF",
     critical: "#FF4400"
   }, jr = {

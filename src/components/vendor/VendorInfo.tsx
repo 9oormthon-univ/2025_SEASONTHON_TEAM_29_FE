@@ -16,12 +16,14 @@ export default function VendorInfo({
   detail,
   phone,
   mapurl,
+  dong,
 }: {
   title: string;
   category: string;
   detail?: string;
   phone?: string;
   mapurl?: string;
+  dong?: string;
 }) {
   const tel = phone?.replaceAll('-', '');
   const categoryLabel = CATEGORY_LABELS[category] ?? category;
@@ -30,7 +32,7 @@ export default function VendorInfo({
     <section className="px-4 py-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="mt-0.5 line-clamp-2 text-lg font-extrabold tracking-tight">[{categoryLabel}] {title}</h1>
+          <h1 className="mt-0.5 line-clamp-2 text-lg font-extrabold tracking-tight">[{categoryLabel}] {title} {dong}점</h1>
           {!!detail && <p className="mt-1 text-[12px] text-gray-500">{detail}</p>}
         </div>
 

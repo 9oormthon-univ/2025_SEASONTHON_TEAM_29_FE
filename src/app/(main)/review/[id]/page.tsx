@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
 import Header from '@/components/common/monocules/Header';
 import CompanyLongCard from '@/components/reviews/CompanyLongCard';
-import RingRating from '@/components/reviews/RingRating';
 import Imagebox from '@/components/reviews/ImageBox';
+import RingRating from '@/components/reviews/RingRating';
 import { tokenStore } from '@/lib/tokenStore';
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 type ReviewData = {
   reviewId: number;
@@ -123,10 +123,14 @@ export default function ReviewDetailPage() {
       CATEGORY_MAP[data.vendorCategory as keyof typeof CATEGORY_MAP] ?? '웨딩홀'
     );
   }, [data]);
+  const router = useRouter();
 
   return (
     <div className="w-full max-w-[420px] mx-auto">
-      <Header value="리뷰상세" />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="리뷰상세" />
 
       {loading && (
         <div className="px-5 mt-5 text-sm text-text--secondary">
@@ -148,6 +152,7 @@ export default function ReviewDetailPage() {
                 height={64}
                 className="object-contain"
                 priority
+                unoptimized
               />
             </div>
             <div className="flex flex-col">
@@ -199,6 +204,7 @@ export default function ReviewDetailPage() {
                       width={80}
                       height={80}
                       priority
+                      unoptimized
                     />
                   </button>
                 ))}
