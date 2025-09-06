@@ -38,6 +38,7 @@ export default function VendorCard({ item, href, square = true }: { item: Common
             fill
             className="object-contain p-2"
             sizes="(max-width:768px) 44vw, 320px"
+            unoptimized
           />
         ) : (
           <div className="absolute inset-0 grid place-items-center text-xs text-gray-400">이미지 없음</div>

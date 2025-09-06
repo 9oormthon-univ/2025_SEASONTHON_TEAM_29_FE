@@ -1,21 +1,21 @@
 // src/app/(main)/editorials/[id]/page.tsx
 import ShareButton from '@/components/common/atomic/ShareButton';
 import Header from '@/components/common/monocules/Header';
+import { EDITORIAL_COMPONENTS } from '@/data/editorials';
 import { getEditorialById } from '@/lib/editorials';
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import Image from 'next/image';
+import { notFound } from 'next/navigation';
 
-type RouteParams = Promise<{ id: string }>;
+// ✅ params는 Promise 아님! (await 제거)
+type RouteParams = { id: string };
 
 export async function generateMetadata({
   params,
 }: {
   params: RouteParams;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { id } = params; // ✅ await 제거
   const ed = getEditorialById(Number(id));
   if (!ed) return {};
 
@@ -41,22 +41,19 @@ export async function generateMetadata({
   };
 }
 
-export default async function EditorialDetailPage({
+export default function EditorialDetailPage({
   params,
 }: {
   params: RouteParams;
 }) {
-  const { id } = await params;
-  const ed = getEditorialById(Number(id));
+  const { id } = params; // ✅ await 제거
+  const numId = Number(id);
+  const ed = getEditorialById(numId);
   if (!ed) return notFound();
 
-  const filePath = path.join(
-    process.cwd(),
-    'public',
-    ed.contentPath.replace(/^\//, ''),
-  );
-  const html = await fs.readFile(filePath, 'utf8').catch(() => null);
-  if (html == null) return notFound();
+  // id → 컴포넌트
+  const Body = EDITORIAL_COMPONENTS[numId];
+  if (!Body) return notFound();
 
   const isWhite = ed.bannerColor === 'white';
   const overlayTextCls = isWhite ? 'text-white drop-shadow-md' : 'text-black';
@@ -65,10 +62,9 @@ export default async function EditorialDetailPage({
 
   return (
     <main className="mx-auto w-full max-w-[420px] pb-24" data-hide-bottombar>
-      {/* 상단 헤더(항상 고정 높이) */}
       <Header value="매거진" className="h-[50px] px-[22px]" />
 
-      {/* 썸네일 + 오버레이(태그 | 타이틀) */}
+      {/* 썸네일 + 오버레이 */}
       <section className="relative">
         <Image
           src={ed.thumbnail || ed.heroSrc}
@@ -106,10 +102,10 @@ export default async function EditorialDetailPage({
         <div className="mt-2 text-sm text-gray-500">{ed.dateISO}</div>
       </section>
 
-      <article
-        className="prose prose-sm max-w-none px-[22px] py-2 prose-img:rounded-md prose-img:w-full"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      {/* ✅ 컴포넌트로 본문 렌더링 (dangerouslySetInnerHTML 제거) */}
+      <article className="prose prose-sm max-w-none px-[22px] py-2 prose-img:rounded-md prose-img:w-full">
+        <Body />
+      </article>
 
       {(ed.photoSource || ed.editor) && (
         <footer className="px-[22px] pb-8 pt-20 text-right space-y-1">
@@ -139,6 +135,7 @@ export default async function EditorialDetailPage({
   );
 }
 
+// SSG용: 그대로 유지
 export async function generateStaticParams() {
   const { editorials } = await import('@/data/editorialsData');
   return editorials.map((e) => ({ id: String(e.id) }));
