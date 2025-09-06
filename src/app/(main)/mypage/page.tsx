@@ -435,10 +435,6 @@ export default function Page() {
         </h3>
 
         <div className="mt-3">
-          <div className="mb-2 text-sm font-medium text-foreground">
-            내 예약에서 선택
-          </div>
-
           {resLoading && (
             <div className="grid gap-2">
               {[...Array(4)].map((_, i) => (

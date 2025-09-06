@@ -1,6 +1,9 @@
 // src/lib/dday.ts
 /** "YYYY-MM-DD" → D-day 숫자 (오늘=0, 과거는 +, 미래는 -가 아닌 'D-n' 관례에 맞춰 음수 없이 반환하려면 옵션 사용) */
-export function getDDay(dateStr: string, opts?: { clampPastToZero?: boolean; tz?: string }): number | null {
+export function getDDay(
+  dateStr: string,
+  opts?: { clampPastToZero?: boolean; tz?: string },
+): number | null {
   if (!dateStr) return null;
 
   // 타임존 기준 '날짜 00:00'을 맞춰서 일수 차이 계산
@@ -31,10 +34,10 @@ function toLocalMidnight(ymd: string, tz?: string): Date | null {
   const [_, y, mo, d] = m;
   if (tz) {
     // Intl로 타임존 기준의 자정 시각 생성
-    const dtf = new Intl.DateTimeFormat('en-CA', {
-      timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
-      hourCycle: 'h23', hour: '2-digit', minute: '2-digit', second: '2-digit',
-    });
+    // const dtf = new Intl.DateTimeFormat('en-CA', {
+    //   timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
+    //   hourCycle: 'h23', hour: '2-digit', minute: '2-digit', second: '2-digit',
+    // });
     // 해당 타임존의 자정 문자열을 Date로 역변환
     const iso = `${y}-${mo}-${d}T00:00:00`;
     // tz가 있는 경우, Date는 로컬 타임존으로 생성되므로 오프셋 보정이 필요.
@@ -47,8 +50,17 @@ function toLocalMidnight(ymd: string, tz?: string): Date | null {
 function startOfToday(tz?: string): Date {
   const now = new Date();
   if (!tz) return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const y = new Intl.DateTimeFormat('en', { timeZone: tz, year: 'numeric' }).format(now);
-  const m = new Intl.DateTimeFormat('en', { timeZone: tz, month: 'numeric' }).format(now);
-  const d = new Intl.DateTimeFormat('en', { timeZone: tz, day: 'numeric' }).format(now);
+  const y = new Intl.DateTimeFormat('en', {
+    timeZone: tz,
+    year: 'numeric',
+  }).format(now);
+  const m = new Intl.DateTimeFormat('en', {
+    timeZone: tz,
+    month: 'numeric',
+  }).format(now);
+  const d = new Intl.DateTimeFormat('en', {
+    timeZone: tz,
+    day: 'numeric',
+  }).format(now);
   return new Date(Number(y), Number(m) - 1, Number(d));
 }

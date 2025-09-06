@@ -5,7 +5,10 @@ import { formatDDayLabel, getDDay } from '@/lib/dday';
 import { parseJwt } from '@/lib/jwt';
 import { useMemo } from 'react';
 
-export function useDDayFromToken(token?: string | null, opts?: { clampPastToZero?: boolean; tz?: string }) {
+export function useDDayFromToken(
+  token?: string | null,
+  opts?: { clampPastToZero?: boolean; tz?: string },
+) {
   return useMemo(() => {
     const j = parseJwt(token);
     const dateStr = j?.weddingDate;
@@ -15,5 +18,6 @@ export function useDDayFromToken(token?: string | null, opts?: { clampPastToZero
       dday: d,
       label: d == null ? '' : formatDDayLabel(d),
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, opts?.clampPastToZero, opts?.tz]);
 }
