@@ -76,9 +76,9 @@ export default function ReviewPage() {
         throw new Error(`후기 등록 실패 (${res.status}) ${text}`);
       }
 
-      setDoneMsg('후기가 등록되었어요! 5초 후 홈으로 이동합니다.');
+      setDoneMsg('후기가 등록되었어요! ');
       redirectTimerRef.current = window.setTimeout(() => {
-        router.replace('/home');
+        router.replace('/mypage');
       }, 5000);
     } catch (e: unknown) {
       setErrorMsg(
