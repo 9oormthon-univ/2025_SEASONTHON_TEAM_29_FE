@@ -18,6 +18,7 @@ export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail })
         detail={vendor.detail}
         phone={vendor.phone}
         mapurl={vendor.mapurl}
+        dong={vendor.address?.dong}
       />
 
       {/* 상단 소개 문단 */}

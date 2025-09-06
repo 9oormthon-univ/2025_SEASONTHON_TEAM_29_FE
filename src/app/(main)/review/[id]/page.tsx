@@ -1,13 +1,13 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import Image from 'next/image';
 import Header from '@/components/common/monocules/Header';
 import CompanyLongCard from '@/components/reviews/CompanyLongCard';
-import RingRating from '@/components/reviews/RingRating';
 import Imagebox from '@/components/reviews/ImageBox';
+import RingRating from '@/components/reviews/RingRating';
 import { tokenStore } from '@/lib/tokenStore';
+import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 type ReviewData = {
   reviewId: number;
@@ -148,6 +148,7 @@ export default function ReviewDetailPage() {
                 height={64}
                 className="object-contain"
                 priority
+                unoptimized
               />
             </div>
             <div className="flex flex-col">
@@ -199,6 +200,7 @@ export default function ReviewDetailPage() {
                       width={80}
                       height={80}
                       priority
+                      unoptimized
                     />
                   </button>
                 ))}

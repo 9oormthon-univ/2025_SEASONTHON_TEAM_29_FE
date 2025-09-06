@@ -1,10 +1,11 @@
 'use client';
 
-import * as React from 'react';
-import clsx from 'clsx';
-import Header from '@/components/common/monocules/Header';
-import ProgressBar from '@/components/common/atomic/ProgressBar';
 import Button from '@/components/common/atomic/Button';
+import ProgressBar from '@/components/common/atomic/ProgressBar';
+import Header from '@/components/common/monocules/Header';
+import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
+import * as React from 'react';
 
 type Step = 1 | 2 | 3;
 
@@ -42,12 +43,13 @@ export default function ReservationStepLayout(
 ) {
   const { title, step, headline, rightSlot, children, contentClassName } =
     props;
+  const router = useRouter();
 
   const pct = (step / 3) * 100;
 
   return (
     <div className="min-h-dvh">
-      <Header value={title} rightSlot={rightSlot} />
+      <Header value={title} rightSlot={rightSlot} showBack onBack={()=>router.back()}/>
       <div className="mx-auto w-full max-w-[420px] px-[22px]">
         <div className="py-2">
           <ProgressBar

@@ -41,6 +41,7 @@ export default function TourItem({ name, logo, status, onClick }: Props) {
             height={56}
             className="h-[50px] w-[50px] rounded-2xl object-cover ring-1 ring-gray-100"
             priority={false}
+            unoptimized
           />
         ) : (
           <div
