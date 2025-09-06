@@ -53,6 +53,7 @@ type ApiResponseTimeSlots = {
 
 const getErrorMessage = (e: unknown) =>
   e instanceof Error ? e.message : typeof e === 'string' ? e : '시간 조회 실패';
+const ensureHMS = (t: string) => (t.length === 5 ? `${t}:00` : t);
 
 export default function ConsultTimePage() {
   const router = useRouter();
@@ -71,6 +72,7 @@ export default function ConsultTimePage() {
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [posting, setPosting] = React.useState(false);
+  const [adding, setAdding] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [sheet, setSheet] = React.useState<null | 'book' | 'estimate'>(null);
 
@@ -125,7 +127,7 @@ export default function ConsultTimePage() {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ date: rawDate, time: selectedTime }),
+        body: JSON.stringify({ date: rawDate, time: ensureHMS(selectedTime) }),
       });
       if (!res.ok) throw new Error(`예약 실패 (HTTP ${res.status})`);
       setSheet('book');
@@ -135,10 +137,28 @@ export default function ConsultTimePage() {
       setPosting(false);
     }
   };
-
-  const handleAddToEstimate = () => {
-    if (!selectedTime) return;
-    setSheet('estimate');
+  const handleAddToEstimate = async () => {
+    if (!selectedTime || !API_BASE || vendorId === null) return;
+    try {
+      setAdding(true);
+      setError(null);
+      const token = tokenStore.get();
+      const url = `${API_BASE}/v1/estimate/${vendorId}`;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ date: rawDate, time: ensureHMS(selectedTime) }),
+      });
+      if (!res.ok) throw new Error(`견적 담기 실패 (HTTP ${res.status})`);
+      setSheet('estimate');
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (
@@ -148,11 +168,11 @@ export default function ConsultTimePage() {
       headline="시간을 선택해 주세요."
       mode="double"
       leftText={posting ? '예약 중...' : '예약하기'}
-      rightText="견적서 담기"
+      rightText={adding ? '담는 중…' : '견적서 담기'}
       onLeft={handleReserve}
       onRight={handleAddToEstimate}
       activeLeft={!!selectedTime && !posting && vendorId !== null}
-      activeRight={!!selectedTime && vendorId !== null}
+      activeRight={!!selectedTime && !adding && vendorId !== null}
     >
       {loading && (
         <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>
