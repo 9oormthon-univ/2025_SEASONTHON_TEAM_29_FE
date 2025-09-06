@@ -3,6 +3,7 @@
 import Section from '@/components/common/Section';
 import type { StoryItem } from '@/types/story';
 import useEmblaCarousel from 'embla-carousel-react';
+import Image from 'next/image';
 
 export default function StoryWideCarousel({
   items,
@@ -37,9 +38,9 @@ export default function StoryWideCarousel({
 
                 {/* 이미지 대신 플레이스홀더 */}
                 <div className="relative mx-1 h-[60px] w-[60px] overflow-hidden rounded-md">
-                  <div className="absolute inset-0 grid place-items-center bg-gray-200 text-[10px] text-gray-600">
-                    이미지 없음
-                  </div>
+                  <Image
+                  src={s.img}
+                  width={60} height={60} alt=""/>
                 </div>
               </article>
             </a>
