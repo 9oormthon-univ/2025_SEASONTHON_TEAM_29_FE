@@ -123,9 +123,7 @@ export default function ConsultTimePage() {
 
   React.useEffect(() => {
     if (!sheet) return;
-    const t = setTimeout(() => {
-      router.replace(backTo);
-    }, 1500);
+    const t = setTimeout(() => router.push('/home'), 2000);
     return () => clearTimeout(t);
   }, [sheet, router, backTo]);
 

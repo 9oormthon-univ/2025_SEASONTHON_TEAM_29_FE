@@ -30,7 +30,10 @@ export default function NewTourPage() {
     try {
       // 백엔드가 현재 date만 받으므로 날짜만 추출
       const dateOnly = dateTime.slice(0, 10); // 'YYYY-MM-DD'
-      await createTour({ vendorName: vendorName.trim(), reservationDate: dateOnly });
+      await createTour({
+        vendorName: vendorName.trim(),
+        reservationDate: dateOnly,
+      });
       router.replace('/tours');
     } catch (err) {
       alert(err instanceof Error ? err.message : '생성 실패');
@@ -41,14 +44,18 @@ export default function NewTourPage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[calc(env(safe-area-inset-bottom)+96px)]">
-      <Header 
+      <Header
+        value="일정 등록하기"
+        className="h-[50px]"
         showBack
-        onBack={()=>router.back()}
-        value="일정 등록하기" className="h-[50px]" />
+        onBack={() => router.back()}
+      />
 
       <form onSubmit={onSubmit} className="px-[22px] py-4 space-y-6">
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-2">업체명</label>
+          <label className="block text-xs font-medium text-gray-600 mb-2">
+            업체명
+          </label>
           <input
             type="text"
             value={vendorName}
@@ -59,7 +66,9 @@ export default function NewTourPage() {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-2">예약날짜</label>
+          <label className="block text-xs font-medium text-gray-600 mb-2">
+            예약날짜
+          </label>
           <input
             type="datetime-local"
             value={dateTime}
@@ -72,7 +81,7 @@ export default function NewTourPage() {
       </form>
 
       {/* 하단 고정 버튼 (공용 Button 사용) */}
-      <div className="fixed inset-x-0 bottom-0 z-10 mx-auto w-full max-w-[420px] px-[22px] pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 bg-white/80 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-20 z-10 mx-auto w-full max-w-[420px] px-[22px] pb-[calc(env(safe-area-inset-bottom)+12px)] pt-3 bg-white/80 backdrop-blur">
         <Button
           type="submit"
           fullWidth
@@ -82,7 +91,9 @@ export default function NewTourPage() {
           // 폼 submit 트리거
           onClick={(e) => {
             // 가장 쉬운 방법: 폼 submit 호출
-            const form = (e.currentTarget.closest('main') as HTMLElement)?.querySelector('form') as HTMLFormElement | null;
+            const form = (
+              e.currentTarget.closest('main') as HTMLElement
+            )?.querySelector('form') as HTMLFormElement | null;
             form?.requestSubmit();
           }}
         >

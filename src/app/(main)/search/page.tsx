@@ -4,7 +4,7 @@
 import Button from '@/components/common/atomic/Button';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import Header from '@/components/common/monocules/Header';
-import { categories } from "@/data/homeData";
+import { categories } from '@/data/homeData';
 import { CategoryKey } from '@/types/category';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -20,14 +20,13 @@ export default function CategorySelectPage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto px-[22px]">
-      <Header 
-        showBack
-        onBack={()=>router.back()}
-        value="검색"/>
+      <Header showBack onBack={() => router.back()} value="검색" />
 
       <div className="pt-3">
         <h1 className="text-head-2 font-extrabold">
-          검색할 카테고리를<br/>선택해 주세요.
+          검색할 카테고리를
+          <br />
+          선택해 주세요.
         </h1>
 
         <div className="mt-5 grid grid-cols-2 gap-4">
@@ -40,20 +39,28 @@ export default function CategorySelectPage() {
                 onClick={() => setSelected(c.key)}
                 className={[
                   'flex aspect-square flex-col items-center justify-center rounded-2xl border bg-white transition',
-                  active ? 'border-primary-500 ring-2 ring-primary-500/30' : 'border-gray-200',
+                  active
+                    ? 'border-primary-500 ring-2 ring-primary-500/30'
+                    : 'border-gray-200',
                 ].join(' ')}
               >
                 <div className="h-14 w-14">
-                  <SvgObject src={c.icon} alt={c.label} className="h-full w-full" />
+                  <SvgObject
+                    src={c.icon}
+                    alt={c.label}
+                    className="h-full w-full"
+                  />
                 </div>
-                <span className="mt-2 text-[15px] font-semibold text-gray-800">{c.label}</span>
+                <span className="mt-2 text-[15px] font-semibold text-gray-800">
+                  {c.label}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
       <div className="fixed inset-x-0 bottom-0 z-10">
-        <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+        <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-20 pt-3">
           <Button fullWidth size="lg" disabled={!selected} onClick={goNext}>
             다음
           </Button>

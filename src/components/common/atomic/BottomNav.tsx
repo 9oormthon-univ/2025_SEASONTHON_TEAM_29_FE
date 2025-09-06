@@ -51,7 +51,7 @@ export default function BottomNav({
     <nav
       aria-label="하단 내비게이션"
       className={clsx(
-        'fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-full',
+        'h-[84px] fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-full',
         'border-t border-gray-200/70 dark:border-white/10',
         'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75',
         'pb-[env(safe-area-inset-bottom)]',
