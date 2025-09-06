@@ -12,7 +12,12 @@ import { tokenStore } from '@/lib/tokenStore';
 import type { VendorItem } from '@/types/reservation';
 import Image from 'next/image';
 
-type Company = { id: string; region: string; name: string; imageSrc: string };
+type Company = {
+  id: string;
+  name: string;
+  imageSrc: string;
+  district: string;
+};
 type ReviewCompany = Company & { rating: { score: number; count?: number } };
 
 type MyReservation = {
@@ -27,6 +32,7 @@ type MyReservation = {
   mainImageUrl?: string;
   vendorDescription?: string;
   vendorCategory?: string;
+  district?: string;
 };
 
 type ReservationApiItem = {
@@ -41,6 +47,7 @@ type ReservationApiItem = {
   mainImageUrl?: string;
   vendorDescription?: string;
   vendorCategory?: string;
+  district?: string;
 };
 
 type MyReviewCard = ReviewCompany;
@@ -86,6 +93,7 @@ function toMyReservation(r: ReservationApiItem): MyReservation {
     vendorName: r.vendorName ? String(r.vendorName) : undefined,
     vendorLogoUrl: r.vendorLogoUrl ? String(r.vendorLogoUrl) : undefined,
     mainImageUrl: r.mainImageUrl ? String(r.mainImageUrl) : undefined,
+    district: r.district ? String(r.district) : undefined,
     vendorDescription: r.vendorDescription
       ? String(r.vendorDescription)
       : undefined,
@@ -94,25 +102,32 @@ function toMyReservation(r: ReservationApiItem): MyReservation {
 }
 function toMyReviewCard(v: unknown): MyReviewCard | null {
   if (!isRecord(v)) return null;
+
   const id =
     (typeof v.reviewId === 'number' || typeof v.reviewId === 'string'
       ? v.reviewId
       : typeof v.id === 'number' || typeof v.id === 'string'
         ? v.id
         : null) ?? null;
+
   const name =
     typeof v.vendorName === 'string'
       ? v.vendorName
       : `업체 #${String(id ?? '')}`;
-  const region = typeof v.vendorRegion === 'string' ? v.vendorRegion : '-';
+
+  const district =
+    typeof (v as any).district === 'string'
+      ? (v as any).district
+      : typeof (v as any).vendorDistrict === 'string'
+        ? (v as any).vendorDistrict
+        : undefined;
+
   const imageSrc =
-    typeof v.vendorLogoUrl === 'string'
-      ? v.vendorLogoUrl
+    typeof (v as any).vendorLogoUrl === 'string'
+      ? (v as any).vendorLogoUrl
       : '/logos/placeholder.png';
-  const pickNumber = (
-    obj: Record<string, unknown>,
-    keys: string[],
-  ): number | undefined => {
+
+  const pickNumber = (obj: Record<string, unknown>, keys: string[]) => {
     for (const k of keys) {
       const val = obj[k];
       if (typeof val === 'number' && Number.isFinite(val)) return val;
@@ -129,10 +144,11 @@ function toMyReviewCard(v: unknown): MyReviewCard | null {
     0;
 
   if (id == null) return null;
+
   return {
     id: String(id),
     name,
-    region,
+    district,
     imageSrc,
     rating: { score, count: undefined },
   };
@@ -344,7 +360,7 @@ export default function Page() {
                     return (
                       <CompanyCard
                         key={r.id}
-                        region={v?.region ?? '-'}
+                        region={r.district ?? '-'}
                         name={name}
                         imageSrc={logo}
                       />
@@ -387,7 +403,7 @@ export default function Page() {
                 <CompanyCard
                   key={c.id}
                   variant="review"
-                  region={c.region}
+                  region={c.district ?? '-'}
                   name={c.name}
                   imageSrc={c.imageSrc}
                   rating={c.rating}
@@ -463,7 +479,6 @@ export default function Page() {
                   const v = vendorMap[String(r.vendorId)];
                   const vendorName =
                     r.vendorName ?? v?.name ?? `업체 #${r.vendorId}`;
-                  const vendorRegion = v?.region ?? '-';
                   const logo = pickVendorLogo(v, r);
 
                   const when =
@@ -503,9 +518,6 @@ export default function Page() {
                             </span>
                           </div>
                         </div>
-                        <span className="text-xs text-text-tertiary">
-                          {vendorRegion}
-                        </span>
                       </button>
                     </li>
                   );
