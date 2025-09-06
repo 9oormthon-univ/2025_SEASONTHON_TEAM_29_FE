@@ -52,3 +52,28 @@ export async function fetchContractSlots(
 
   return { items, page, totalPages };
 }
+
+export async function createEstimate(
+  vendorId: number,
+  payload: { date: string; time: string },
+  signal?: AbortSignal,
+) {
+  const token = tokenStore.get?.();
+
+  const res = await fetch(`${API_URL}/v1/estimate/${vendorId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+    signal,
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`견적 담기 실패 (${res.status}) ${text}`);
+  }
+  return res.json();
+}

@@ -8,6 +8,7 @@ import ReservationCard from '@/components/reservation/ReservationCard';
 import { useContractSlots } from '@/hooks/useContractSlots';
 import { formatMoney, formatSlot } from '@/lib/format';
 import type { ContractSlot } from '@/types/estimate';
+import { createEstimate } from '@/services/estimates.api';
 
 function toReservationCardPropsFromContract(s: ContractSlot) {
   return {
@@ -18,23 +19,46 @@ function toReservationCardPropsFromContract(s: ContractSlot) {
   };
 }
 
+function splitISOForApi(iso: string) {
+  const [datePart, timeWithZone = ''] = iso.split('T');
+  const timePart = timeWithZone.slice(0, 8);
+  return { date: datePart, time: timePart || '00:00:00' };
+}
+
 export default function SlotSelectPage() {
   const router = useRouter();
   const sp = useSearchParams();
   const vendorId = useMemo(() => Number(sp.get('vendorId') ?? 1), [sp]);
+
   const { slots, loading, error, refetch } = useContractSlots({ vendorId });
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [addErr, setAddErr] = useState<string | null>(null);
   useEffect(() => {
     if (!sheetOpen) return;
     const t = setTimeout(() => router.push('/home'), 5000);
     return () => clearTimeout(t);
   }, [sheetOpen, router]);
 
-  const openSheet = () => {
+  const handleAddEstimate = async () => {
     if (!selectedId) return;
-    setSheetOpen(true);
+    const slot = slots.find((s) => s.id === selectedId);
+    if (!slot) return;
+
+    const { date, time } = splitISOForApi(slot.dateISO);
+
+    try {
+      setAdding(true);
+      setAddErr(null);
+      await createEstimate(vendorId, { date, time });
+      setSheetOpen(true);
+    } catch (e) {
+      setAddErr(e instanceof Error ? e.message : '견적 담기에 실패했어요.');
+    } finally {
+      setAdding(false);
+    }
   };
 
   return (
@@ -50,14 +74,14 @@ export default function SlotSelectPage() {
       }
       mode="double"
       leftText="계약금 결제"
-      rightText="견적서 담기"
+      rightText={adding ? '담는 중…' : '견적서 담기'}
       onLeft={() =>
         selectedId &&
         router.push(
           `/reservation/company/finish?vendorId=${vendorId}&slotId=${selectedId}`,
         )
       }
-      onRight={openSheet}
+      onRight={handleAddEstimate}
     >
       {error && (
         <p className="text-sm text-red-500 text-center my-2">
@@ -66,6 +90,9 @@ export default function SlotSelectPage() {
             다시 시도
           </button>
         </p>
+      )}
+      {addErr && (
+        <p className="text-sm text-red-500 text-center my-1">{addErr}</p>
       )}
 
       <div className="flex flex-col gap-4 items-center">
