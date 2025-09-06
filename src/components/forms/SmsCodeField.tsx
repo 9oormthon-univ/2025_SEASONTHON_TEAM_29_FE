@@ -107,7 +107,7 @@ export default function SmsCodeField({
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
           placeholder="숫자 6자리를 입력하세요."
           aria-invalid={!!error || undefined}
-          type={uiType as any}
+          type={uiType}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           fullWidth
