@@ -7,11 +7,9 @@ import VendorCard from '@/components/common/atomic/VendorCard';
 import Header from '@/components/common/monocules/Header';
 import { useVendorsByCategory } from '@/hooks/useVendorsByCategory';
 import { Search } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function StudioListPage() {
-  const router = useRouter();
   const [selRegion, setSelRegion] = useState(false);
   const [selOutdoor, setSelOutdoor] = useState(false);
   const [selNight, setSelNight] = useState(false);
