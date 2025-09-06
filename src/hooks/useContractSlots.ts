@@ -26,17 +26,19 @@ export function useContractSlots(opts: UseContractSlotsOpts) {
   const [err, setErr] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
-
-  const params: ContractAvailabilityReq = {
-    year: opts.year ?? defaultYear,
-    months: opts.months ?? defaultMonths,
-    page,
-    size: opts.pageSize ?? 10,
-  };
+  const params: ContractAvailabilityReq = useMemo(
+    () => ({
+      year: opts.year ?? defaultYear,
+      months: opts.months ?? defaultMonths,
+      page,
+      size: opts.pageSize ?? 10,
+    }),
+    [defaultYear, defaultMonths, page, opts.year, opts.months, opts.pageSize],
+  );
 
   const load = useCallback(
     async (reset = false) => {
-      if (abortRef.current) abortRef.current.abort();
+      abortRef.current?.abort();
       const ac = new AbortController();
       abortRef.current = ac;
 
@@ -46,7 +48,7 @@ export function useContractSlots(opts: UseContractSlotsOpts) {
       try {
         const {
           items: newItems,
-          page: cur,
+          page: _cur,
           totalPages: tp,
         } = await fetchContractSlots(opts.vendorId, params, ac.signal);
 
@@ -60,29 +62,22 @@ export function useContractSlots(opts: UseContractSlotsOpts) {
         setLoading(false);
       }
     },
-    [
-      opts.vendorId,
-      params.year,
-      params.months.join(','),
-      params.page,
-      params.size,
-    ],
+    [opts.vendorId, params],
   );
 
-  const refetch = useCallback(() => load(true), [load]);
+  const refetch = useCallback(() => {
+    setPage(1);
+    load(true);
+  }, [load]);
 
   const loadNext = useCallback(() => {
     setPage((p) => (p < totalPages ? p + 1 : p));
   }, [totalPages]);
 
   useEffect(() => {
-    load(page === 1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, params.year, params.months.join(','), params.size, opts.vendorId]);
-
-  useEffect(() => {
+    load(params.page === 1);
     return () => abortRef.current?.abort();
-  }, []);
+  }, [load, params]);
 
   return {
     slots: items,

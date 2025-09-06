@@ -28,7 +28,7 @@ export default function EstimateCartPage() {
     Partial<Record<Item['category'], number>>
   >({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const ac = new AbortController();
