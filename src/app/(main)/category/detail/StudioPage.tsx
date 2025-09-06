@@ -3,7 +3,7 @@
 import Chip from '@/components/common/atomic/Chips';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import Header from '@/components/common/monocules/Header';
-import CompanyCard from '@/components/mypage/CompanyCard';
+import CompanyCard from '@/components/my/CompanyCard';
 import { tokenStore } from '@/lib/tokenStore';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';

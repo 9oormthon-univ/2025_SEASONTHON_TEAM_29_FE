@@ -1,7 +1,7 @@
 'use client';
 
 import Header from '@/components/common/monocules/Header';
-import CompanyCard from '@/components/mypage/CompanyCard';
+import CompanyCard from '@/components/my/CompanyCard';
 import { fetchEstimateCart } from '@/services/estimates.api';
 import { useEffect, useMemo, useState } from 'react';
 

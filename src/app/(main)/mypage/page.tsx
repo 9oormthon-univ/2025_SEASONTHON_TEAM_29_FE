@@ -3,12 +3,12 @@
 
 import BottomNav from '@/components/common/atomic/BottomNav';
 import Header from '@/components/common/monocules/Header';
-import BottomSheet from '@/components/mypage/CompanyModal';
-import DdayCard from '@/components/mypage/D-dayCheck';
-import ProfileHeader from '@/components/mypage/ProfileHeader';
-import ReservationsSection from '@/components/mypage/ReservationsSection';
-import ReviewCompanyPicker from '@/components/mypage/ReviewCompanyPicker';
-import ReviewsSection from '@/components/mypage/ReviewsSection';
+import BottomSheet from '@/components/my/CompanyModal';
+import DdayCard from '@/components/my/D-dayCheck';
+import ProfileHeader from '@/components/my/ProfileHeader';
+import ReservationsSection from '@/components/my/ReservationsSection';
+import ReviewCompanyPicker from '@/components/my/ReviewCompanyPicker';
+import ReviewsSection from '@/components/my/ReviewsSection';
 import { useMyProfile } from '@/hooks/useMyProfile';
 import { useMyReservations } from '@/hooks/useMyReservations';
 import { useMyReviews } from '@/hooks/useMyReviews';

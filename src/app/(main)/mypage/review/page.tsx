@@ -1,6 +1,6 @@
 'use client';
 
-import ReviewForm from '@/components/mypage/ReviewForm';
+import ReviewForm from '@/components/my/ReviewForm';
 import { useCreateReview } from '@/hooks/useCreateReview';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
