@@ -39,11 +39,18 @@ export default function SocialSignupPage() {
   // validators
   const phoneDigits = phone.replace(/\D/g, '');
   const isValidPhone = /^010\d{8}$/.test(phoneDigits);
-  const isValidBirth = /^(\d{4})[.\-/]?(0[1-9]|1[0-2])[.\-/]?(0[1-9]|[12]\d|3[01])$/.test(
-    birth.replace(/\s/g, '')
-  );
+  const isValidBirth =
+    /^(\d{4})[.\-/]?(0[1-9]|1[0-2])[.\-/]?(0[1-9]|[12]\d|3[01])$/.test(
+      birth.replace(/\s/g, ''),
+    );
   const isValidWedding = isValidYMD(wedding);
-  const canSubmit = isValidPhone && codeVerified && isValidBirth && isValidWedding && !!role && !loading;
+  const canSubmit =
+    isValidPhone &&
+    codeVerified &&
+    isValidBirth &&
+    isValidWedding &&
+    !!role &&
+    !loading;
 
   // actions
   const prev = () => {
@@ -83,7 +90,10 @@ export default function SocialSignupPage() {
     setLoading(true);
 
     const norm = (v: string) =>
-      v.trim().replace(/[^0-9]/g, '').replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
+      v
+        .trim()
+        .replace(/[^0-9]/g, '')
+        .replace(/^(\d{4})(\d{2})(\d{2})$/, '$1-$2-$3');
 
     const payload: SocialSignupPayload = {
       birthDate: norm(birth),
@@ -122,16 +132,22 @@ export default function SocialSignupPage() {
       </header>
 
       {/* Body (컨텐츠 박스 폭/여백/스크롤 영역 동일) */}
-      <div className="flex-1 overflow-hidden">
-        <div className="mx-auto max-w-[420px] overflow-auto px-4 pb-4 space-y-4">
-          <p className="pt-6 text-sm text-text-secondary">이제 다 끝났어요!</p>
-          <h2 className="mt-1 text-2xl font-extrabold">추가정보를 입력해주세요.</h2>
+      <div className="flex-1 overflow-hidden mx-5.5">
+        <div className="pt-6">
+          <p className="text-sm text-text-default font-medium">
+            이제 다 끝났어요!
+          </p>
+          <h2 className="mt-1 text-2xl font-extrabold">
+            추가정보를 입력해주세요.
+          </h2>
 
           {/* 생년월일 */}
           <Field label="생년월일" htmlFor="birth" className="mt-4">
             <DateInput raw={birth} onRawChange={setBirth} />
             {!!birth && !isValidBirth && (
-              <FieldHint tone="error">YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.</FieldHint>
+              <FieldHint tone="error">
+                YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.
+              </FieldHint>
             )}
           </Field>
 
@@ -147,8 +163,12 @@ export default function SocialSignupPage() {
               }}
               buttonText={
                 codeRequested
-                  ? (sendingCode ? '전송중…' : '재전송')
-                  : (sendingCode ? '전송중…' : '인증번호')
+                  ? sendingCode
+                    ? '전송중…'
+                    : '재전송'
+                  : sendingCode
+                    ? '전송중…'
+                    : '인증번호'
               }
               onButtonClick={async () => {
                 const was = codeRequested;
@@ -169,7 +189,9 @@ export default function SocialSignupPage() {
           <Field label="결혼예정일" htmlFor="wedding" className="mt-4">
             <DateInput raw={wedding} onRawChange={setWedding} />
             {!!wedding && !isValidWedding && (
-              <FieldHint tone="error">YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.</FieldHint>
+              <FieldHint tone="error">
+                YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.
+              </FieldHint>
             )}
           </Field>
 
@@ -177,8 +199,8 @@ export default function SocialSignupPage() {
           <Field label="부부 형태" className="mt-4">
             <PillRadio
               options={[
-                { value: 'groom', label: '신랑' },
                 { value: 'bride', label: '신부' },
+                { value: 'groom', label: '신랑' },
               ]}
               value={role}
               onChange={(v) => setRole(v as 'groom' | 'bride')}
@@ -191,13 +213,13 @@ export default function SocialSignupPage() {
       </div>
 
       {/* Footer (완전 동일) */}
-      <div className="sticky bottom-0 bg-white/70 px-4 pb-[calc(env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+      <div className="sticky bottom-0 bg-white/70 px-4 pb-[calc(env(safe-area-inset-bottom))] pt-3 mb-20 backdrop-blur">
         <Button
           size="md"
           fullWidth
           disabled={!canSubmit}
           onClick={submit}
-          className="h-12 text-sm"
+          className="h-13 text-sm"
         >
           {loading ? '가입 중…' : '웨딧 시작하기'}
         </Button>

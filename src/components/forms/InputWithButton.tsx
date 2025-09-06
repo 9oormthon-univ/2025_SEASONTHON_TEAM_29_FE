@@ -22,7 +22,12 @@ export function InputWithButton({
   disabled,
   invalid,
 }: Props) {
-  const { type: htmlType, className: inputClassName, value, ...restInput } = inputProps;
+  const {
+    type: htmlType,
+    className: inputClassName,
+    value,
+    ...restInput
+  } = inputProps;
   const [focused, setFocused] = React.useState(false);
 
   const hasValue = value !== '' && value !== undefined;
@@ -47,7 +52,7 @@ export function InputWithButton({
         onClick={disabled ? undefined : onButtonClick}
         disabled={disabled}
         variant={disabled ? 'ghost' : 'primary'}
-        className="absolute right-2 top-1/2 -translate-y-1/2"
+        className="absolute right-4 top-1/2 -translate-y-1/2"
       >
         {buttonText}
       </InputBadge>

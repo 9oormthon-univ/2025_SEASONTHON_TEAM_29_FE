@@ -68,11 +68,11 @@ export default function Input({
       ? 'placeholder:text-red-500'
       : uiType === 'variant4' || uiType === 'variant5'
         ? 'placeholder:text-foreground/80'
-        : 'placeholder:text-gray-400';
+        : 'placeholder:text-text--tertiary';
 
   const width = fullWidth ? 'w-full' : 'w-80';
   const inputClass = clsx(
-    'flex-1 bg-transparent outline-none text-sm leading-7',
+    'flex-1 bg-transparent outline-none !text-[14px] leading-tight',
     text,
     ph,
     uiType === 'variant5' && 'caret-primary-500',
