@@ -7,11 +7,7 @@ import Section from '@/components/common/Section';
 import OptionPills from '@/components/tours/fitting/OptionPills';
 import Preview from '@/components/tours/fitting/Preview';
 import ThumbGrid from '@/components/tours/fitting/ThumbGrid';
-import {
-  dressLines,
-  dressMaterials,
-  dressNecklines,
-} from '@/data/dressOptions';
+import { dressLines, dressMaterials, dressNecklines } from '@/data/dressOptions';
 import { useDressFitting } from '@/hooks/useDressFitting';
 import {
   lineIdFromOrder,
@@ -26,8 +22,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function DressFittingClient({ id }: { id: string }) {
-  const { materials, toggleMaterial, neck, setNeck, line, setLine, canSave } =
-    useDressFitting();
+  const { materials, toggleMaterial, neck, setNeck, line, setLine, canSave } = useDressFitting();
   const [saving, setSaving] = useState(false);
   const router = useRouter();
 
@@ -42,31 +37,28 @@ export default function DressFittingClient({ id }: { id: string }) {
 
         const { materialOrder, neckLineOrder, lineOrder } = d;
 
-        // ── 소재(단일): 현재 ON 전부 끄고, target 하나만 ON
+        // 소재(단일)
         const targetMaterial = materialNameFromOrder(materialOrder);
         if (targetMaterial) {
-          // 끄기
+          // 싹 끄고
           materials.forEach((m) => {
-            if (m !== targetMaterial) toggleMaterial(m); // ON이면 OFF
+            if (m !== targetMaterial) toggleMaterial(m); // ON이면 OFF됨
           });
-          // 켜기
-          if (!materials.includes(targetMaterial))
-            toggleMaterial(targetMaterial);
+          // 목표 켜기
+          if (!materials.includes(targetMaterial)) toggleMaterial(targetMaterial);
         }
 
-        // ── 넥라인
+        // 넥라인
         const targetNeckId = neckIdFromOrder(neckLineOrder);
         if (targetNeckId) {
-          const nk =
-            dressNecklines.find((n) => String(n.id) === targetNeckId) ?? null;
+          const nk = dressNecklines.find((n) => String(n.id) === targetNeckId) ?? null;
           setNeck(nk);
         }
 
-        // ── 라인
+        // 라인
         const targetLineId = lineIdFromOrder(lineOrder);
         if (targetLineId) {
-          const ln =
-            dressLines.find((l) => String(l.id) === targetLineId) ?? null;
+          const ln = dressLines.find((l) => String(l.id) === targetLineId) ?? null;
           setLine(ln);
         }
       } catch (e) {
@@ -108,27 +100,23 @@ export default function DressFittingClient({ id }: { id: string }) {
         lineFit={line?.fit ?? null}
         canvasRatioPct={90}
       />
+
       <div className="pt-4">
         <OptionPills
           title="소재"
           options={dressMaterials}
           selected={materials}
           onToggle={(name) => {
-            // 단일 선택 UX로 강제: 선택된 항목만 남기기
+            // 단일 선택
             const target = name;
             materials.forEach((m) => {
-              if (m !== target) toggleMaterial(m); // 끄기
+              if (m !== target) toggleMaterial(m);
             });
-            if (!materials.includes(target)) toggleMaterial(target); // 켜기
+            if (!materials.includes(target)) toggleMaterial(target);
           }}
         />
 
-        <Section
-          title="넥라인"
-          titleSize="md"
-          bleed="viewport"
-          className="mt-[10px]"
-        >
+        <Section title="넥라인" titleSize="md" bleed="viewport" className="mt-[10px]">
           <ThumbGrid
             items={dressNecklines}
             selectedId={neck?.id}
@@ -136,12 +124,7 @@ export default function DressFittingClient({ id }: { id: string }) {
           />
         </Section>
 
-        <Section
-          title="라인"
-          titleSize="md"
-          bleed="viewport"
-          className="mt-[10px]"
-        >
+        <Section title="라인" titleSize="md" bleed="viewport" className="mt-[10px]">
           <ThumbGrid
             items={dressLines}
             selectedId={line?.id}
@@ -150,7 +133,13 @@ export default function DressFittingClient({ id }: { id: string }) {
         </Section>
 
         <div className="mt-10 mx-5.5">
-          <Button> {saving ? '저장 중…' : '저장하기'}</Button>
+          <Button
+            onClick={_onSave}                 // ✅ 클릭 핸들러 연결
+            disabled={!canSave || saving}     // ✅ 비활성/로딩 처리
+            ariaLabel="드레스 옵션 저장"
+          >
+            {saving ? '저장 중…' : '저장하기'}
+          </Button>
         </div>
       </div>
     </main>
