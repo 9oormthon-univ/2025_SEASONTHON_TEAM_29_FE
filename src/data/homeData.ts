@@ -59,8 +59,8 @@ export const reviews: ReviewItem[] = [
 ];
 
 export const stories: StoryItem[] = [
-  { id: 1, category: ['본식드레스', '우아함'], title: '웨딧이 픽한 웨딩드레스', img: '/home/story/story1.png' },
-  { id: 2, category: ['야외', '로맨틱', '단독홀'], title: '신부 취향저격 가든웨딩', img: '/home/story/story2.png' },
+  { id: 1, category: ['본식드레스', '우아함'], title: '웨딧이 픽한 웨딩드레스', img: '/icons/story1.png' },
+  { id: 2, category: ['야외', '로맨틱', '단독홀'], title: '신부 취향저격 가든웨딩', img: '/icons/story2.png' },
 ];
 
 export const makeupVendors: VendorItem[] = [

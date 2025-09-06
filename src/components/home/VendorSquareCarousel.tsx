@@ -21,7 +21,7 @@ export default function VendorSquareCarousel({
         <div className="flex touch-pan-y px-4">
           {items.map((v) => (
             <div key={v.id} className="min-w-0 flex-[0_0_35%]">
-              <VendorCard item={v} href={v.href} />
+              <VendorCard item={v} href={v.href} showPrice={false} />
             </div>
           ))}
         </div>

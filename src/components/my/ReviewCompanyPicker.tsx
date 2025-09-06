@@ -83,6 +83,7 @@ export default function ReviewCompanyPicker({
                     width={28}
                     height={28}
                     className="h-7 w-7 rounded-md object-cover"
+                    unoptimized
                   />
                   <div className="flex flex-col">
                     <span className="text-sm text-foreground">{vendorName}</span>
