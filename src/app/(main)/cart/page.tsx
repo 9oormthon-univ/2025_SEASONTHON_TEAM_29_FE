@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import Header from '@/components/common/monocules/Header';
 import CompanyCard from '@/components/Mypage/CompanyCard';
+import { fetchEstimateCart } from '@/services/estimates.api';
 
 type Item = {
   id: number;
@@ -14,103 +15,6 @@ type Item = {
   category: '웨딩홀' | '드레스' | '메이크업' | '스튜디오';
 };
 
-const ITEMS: Item[] = [
-  // 웨딩홀
-  {
-    id: 1,
-    name: '논현 더채플',
-    region: '논현',
-    imageSrc: '/logos/chapel.png',
-    price: 110000000,
-    priceText: '1100만원~',
-    category: '웨딩홀',
-  },
-  {
-    id: 2,
-    name: '반포 아펠가모',
-    region: '반포',
-    imageSrc: '/logos/apelgamo.png',
-    price: 106500000,
-    priceText: '1065만원~',
-    category: '웨딩홀',
-  },
-  // 드레스
-  {
-    id: 3,
-    name: '렌느브라이덜',
-    region: '청담',
-    imageSrc: '/logos/reine.png',
-    price: 10000000,
-    priceText: '100만원~',
-    category: '드레스',
-  },
-  {
-    id: 4,
-    name: '조슈아벨',
-    region: '선릉',
-    imageSrc: '/logos/joshua.png',
-    price: 12800000,
-    priceText: '128만원~',
-    category: '드레스',
-  },
-  {
-    id: 5,
-    name: '우아르',
-    region: '청담',
-    imageSrc: '/logos/wooarr.png',
-    price: 13000000,
-    priceText: '130만원~',
-    category: '드레스',
-  },
-  {
-    id: 7,
-    name: '우아르',
-    region: '청담',
-    imageSrc: '/logos/wooarr.png',
-    price: 13000000,
-    priceText: '130만원~',
-    category: '드레스',
-  },
-  {
-    id: 8,
-    name: '우아르',
-    region: '청담',
-    imageSrc: '/logos/wooarr.png',
-    price: 13000000,
-    priceText: '130만원~',
-    category: '드레스',
-  },
-  // 메이크업
-  {
-    id: 6,
-    name: '겐크리아',
-    region: '청담',
-    imageSrc: '/logos/cenchrea.png',
-    price: 9300000,
-    priceText: '93만원~',
-    category: '메이크업',
-  },
-  {
-    id: 7,
-    name: '제니하우스',
-    region: '서초',
-    imageSrc: '/logos/jh.png',
-    price: 7150000,
-    priceText: '71만 5천원~',
-    category: '메이크업',
-  },
-  // 스튜디오
-  {
-    id: 8,
-    name: '203사진관',
-    region: '선릉',
-    imageSrc: '/logos/203.png',
-    price: 19000000,
-    priceText: '190만원~',
-    category: '스튜디오',
-  },
-];
-
 const KR = (n: number) =>
   new Intl.NumberFormat('ko-KR', {
     style: 'currency',
@@ -119,7 +23,27 @@ const KR = (n: number) =>
   }).format(n);
 
 export default function EstimateCartPage() {
+  const [items, setItems] = useState<Item[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await fetchEstimateCart(ac.signal);
+        setItems(data);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : '견적서 조회 실패');
+      } finally {
+        setLoading(false);
+      }
+    })();
+    return () => ac.abort();
+  }, []);
 
   const toggler = (id: number) => {
     setSelectedIds((prev) =>
@@ -129,18 +53,17 @@ export default function EstimateCartPage() {
 
   const total = useMemo(
     () =>
-      ITEMS.filter((i) => selectedIds.includes(i.id)).reduce(
-        (s, i) => s + i.price,
-        0,
-      ),
-    [selectedIds],
+      items
+        .filter((i) => selectedIds.includes(i.id))
+        .reduce((s, i) => s + i.price, 0),
+    [items, selectedIds],
   );
 
   const groups: Record<Item['category'], Item[]> = {
-    웨딩홀: ITEMS.filter((i) => i.category === '웨딩홀'),
-    드레스: ITEMS.filter((i) => i.category === '드레스'),
-    메이크업: ITEMS.filter((i) => i.category === '메이크업'),
-    스튜디오: ITEMS.filter((i) => i.category === '스튜디오'),
+    웨딩홀: items.filter((i) => i.category === '웨딩홀'),
+    드레스: items.filter((i) => i.category === '드레스'),
+    메이크업: items.filter((i) => i.category === '메이크업'),
+    스튜디오: items.filter((i) => i.category === '스튜디오'),
   };
 
   return (
@@ -148,13 +71,7 @@ export default function EstimateCartPage() {
       <Header value="견적서" />
 
       <section className="px-5 mt-3">
-        <div
-          className="
-      w-full h-20 inline-flex flex-col items-center justify-center
-      rounded-2xl border border-zinc-300/50 bg-white
-      px-7
-    "
-        >
+        <div className="w-full h-20 inline-flex flex-col items-center justify-center rounded-2xl border border-zinc-300/50 bg-white px-7">
           <div className="text-text--default text-sm font-medium leading-normal">
             총 금액
           </div>
@@ -163,6 +80,13 @@ export default function EstimateCartPage() {
           </div>
         </div>
       </section>
+
+      {loading && (
+        <p className="px-5 mt-4 text-sm text-text--secondary">
+          견적서를 불러오는 중…
+        </p>
+      )}
+
       <section className="px-5 mt-6">
         {(Object.keys(groups) as Array<Item['category']>).map((category) => (
           <div key={category} className="mb-8">
@@ -175,19 +99,25 @@ export default function EstimateCartPage() {
                 style={{ scrollPaddingLeft: 20, scrollPaddingRight: 20 }}
               >
                 <div className="flex gap-[10px] px-5 py-1 snap-x snap-mandatory">
-                  {groups[category].map((item) => (
-                    <CompanyCard
-                      key={item.id}
-                      variant="cart"
-                      name={item.name}
-                      region={item.region}
-                      imageSrc={item.imageSrc}
-                      priceText={item.priceText}
-                      selected={selectedIds.includes(item.id)}
-                      onClick={() => toggler(item.id)}
-                      className="shrink-0 snap-start"
-                    />
-                  ))}
+                  {groups[category].length === 0 ? (
+                    <div className="text-sm text-text--secondary py-4">
+                      담긴 항목이 없어요
+                    </div>
+                  ) : (
+                    groups[category].map((item) => (
+                      <CompanyCard
+                        key={item.id}
+                        variant="cart"
+                        name={item.name}
+                        region={item.region}
+                        imageSrc={item.imageSrc}
+                        priceText={item.priceText}
+                        selected={selectedIds.includes(item.id)}
+                        onClick={() => toggler(item.id)}
+                        className="shrink-0 snap-start"
+                      />
+                    ))
+                  )}
                 </div>
               </div>
             </div>
