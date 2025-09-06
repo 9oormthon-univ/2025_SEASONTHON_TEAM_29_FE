@@ -4,6 +4,7 @@ import { cn } from '@/utills/cn';
 import Input from '@/components/common/atomic/Input';
 import InputBadge from '@/components/common/atomic/InputBadge';
 import { useEffect, useMemo, useState } from 'react';
+import type { InputVisualType } from '@/components/common/atomic/Input';
 
 function mmss(t: number) {
   const m = Math.floor(t / 60)
@@ -81,12 +82,11 @@ export default function SmsCodeField({
   }
 
   const hasValue = code !== '';
-  const uiType = error
+  const uiType: InputVisualType = error
     ? 'incorrect'
     : focused || hasValue
       ? 'variant4'
       : 'default';
-
   return (
     <div className={cn('mt-3', className)}>
       <label
