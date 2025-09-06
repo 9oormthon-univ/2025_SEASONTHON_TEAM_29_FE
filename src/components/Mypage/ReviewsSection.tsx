@@ -1,4 +1,3 @@
-// src/components/Mypage/ReviewsSection.tsx
 'use client';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import CompanyCard from '@/components/mypage/CompanyCard';

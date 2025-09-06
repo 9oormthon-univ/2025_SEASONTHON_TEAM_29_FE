@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
 import Header from '@/components/common/monocules/Header';
-import CompanyCard from '@/components/Mypage/CompanyCard';
+import CompanyCard from '@/components/mypage/CompanyCard';
 import { fetchEstimateCart } from '@/services/estimates.api';
+import { useEffect, useMemo, useState } from 'react';
 
 type Item = {
   id: number;
