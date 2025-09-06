@@ -7,6 +7,7 @@ import VendorCard from '@/components/common/atomic/VendorCard';
 import Header from '@/components/common/monocules/Header';
 import { useVendorsByCategory } from '@/hooks/useVendorsByCategory';
 import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function StudioListPage() {
@@ -18,9 +19,13 @@ export default function StudioListPage() {
   const { items, loading, error, hasMore, loadMore } =
     useVendorsByCategory('STUDIO', 30);
 
+  const router = useRouter();
+
   return (
     <main className="relative mx-auto w-full max-w-[420px]">
       <Header
+        showBack
+        onBack={()=>router.back()}
         value="스튜디오"
         rightSlot={
           <button type="button" aria-label="검색" className="p-2">

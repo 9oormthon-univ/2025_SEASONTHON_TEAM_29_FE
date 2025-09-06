@@ -41,7 +41,10 @@ export default function NewTourPage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[calc(env(safe-area-inset-bottom)+96px)]">
-      <Header value="일정 등록하기" className="h-[50px]" />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="일정 등록하기" className="h-[50px]" />
 
       <form onSubmit={onSubmit} className="px-[22px] py-4 space-y-6">
         <div>

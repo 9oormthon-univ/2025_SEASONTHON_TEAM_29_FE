@@ -91,7 +91,10 @@ export default function DressFittingClient({ id }: { id: string }) {
 
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[calc(env(safe-area-inset-bottom)+96px)]">
-      <Header value="투어일지" />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="투어일지" />
 
       <Preview
         neckOverlay={neck?.overlay ?? null}

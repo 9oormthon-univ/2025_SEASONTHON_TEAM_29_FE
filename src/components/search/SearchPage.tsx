@@ -55,7 +55,10 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   return (
     <main className="mx-auto px-[22px] w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
-      <Header value="검색" />
+      <Header
+        showBack
+        onBack={()=>router.back()} 
+        value="검색" />
 
       <section className="px-0">
         <QueryInput

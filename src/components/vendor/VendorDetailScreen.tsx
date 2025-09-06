@@ -3,14 +3,19 @@
 import Header from '@/components/common/monocules/Header';
 import PlaceSectionBlock from '@/components/vendor/place-section-block';
 import type { VendorDetail } from '@/types/vendor';
+import { useRouter } from 'next/navigation';
 import VendorActions from './VendorActions';
 import VendorHero from './VendorHero';
 import VendorInfo from './VendorInfo';
 
 export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail }) {
+  const router = useRouter();
   return (
     <main className="mx-auto w-full max-w-[420px] pb-[calc(env(safe-area-inset-bottom)+24px)]">
-      <Header value={vendor.title+' '+vendor.address?.dong} />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value={vendor.title+' '+vendor.address?.dong} />
       <VendorHero src={vendor.mainImage} alt={vendor.title} />
       <VendorInfo
         title={vendor.title}

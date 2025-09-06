@@ -55,7 +55,10 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-background pb-24">
-      <Header value="마이" />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="마이" />
       <section className="mx-auto max-w-96 px-5 pt-2">
         <ProfileHeader
           loading={profLoading}

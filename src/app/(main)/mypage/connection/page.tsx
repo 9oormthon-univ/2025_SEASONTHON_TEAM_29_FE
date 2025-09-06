@@ -51,11 +51,15 @@ function CoupleLinkingView({ onComplete }: Props) {
       setLoadingConn(false);
     }
   };
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-background flex justify-center">
       <div className="w-96 px-6 py-5 space-y-8 pb-28">
-        <Header value="계정연동" />
+        <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="계정연동" />
 
         <section className="space-y-2">
           <h2 className="text-sm font-medium text-text--default">코드번호 생성</h2>

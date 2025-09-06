@@ -6,7 +6,7 @@ import Imagebox from '@/components/reviews/ImageBox';
 import RingRating from '@/components/reviews/RingRating';
 import { tokenStore } from '@/lib/tokenStore';
 import Image from 'next/image';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 type ReviewData = {
@@ -123,10 +123,14 @@ export default function ReviewDetailPage() {
       CATEGORY_MAP[data.vendorCategory as keyof typeof CATEGORY_MAP] ?? '웨딩홀'
     );
   }, [data]);
+  const router = useRouter();
 
   return (
     <div className="w-full max-w-[420px] mx-auto">
-      <Header value="리뷰상세" />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="리뷰상세" />
 
       {loading && (
         <div className="px-5 mt-5 text-sm text-text--secondary">

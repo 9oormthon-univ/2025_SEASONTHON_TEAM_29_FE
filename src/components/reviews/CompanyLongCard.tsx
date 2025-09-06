@@ -48,6 +48,7 @@ export default function CompanyLongCard({
               width={64}
               height={64}
               className="w-16 h-16 object-cover"
+              unoptimized
             />
           ) : (
             <div className="w-full h-full bg-white" />

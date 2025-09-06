@@ -11,6 +11,7 @@ import { MOCK_EVENTS, MOCK_WEDDING_DATE, expandFairsToDays } from '@/data/calend
 import { addMonths, dday, toYMD } from '@/lib/calendar';
 import { EventItem } from '@/types/calendar';
 import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
 type Mode = 'schedule' | 'event';
@@ -63,10 +64,13 @@ export default function CalendarPage() {
       .filter((e) => e.date === activeYmd)
       .map((e) => ({ id: e.id, title: e.title, sticker: e.sticker })); // expandFairsToDays가 title 반환하도록 위에서 수정함
   }, [activeYmd, mode, base]);
+  const router = useRouter();
 
   return (
     <main className="mx-auto w-full max-w-[420px]">
       <Header
+        showBack
+        onBack={()=>{()=>router.back()}}
         value={`${base.getMonth() + 1}월`}
         rightSlot={
           <CalendarToggle

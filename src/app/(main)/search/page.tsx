@@ -20,7 +20,10 @@ export default function CategorySelectPage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto px-[22px]">
-      <Header value="검색"/>
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="검색"/>
 
       <div className="pt-3">
         <h1 className="text-head-2 font-extrabold">

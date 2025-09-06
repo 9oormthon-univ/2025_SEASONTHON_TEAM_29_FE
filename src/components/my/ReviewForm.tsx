@@ -4,6 +4,7 @@ import Button from '@/components/common/atomic/Button';
 import TextField from '@/components/common/atomic/TextField';
 import Header from '@/components/common/monocules/Header';
 import RingRating from '@/components/reviews/RingRating';
+import { useRouter } from 'next/navigation';
 import { Dispatch, SetStateAction, useState } from 'react';
 import PhotoCard from './PhotoCard';
 
@@ -41,10 +42,15 @@ export default function ReviewForm({
 }: ReviewFormProps) {
   const [files, setFiles] = useState<File[]>([]);
 
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-background flex justify-center">
       <div className="w-96 px-6 pb-36">
-        <Header value="후기" />
+        <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="후기" />
 
         {/* 헤더 & 평점 */}
         <section className="mt-2 text-center">
