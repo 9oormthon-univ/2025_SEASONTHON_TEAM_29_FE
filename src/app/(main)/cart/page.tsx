@@ -24,7 +24,9 @@ const KR = (n: number) =>
 
 export default function EstimateCartPage() {
   const [items, setItems] = useState<Item[]>([]);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedByCategory, setSelectedByCategory] = useState<
+    Partial<Record<Item['category'], number>>
+  >({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,20 +46,23 @@ export default function EstimateCartPage() {
     })();
     return () => ac.abort();
   }, []);
-
-  const toggler = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id],
-    );
+  const toggleOne = (item: Item) => {
+    setSelectedByCategory((prev) => {
+      const current = prev[item.category];
+      if (current === item.id) {
+        const next = { ...prev };
+        delete next[item.category];
+        return next;
+      }
+      return { ...prev, [item.category]: item.id };
+    });
   };
-
-  const total = useMemo(
-    () =>
-      items
-        .filter((i) => selectedIds.includes(i.id))
-        .reduce((s, i) => s + i.price, 0),
-    [items, selectedIds],
-  );
+  const total = useMemo(() => {
+    const selectedItems = items.filter(
+      (i) => selectedByCategory[i.category] === i.id,
+    );
+    return selectedItems.reduce((s, i) => s + i.price, 0);
+  }, [items, selectedByCategory]);
 
   const groups: Record<Item['category'], Item[]> = {
     웨딩홀: items.filter((i) => i.category === '웨딩홀'),
@@ -86,7 +91,6 @@ export default function EstimateCartPage() {
           견적서를 불러오는 중…
         </p>
       )}
-
       <section className="px-5 mt-6">
         {(Object.keys(groups) as Array<Item['category']>).map((category) => (
           <div key={category} className="mb-8">
@@ -112,8 +116,8 @@ export default function EstimateCartPage() {
                         region={item.region}
                         imageSrc={item.imageSrc}
                         priceText={item.priceText}
-                        selected={selectedIds.includes(item.id)}
-                        onClick={() => toggler(item.id)}
+                        selected={selectedByCategory[item.category] === item.id}
+                        onClick={() => toggleOne(item)}
                         className="shrink-0 snap-start"
                       />
                     ))
