@@ -36,7 +36,7 @@ export default function PlaceSectionBlock({ section }: { section: PlaceSection }
           {section.images.map((src, i) => (
             <div key={i} className="min-w-0 flex-[0_0_100%]">
               <div className="relative aspect-[4/3] w-full bg-gray-50">
-                <Image src={src} alt={`${section.name}-${i}`} fill className="object-cover" />
+                <Image src={src} alt={`${section.name}-${i}`} fill className="object-cover" unoptimized/>
               </div>
             </div>
           ))}
