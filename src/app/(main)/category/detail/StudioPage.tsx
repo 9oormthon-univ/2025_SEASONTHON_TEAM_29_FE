@@ -50,7 +50,7 @@ export default function StudioListPage() {
   const [page, setPage] = useState(0);
   const [items, setItems] = useState<VendorItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [_err, setErr] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
   const endpoint = useMemo(() => {
