@@ -7,6 +7,7 @@ import TourTabs from '@/components/tours/TourTabs';
 import { getTours } from '@/services/tours.api';
 import type { ToursBundle } from '@/types/tour';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 function PlusButton() {
@@ -44,10 +45,13 @@ export default function ToursPage() {
     })();
     return () => { alive = false; };
   }, []);
+  const router = useRouter();
 
   return (
     <main className="w-full max-w-[420px] mx-auto">
       <Header
+        showBack
+        onBack={()=>router.back()}
         value="투어일지"
         rightSlot={<PlusButton />}  // ✅ 우측에 + 버튼
       />

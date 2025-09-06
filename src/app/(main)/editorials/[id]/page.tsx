@@ -3,9 +3,9 @@ import ShareButton from '@/components/common/atomic/ShareButton';
 import Header from '@/components/common/monocules/Header';
 import { EDITORIAL_COMPONENTS } from '@/data/editorials';
 import { getEditorialById } from '@/lib/editorials';
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 
 type RouteParams = { id: string };
 
@@ -60,7 +60,10 @@ export default async function EditorialDetailPage({
 
   return (
     <main className="mx-auto w-full max-w-[420px] pb-24" data-hide-bottombar>
-      <Header value="매거진" className="h-[50px] px-[22px]" />
+      <Header
+        value="매거진"
+        className="h-[50px] px-[22px]"
+      />
 
       {/* 썸네일 + 오버레이 */}
       <section className="relative">

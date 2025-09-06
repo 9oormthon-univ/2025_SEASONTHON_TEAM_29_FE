@@ -3,7 +3,7 @@ import { http, type ApiEnvelope } from '@/services/http';
 import type { SearchItem } from '@/types/search';
 
 export type HallStyle = 'CHAPEL' | 'HOTEL' | 'CONVENTION' | 'HOUSE';
-export type HallMeal  = 'BUFFET' | 'COURSE' | 'ONE' | 'TABLE_SETTING';
+export type HallMeal  = 'BUFFET' | 'COURSE' | 'ONE_TABLE_SETTING' | 'TABLE_SETTING';
 
 export type HallSearchReq = {
   districts?: string[];          // ["강남구", "마포구"]

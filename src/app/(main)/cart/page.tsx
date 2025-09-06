@@ -3,6 +3,7 @@
 import Header from '@/components/common/monocules/Header';
 import CompanyCard from '@/components/my/CompanyCard';
 import { fetchEstimateCart } from '@/services/estimates.api';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 type Item = {
@@ -70,10 +71,14 @@ export default function EstimateCartPage() {
     메이크업: items.filter((i) => i.category === '메이크업'),
     스튜디오: items.filter((i) => i.category === '스튜디오'),
   };
+  const router = useRouter();
 
   return (
     <div className="w-full max-w-[420px] mx-auto">
-      <Header value="견적서" />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="견적서" />
 
       <section className="px-5 mt-3">
         <div className="w-full h-20 inline-flex flex-col items-center justify-center rounded-2xl border border-zinc-300/50 bg-white px-7">

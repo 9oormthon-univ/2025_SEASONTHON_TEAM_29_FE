@@ -26,7 +26,7 @@ export type VendorAddress = {
 export type VendorHallDetails = {
   category?: 'WEDDING_HALL';
   style?: 'CONVENTION' | 'CHAPEL' | 'HOTEL' | 'HOUSE';
-  meal?: 'BUFFET' | 'COURSE' | 'ONE' | 'TABLE_SETTING';
+  meal?: 'BUFFET' | 'COURSE' | 'ONE_TABLE_SETTING' | 'TABLE_SETTING';
   hallSeats?: number;
   banquetSeats?: number;
   maximumGuest?: number;

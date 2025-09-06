@@ -1,11 +1,11 @@
 'use client';
 
-import * as React from 'react';
+import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
+import { tokenStore } from '@/lib/tokenStore';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
-import { tokenStore } from '@/lib/tokenStore';
+import * as React from 'react';
 
 function TimeChip({
   label,
@@ -76,6 +76,19 @@ export default function ConsultTimePage() {
   const [error, setError] = React.useState<string | null>(null);
   const [sheet, setSheet] = React.useState<null | 'book' | 'estimate'>(null);
 
+  const backTo = React.useMemo(() => {
+    const ret = sp.get('return');
+    if (ret && /^\/[A-Za-z0-9/_?&=%.-]*$/.test(ret)) return ret; // 간단한 안전장치
+    if (vendorId != null) {
+      return `/vendor/hall/${vendorId}`;
+    }
+    return '/home';
+  }, [sp, vendorId]);
+
+  React.useEffect(() => {
+    setSelectedTime(null);
+  }, [rawDate]);
+
   React.useEffect(() => {
     setSelectedTime(null);
   }, [rawDate]);
@@ -112,7 +125,7 @@ export default function ConsultTimePage() {
     if (!sheet) return;
     const t = setTimeout(() => router.push('/home'), 2000);
     return () => clearTimeout(t);
-  }, [sheet, router]);
+  }, [sheet, router, backTo]);
 
   const handleReserve = async () => {
     if (!selectedTime || !API_BASE || vendorId === null) return;

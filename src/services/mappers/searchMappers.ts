@@ -11,7 +11,7 @@ const STYLE_KO_TO_API: Record<string, HallStyle> = {
 const MEAL_KO_TO_API: Record<string, HallMeal> = {
   뷔페: 'BUFFET',
   코스: 'COURSE',
-  한상차림: 'ONE',
+  한상차림: 'ONE_TABLE_SETTING',
   테이블세팅: 'TABLE_SETTING', // 백엔드 enum 확인 필요
 };
 

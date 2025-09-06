@@ -38,15 +38,20 @@ type Paged<T> = {
 
 export type HomeReviewItem = {
   id: number;
-  src: string | null;          // 이미지 없으면 null
-  href: string;                // 상세 링크
-  alt: string;                 // 이미지 대체 텍스트
-  category: string;            // 여기서는 업체명으로 표시
-  title: string;               // 리뷰 본문 요약
-  rings: number;               // 평점
+  src: string | null;
+  href: string;
+  alt: string;
+  category: string;
+  title: string;
+  rings: number;
+  writer: string;   // ✅ 추가
+  date: string;     // ✅ 추가 (YYYY.MM.DD 포맷)
 };
 
 function mapToHomeItem(r: RawHomeReview): HomeReviewItem {
+  const d = new Date(r.createdAt);
+  const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`;
+
   return {
     id: r.reviewId,
     src: r.reviewImageUrl ?? null,
@@ -55,6 +60,8 @@ function mapToHomeItem(r: RawHomeReview): HomeReviewItem {
     category: r.vendorName,
     title: r.content?.trim() || `${r.vendorName} 후기`,
     rings: Math.max(0, Math.min(5, Math.round(r.rating))),
+    writer: r.writerName,
+    date: dateStr,
   };
 }
 

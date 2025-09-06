@@ -47,7 +47,10 @@ export default function ResultsScreen({
       className="mx-auto w-full max-w-[420px] px-[22px] h-dvh flex flex-col overflow-hidden"
       data-hide-bottombar
     >
-      <Header value="검색결과" />
+      <Header 
+        showBack
+        onBack={()=>router.back()}
+        value="검색결과" />
 
       {/* 선택 칩스 */}
       <div className="mb-2 -mx-[6px] flex flex-wrap gap-2 px-[6px]">
