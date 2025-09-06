@@ -39,8 +39,7 @@ export default function ConsultDaysPage() {
 
   const { year, monthIdx, label } = getYearMonth(sp);
   const month1 = monthIdx + 1;
-  //   const vendorId = sp.get('vendorId');
-  const vendorId = 3;
+  const vendorId = sp.get('vendorId');
   const API_BASE = process.env.NEXT_PUBLIC_API_URL;
 
   const first = new Date(year, monthIdx, 1);

@@ -54,12 +54,16 @@ type ApiResponseTimeSlots = {
 const getErrorMessage = (e: unknown) =>
   e instanceof Error ? e.message : typeof e === 'string' ? e : '시간 조회 실패';
 
-const VENDOR_ID = 3;
-
 export default function ConsultTimePage() {
   const router = useRouter();
   const sp = useSearchParams();
   const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+  const vendorIdStr = sp.get('vendorId');
+  const vendorId =
+    vendorIdStr !== null && !Number.isNaN(Number(vendorIdStr))
+      ? Number(vendorIdStr)
+      : null;
+
   const rawDate = sp.get('date') ?? new Date().toISOString().slice(0, 10);
   const [yy, mm, dd] = rawDate.split('-').map(Number);
 
@@ -71,13 +75,21 @@ export default function ConsultTimePage() {
   const [sheet, setSheet] = React.useState<null | 'book' | 'estimate'>(null);
 
   React.useEffect(() => {
+    setSelectedTime(null);
+  }, [rawDate]);
+
+  React.useEffect(() => {
     if (!API_BASE) return;
+    if (vendorId === null) {
+      setError('유효한 vendorId가 없습니다.');
+      return;
+    }
     const fetchDetail = async () => {
       setLoading(true);
       setError(null);
       try {
         const token = tokenStore.get();
-        const url = `${API_BASE}/v1/reservation/${VENDOR_ID}/detail?year=${yy}&month=${mm}&day=${dd}`;
+        const url = `${API_BASE}/v1/reservation/${vendorId}/detail?year=${yy}&month=${mm}&day=${dd}`;
         const res = await fetch(url, {
           headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
           cache: 'no-store',
@@ -92,7 +104,7 @@ export default function ConsultTimePage() {
       }
     };
     fetchDetail();
-  }, [API_BASE, yy, mm, dd]);
+  }, [API_BASE, vendorId, yy, mm, dd]);
 
   React.useEffect(() => {
     if (!sheet) return;
@@ -101,12 +113,12 @@ export default function ConsultTimePage() {
   }, [sheet, router]);
 
   const handleReserve = async () => {
-    if (!selectedTime || !API_BASE) return;
+    if (!selectedTime || !API_BASE || vendorId === null) return;
     try {
       setPosting(true);
       setError(null);
       const token = tokenStore.get();
-      const url = `${API_BASE}/v1/reservation/${VENDOR_ID}`;
+      const url = `${API_BASE}/v1/reservation/${vendorId}`;
       const res = await fetch(url, {
         method: 'POST',
         headers: {
@@ -139,8 +151,8 @@ export default function ConsultTimePage() {
       rightText="견적서 담기"
       onLeft={handleReserve}
       onRight={handleAddToEstimate}
-      activeLeft={!!selectedTime && !posting}
-      activeRight={!!selectedTime}
+      activeLeft={!!selectedTime && !posting && vendorId !== null}
+      activeRight={!!selectedTime && vendorId !== null}
     >
       {loading && (
         <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>
