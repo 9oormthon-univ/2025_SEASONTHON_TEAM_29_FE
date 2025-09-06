@@ -9,19 +9,20 @@ import calendar from '@/../public/onboarding/illus/calendar.png';
 import rings from '@/../public/onboarding/illus/rings.png';
 import scale from '@/../public/onboarding/illus/scale.png';
 import EdgeBleed from '../common/atomic/EdgeBleed';
+import Slider from '../common/atomic/Slider';
 
 type Slide = { img: StaticImageData; title: string; desc?: string };
 const slides: Slide[] = [
-  { img: scale,    title: '원하는 곳만 골라서\n비교 할 수 있게!' },
+  { img: scale, title: '원하는 곳만 골라서\n비교 할 수 있게!' },
   { img: calendar, title: '행사와 투어 일정\n공유도 자동으로!' },
-  { img: rings,    title: '한 번 뿐인 결혼식,\n이제는 웨딧과 함께해요' },
+  { img: rings, title: '한 번 뿐인 결혼식,\n이제는 웨딧과 함께해요' },
 ];
 
 export default function OnboardingSlider() {
   const [selected, setSelected] = useState(0);
   const [emblaRef, emblaApi] = useEmblaCarousel(
     { loop: true, align: 'center' },
-    [Autoplay({ delay: 8000, stopOnInteraction: false })]
+    [Autoplay({ delay: 8000, stopOnInteraction: false })],
   );
 
   const onSelect = useCallback(() => {
@@ -39,16 +40,18 @@ export default function OnboardingSlider() {
     <EdgeBleed>
       <div>
         <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex touch-pan-y select-none"> {/* ← 페이지 좌우 스크롤 완화 */}
+          <div className="flex touch-pan-y select-none">
+            {' '}
+            {/* ← 페이지 좌우 스크롤 완화 */}
             {slides.map((s, i) => (
               <section key={i} className="min-w-0 flex-[0_0_100%]">
                 <div className="mt-8">
-                  <h2 className="whitespace-pre-line pl-10 text-left text-[22px] font-extrabold leading-tight text-gray-900">
+                  <h2 className="whitespace-pre-line pl-10 text-left text-[24px] font-bold leading-tight text-gray-900">
                     {s.title}
                   </h2>
                 </div>
 
-                <div className="relative mx-auto mt-4 h-[280px] w-full">
+                <div className="relative mx-auto mt-4 mb-9 h-[291px] w-[410px]">
                   <Image
                     src={s.img}
                     alt={s.title}
@@ -63,18 +66,11 @@ export default function OnboardingSlider() {
         </div>
 
         {/* 인디케이터 */}
-        <div className="mt-4 flex justify-center gap-2">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              aria-label={`slide ${i + 1}`}
-              onClick={() => emblaApi?.scrollTo(i)}
-              className={`h-2 rounded-full transition-all ${
-                i === selected ? 'w-8 bg-primary-500' : 'w-2 bg-gray-300'
-              }`}
-            />
-          ))}
-        </div>
+        <Slider
+          total={slides.length}
+          index={selected}
+          onChange={(i) => emblaApi?.scrollTo(i)}
+        />
       </div>
     </EdgeBleed>
   );
