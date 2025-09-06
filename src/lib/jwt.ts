@@ -41,6 +41,7 @@ export function parseJwt(token: string | undefined | null): JwtPayload | null {
   if (parts.length < 2) return null;
   try {
     const raw = JSON.parse(b64urlToStr(parts[1]));
+    console.log(raw);
     return isJwtPayload(raw) ? raw : null;
   } catch {
     return null;
