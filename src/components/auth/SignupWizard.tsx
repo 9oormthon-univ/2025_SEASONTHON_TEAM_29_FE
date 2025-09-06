@@ -48,7 +48,9 @@ export default function SignupWizard() {
       router.replace('/login');
     } catch (e: unknown) {
       const msg =
-        e instanceof Error ? e.message : '회원가입에 실패했어요. 다시 시도해주세요.';
+        e instanceof Error
+          ? e.message
+          : '회원가입에 실패했어요. 다시 시도해주세요.';
       setErr(msg);
     } finally {
       setLoading(false);
@@ -66,12 +68,13 @@ export default function SignupWizard() {
           >
             <ChevronLeft className="h-7 w-7" />
           </button>
-          <h1 className="text-md font-medium">회원가입</h1>
+          <h1 className="text-md font-medium">회원가입 ({index + 1}/3)</h1>
         </div>
+
         <ProgressBar value={index + 1} max={3} size="xs" className="w-full" />
       </header>
 
-      <div className="flex-1 overflow-hidden" ref={emblaRef}>
+      <div className="flex-1 overflow-hidden mx-5.5" ref={emblaRef}>
         <div className="flex">
           <StepTerms {...wiz} />
           <StepBasic {...wiz} />
@@ -79,7 +82,7 @@ export default function SignupWizard() {
         </div>
       </div>
 
-      <div className="sticky bottom-0 px-4 bg-white/70 pb-[calc(env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+      <div className="sticky bottom-0 px-4 bg-white/70 pb-[calc(env(safe-area-inset-bottom))] pt-3 mb-20 backdrop-blur">
         {index < 2 ? (
           <Button
             size="md"
@@ -89,17 +92,17 @@ export default function SignupWizard() {
               (index === 1 && !wiz.canNextBasic)
             }
             onClick={next}
-            className="h-12 text-sm"
+            className="h-13 text-sm"
           >
             다음
           </Button>
         ) : (
           <Button
-            size="md"
+            size="lg"
             fullWidth
             disabled={!wiz.canSubmitExtra || loading}
             onClick={onSignUp}
-            className="h-12 text-sm"
+            className="h-13 text-sm"
           >
             {loading ? '가입 중…' : '웨딧 시작하기'}
           </Button>

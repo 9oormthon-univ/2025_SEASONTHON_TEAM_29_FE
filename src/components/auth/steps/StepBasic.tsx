@@ -13,15 +13,20 @@ import { useState } from 'react';
 type Props = ReturnType<typeof useSignupWizard>;
 
 export default function StepBasic(props: Props) {
-  const [nameActive, setNameActive]   = useState(false);
+  const [nameActive, setNameActive] = useState(false);
   const [resendKey, setResendKey] = useState(0);
   const {
-    basic, setBasic,
-    isValidPhone, sendingCode, codeRequested, verifySms, sendSms,
+    basic,
+    setBasic,
+    isValidPhone,
+    sendingCode,
+    codeRequested,
+    verifySms,
+    sendSms,
     flags, // { nameOk, birthOk, phoneOk }
   } = props;
 
-  const touchedName  = basic.name.length  > 0;
+  const touchedName = basic.name.length > 0;
   const touchedBirth = basic.birth.length > 0;
   const touchedPhone = basic.phone.length > 0;
 
@@ -30,8 +35,10 @@ export default function StepBasic(props: Props) {
 
   return (
     <section className="min-w-0 flex-[0_0_100%]">
-      <div className="pt-6 px-4">
-        <p className="text-sm text-text-secondary">검증된 개인정보 수집을 위해</p>
+      <div className="pt-6">
+        <p className="text-sm text-text-default font-medium">
+          검증된 개인정보 수집을 위해
+        </p>
         <h2 className="mt-1 text-2xl font-extrabold">본인확인을 해주세요.</h2>
 
         {/* 이름 */}
@@ -59,7 +66,9 @@ export default function StepBasic(props: Props) {
             onRawChange={(raw) => setBasicField('birth', raw)}
           />
           {touchedBirth && !flags.birthOk && (
-            <FieldHint tone="error">YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.</FieldHint>
+            <FieldHint tone="error">
+              YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.
+            </FieldHint>
           )}
         </Field>
 
@@ -74,12 +83,17 @@ export default function StepBasic(props: Props) {
               onChange: (e) => setBasicField('phone', e.target.value),
             }}
             buttonText={
-              codeRequested ? (sendingCode ? '전송중…' : '재전송') :
-                              (sendingCode ? '전송중…' : '인증번호')
+              codeRequested
+                ? sendingCode
+                  ? '전송중…'
+                  : '재전송'
+                : sendingCode
+                  ? '전송중…'
+                  : '인증번호'
             }
             onButtonClick={async () => {
               const wasRequested = codeRequested; // 재전송 여부 체크
-              await sendSms();                    // 전송(성공 시 hook에서 codeRequested true 유지/설정)
+              await sendSms(); // 전송(성공 시 hook에서 codeRequested true 유지/설정)
               if (wasRequested) setResendKey((k) => k + 1); // ✅ 재전송이면 입력칸/타이머 초기화
             }}
             disabled={!isValidPhone || sendingCode}

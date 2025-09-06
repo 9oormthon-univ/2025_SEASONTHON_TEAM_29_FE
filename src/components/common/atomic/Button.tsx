@@ -32,7 +32,7 @@ export default function Button({
   const isInactive = disabled || state === 'inactive';
 
   const sizeClass =
-    size === 'lg' ? 'w-80 py-3 rounded-xl' : 'px-14 py-2.5 rounded-xl';
+    size === 'lg' ? 'w-[346px] py-3 rounded-xl' : 'px-14 py-2.5 rounded-xl';
 
   const colorClass = isInactive
     ? 'bg-primary-200 text-primary-300 cursor-not-allowed'
