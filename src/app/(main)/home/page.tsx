@@ -16,8 +16,8 @@ export default function HomePage() {
   const banners = getEditorialBanners();
 
   // 실데이터: 메이크업 / 스튜디오
-  const makeup = useVendorsByCategory('MAKEUP', 10);
-  const studio = useVendorsByCategory('STUDIO', 10);
+  const makeup = useVendorsByCategory('MAKEUP', 5);
+  const studio = useVendorsByCategory('STUDIO', 5);
 
   // ✅ 실데이터: 최신 리뷰
   const reviews = useHomeReviews(10);

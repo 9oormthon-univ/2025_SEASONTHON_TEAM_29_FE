@@ -71,7 +71,7 @@ export default function DressFittingClient({ id }: { id: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const _onSave = async () => {
+  const onSave = async () => {
     if (!canSave || saving) return;
     setSaving(true);
     try {
@@ -134,7 +134,7 @@ export default function DressFittingClient({ id }: { id: string }) {
 
         <div className="mt-10 mx-5.5">
           <Button
-            onClick={_onSave}                 // ✅ 클릭 핸들러 연결
+            onClick={onSave}                 // ✅ 클릭 핸들러 연결
             disabled={!canSave || saving}     // ✅ 비활성/로딩 처리
             ariaLabel="드레스 옵션 저장"
           >

@@ -48,7 +48,7 @@ export default function ToursPage() {
   const router = useRouter();
 
   return (
-    <main className="w-full max-w-[420px] mx-auto">
+    <main className="w-full max-w-[420px] mx-auto pb-[96px]">
       <Header
         showBack
         onBack={()=>router.back()}

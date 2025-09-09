@@ -1,23 +1,15 @@
 'use client';
 
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
-import { tokenStore } from '@/lib/tokenStore';
+import { addToEstimate, createReservation, getReservationTimes, type ReservationTimeEx } from '@/services/reservation.api';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
 function TimeChip({
-  label,
-  selected,
-  disabled,
-  onClick,
-}: {
-  label: string;
-  selected: boolean;
-  disabled?: boolean;
-  onClick: () => void;
-}) {
+  label, selected, disabled, onClick,
+}: { label: string; selected: boolean; disabled?: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -26,9 +18,7 @@ function TimeChip({
       className={clsx(
         'h-14 w-full rounded-[100px] px-6 text-sm font-medium inline-flex items-center justify-center',
         'outline outline-offset-[-1px] transition-opacity',
-        selected
-          ? 'bg-primary-200 outline-2 outline-primary-300'
-          : 'outline-1 outline-box-line',
+        selected ? 'bg-primary-200 outline-2 outline-primary-300' : 'outline-1 outline-box-line',
         disabled && 'opacity-40 pointer-events-none',
       )}
     >
@@ -37,38 +27,19 @@ function TimeChip({
   );
 }
 
-type TimeSlot = {
-  time: string;
-  timeDisplay: string;
-  reservationId: number;
-  available: boolean;
-};
-
-type ApiResponseTimeSlots = {
-  status: number;
-  success: boolean;
-  message: string;
-  data: { timeSlots: TimeSlot[] } | null;
-};
-
-const getErrorMessage = (e: unknown) =>
-  e instanceof Error ? e.message : typeof e === 'string' ? e : '시간 조회 실패';
-const ensureHMS = (t: string) => (t.length === 5 ? `${t}:00` : t);
+const getErr = (e: unknown) => e instanceof Error ? e.message : '시간 조회 실패';
 
 export default function ConsultTimePage() {
   const router = useRouter();
   const sp = useSearchParams();
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+
   const vendorIdStr = sp.get('vendorId');
-  const vendorId =
-    vendorIdStr !== null && !Number.isNaN(Number(vendorIdStr))
-      ? Number(vendorIdStr)
-      : null;
+  const vendorId = vendorIdStr && !Number.isNaN(Number(vendorIdStr)) ? Number(vendorIdStr) : null;
 
   const rawDate = sp.get('date') ?? new Date().toISOString().slice(0, 10);
   const [yy, mm, dd] = rawDate.split('-').map(Number);
 
-  const [slots, setSlots] = React.useState<TimeSlot[]>([]);
+  const [slots, setSlots] = React.useState<ReservationTimeEx[]>([]);
   const [selectedTime, setSelectedTime] = React.useState<string | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [posting, setPosting] = React.useState(false);
@@ -78,97 +49,63 @@ export default function ConsultTimePage() {
 
   const backTo = React.useMemo(() => {
     const ret = sp.get('return');
-    if (ret && /^\/[A-Za-z0-9/_?&=%.-]*$/.test(ret)) return ret; // 간단한 안전장치
-    if (vendorId != null) {
-      return `/vendor/hall/${vendorId}`;
-    }
-    return '/home';
+    if (ret && /^\/[A-Za-z0-9/_?&=%.-]*$/.test(ret)) return ret;
+    return vendorId != null ? `/vendor/hall/${vendorId}` : '/home';
   }, [sp, vendorId]);
 
-  React.useEffect(() => {
-    setSelectedTime(null);
-  }, [rawDate]);
+  // 날짜 바뀔 때 선택 초기화
+  React.useEffect(() => setSelectedTime(null), [rawDate]);
 
+  // 시간 슬롯 로드
   React.useEffect(() => {
-    setSelectedTime(null);
-  }, [rawDate]);
-
-  React.useEffect(() => {
-    if (!API_BASE) return;
-    if (vendorId === null) {
+    if (vendorId == null) {
       setError('유효한 vendorId가 없습니다.');
       return;
     }
-    const fetchDetail = async () => {
+    (async () => {
       setLoading(true);
       setError(null);
       try {
-        const token = tokenStore.get();
-        const url = `${API_BASE}/v1/reservation/${vendorId}/detail?year=${yy}&month=${mm}&day=${dd}`;
-        const res = await fetch(url, {
-          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-          cache: 'no-store',
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = (await res.json()) as ApiResponseTimeSlots;
-        setSlots(json.data?.timeSlots ?? []);
-      } catch (e: unknown) {
-        setError(getErrorMessage(e));
+        const data = await getReservationTimes({ vendorId, year: yy, month: mm, day: dd });
+        setSlots(data);
+      } catch (e) {
+        setError(getErr(e));
       } finally {
         setLoading(false);
       }
-    };
-    fetchDetail();
-  }, [API_BASE, vendorId, yy, mm, dd]);
+    })();
+  }, [vendorId, yy, mm, dd]);
 
+  // 완료 시 자동 이동
   React.useEffect(() => {
     if (!sheet) return;
-    const t = setTimeout(() => router.push('/home'), 2000);
+    const t = setTimeout(() => router.push(backTo), 1500);
     return () => clearTimeout(t);
   }, [sheet, router, backTo]);
 
   const handleReserve = async () => {
-    if (!selectedTime || !API_BASE || vendorId === null) return;
+    if (!selectedTime || vendorId === null) return;
     try {
       setPosting(true);
       setError(null);
-      const token = tokenStore.get();
-      const url = `${API_BASE}/v1/reservation/${vendorId}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ date: rawDate, time: ensureHMS(selectedTime) }),
-      });
-      if (!res.ok) throw new Error(`예약 실패 (HTTP ${res.status})`);
+      await createReservation({ vendorId, date: rawDate, time: selectedTime });
       setSheet('book');
-    } catch (e: unknown) {
-      setError(getErrorMessage(e));
+    } catch (e) {
+      setError(getErr(e));
     } finally {
       setPosting(false);
     }
   };
+
   const handleAddToEstimate = async () => {
-    if (!selectedTime || !API_BASE || vendorId === null) return;
+    if (!selectedTime || vendorId === null) return;
     try {
       setAdding(true);
       setError(null);
-      const token = tokenStore.get();
-      const url = `${API_BASE}/v1/estimate/${vendorId}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ date: rawDate, time: ensureHMS(selectedTime) }),
-      });
-      if (!res.ok) throw new Error(`견적 담기 실패 (HTTP ${res.status})`);
+      await addToEstimate({ vendorId, date: rawDate, time: selectedTime });
       setSheet('estimate');
-    } catch (e: unknown) {
-      setError(getErrorMessage(e));
+    } catch (e) {
+      setError(getErr(e));
     } finally {
       setAdding(false);
     }
@@ -187,16 +124,14 @@ export default function ConsultTimePage() {
       activeLeft={!!selectedTime && !posting && vendorId !== null}
       activeRight={!!selectedTime && !adding && vendorId !== null}
     >
-      {loading && (
-        <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>
-      )}
+      {loading && <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>}
       {error && <div className="text-sm text-red-500">오류: {error}</div>}
 
       <div className="grid grid-cols-3 gap-4">
         {slots.map((s) => (
           <TimeChip
-            key={`${s.time}-${s.reservationId}`}
-            label={s.timeDisplay || s.time}
+            key={`${s.id ?? s.time}`}
+            label={s.display ?? s.time}
             selected={selectedTime === s.time}
             disabled={!s.available}
             onClick={() => setSelectedTime(s.time)}
@@ -216,20 +151,14 @@ export default function ConsultTimePage() {
             <div className="h-full flex flex-col items-center justify-center gap-6">
               <Image
                 src={sheet === 'book' ? '/congratu.png' : '/cartCheck.png'}
-                alt={
-                  sheet === 'book'
-                    ? '예약이 완료 되었어요!'
-                    : '견적서에 잘 담았어요!'
-                }
+                alt={sheet === 'book' ? '예약이 완료 되었어요!' : '견적서에 잘 담았어요!'}
                 width={160}
                 height={160}
                 priority
                 className="w-[160px] h-[160px] select-none pointer-events-none"
               />
               <p className="text-[16px] font-semibold text-text--default">
-                {sheet === 'book'
-                  ? '예약이 완료 되었어요!'
-                  : '견적서에 잘 담았어요!'}
+                {sheet === 'book' ? '예약이 완료 되었어요!' : '견적서에 잘 담았어요!'}
               </p>
             </div>
           </div>

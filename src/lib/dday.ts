@@ -33,15 +33,7 @@ function toLocalMidnight(ymd: string, tz?: string): Date | null {
   if (!m) return null;
   const [_, y, mo, d] = m;
   if (tz) {
-    // Intl로 타임존 기준의 자정 시각 생성
-    // const dtf = new Intl.DateTimeFormat('en-CA', {
-    //   timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit',
-    //   hourCycle: 'h23', hour: '2-digit', minute: '2-digit', second: '2-digit',
-    // });
-    // 해당 타임존의 자정 문자열을 Date로 역변환
     const iso = `${y}-${mo}-${d}T00:00:00`;
-    // tz가 있는 경우, Date는 로컬 타임존으로 생성되므로 오프셋 보정이 필요.
-    // 간단히: 타임존 없는 상태로 만들고 나중 계산도 동일 tz 기준 today 사용.
     return new Date(iso);
   }
   return new Date(Number(y), Number(mo) - 1, Number(d)); // 로컬 자정

@@ -42,7 +42,7 @@ export async function createTour(body: CreateTourReq) {
 }
 
 export async function saveDress(body: SaveDressReq) {
-  // Swagger 스샷과 동일
+  console.log(body);
   return http<ApiEnvelope<string>>('/v1/tour/save_dress', {
     method: 'POST',
     body: JSON.stringify(body),

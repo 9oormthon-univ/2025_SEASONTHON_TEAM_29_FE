@@ -59,7 +59,6 @@ export default function ReservationsSection({
                   region={r.district ?? '-'}
                   name={name}
                   imageSrc={logo}
-                  /** 지난 예약이면 이미지 위만 덮기 */
                   dimImage={past}
                 />
               );
