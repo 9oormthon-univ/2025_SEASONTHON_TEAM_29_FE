@@ -16,6 +16,9 @@ export default function ReviewsSection({
   /** 지난 예약이 있을 때만 작성 버튼 노출 */
   allowWrite?: boolean;
 }) {
+  const uniqueItems = items.filter((item, idx, arr) =>
+    arr.findIndex((x) => x.id === item.id) === idx
+  );
   return (
     <div className="mt-4">
       <div className="mb-3 flex items-center justify-between px-1">
@@ -37,9 +40,9 @@ export default function ReviewsSection({
           </button>
         )}
 
-        {items.map((c) => (
+        {uniqueItems.map((c) => (
           <CompanyCard
-            key={c.id}
+            key={c.id}                   // 이제 고유
             variant="review"
             region={c.district ?? '-'}
             name={c.name}

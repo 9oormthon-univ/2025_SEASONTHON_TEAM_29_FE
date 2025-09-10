@@ -50,22 +50,20 @@ export default function CompanyCard({
       >
         <div
           className={clsx(
-            'w-28 h-28 rounded-lg flex items-center justify-center bg-white overflow-hidden border relative mb-12 -mr-4',
+            'relative mb-12 -mr-4 w-28 h-28 rounded-lg bg-white overflow-hidden border',
             selected ? 'border-primary-500' : 'border-box-line',
           )}
         >
           <Image
             src={imageSrc}
             alt={altText}
-            fill
-            className="object-contain"
+            fill               // ✅ 부모 크기를 꽉 채우는 기준
+            className="object-contain"  // ✅ 비율 유지하며 안쪽에 딱 맞춤
             priority
             unoptimized
             sizes="112px"
           />
-          {dimImage && (
-            <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
-          )}
+          {dimImage && <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />}
         </div>
         {(region || name) && (
           <div className="absolute left-0 top-[122px] inline-flex items-center gap-1 pl-0.5">
@@ -108,22 +106,20 @@ export default function CompanyCard({
       >
         <div
           className={clsx(
-            'w-28 h-28 bg-white rounded-lg border border-box-line flex items-center justify-center relative overflow-hidden',
+            'relative w-28 h-28 bg-white rounded-lg border overflow-hidden',
             selected ? 'border-primary-500' : 'border-box-line',
           )}
         >
           <Image
             src={imageSrc}
             alt={altText}
-            width={112}
-            height={112}
-            className="object-contain"
+            fill               // ✅
+            className="object-contain"  // ✅
             priority
             unoptimized
+            sizes="112px"
           />
-          {dimImage && (
-            <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
-          )}
+          {dimImage && <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />}
         </div>
 
         <div className="mt-2 flex items-center gap-1">
@@ -165,19 +161,17 @@ export default function CompanyCard({
         className,
       )}
     >
-      <div className="w-28 h-28 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-box-line overflow-hidden relative">
+      <div className="relative w-28 h-28 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
         <Image
           src={imageSrc}
           alt={altText}
-          width={112}
-          height={112}
-          className="w-28 h-28 object-cover"
+          fill               // ✅
+          className="object-contain"  // ✅
           priority
           unoptimized
+          sizes="112px"
         />
-        {dimImage && (
-          <div className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none" />
-        )}
+        {dimImage && <div className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none" />}
       </div>
 
       <div className={cn('mt-2 flex items-center gap-1 pl-0.5', textDimCls)}>

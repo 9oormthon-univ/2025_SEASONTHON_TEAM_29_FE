@@ -6,59 +6,48 @@ import Header from '@/components/common/monocules/Header';
 import BottomSheet from '@/components/my/CompanyModal';
 import DdayCard from '@/components/my/D-dayCheck';
 import ProfileHeader from '@/components/my/ProfileHeader';
-import ReservationsSection from '@/components/my/ReservationsSection';
 import ReviewCompanyPicker from '@/components/my/ReviewCompanyPicker';
-import ReviewsSection from '@/components/my/ReviewsSection';
 import { useMyProfile } from '@/hooks/useMyProfile';
 import { useMyReservations } from '@/hooks/useMyReservations';
 import { useMyReviews } from '@/hooks/useMyReviews';
+import { isPastYMDSeoul } from '@/lib/dateKR';
 import { resolveWeddingTarget } from '@/services/mypage.api';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
-function todayYMDSeoul(): string {
-  const now = new Date();
-  const y = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Seoul', year: 'numeric' }).format(now);
-  const m = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Seoul', month: '2-digit' }).format(now);
-  const d = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Seoul', day: '2-digit' }).format(now);
-  return `${y}-${m}-${d}`;
-}
-function isPastYMDSeoul(ymd: string): boolean {
-  const today = todayYMDSeoul();
-  return /^\d{4}-\d{2}-\d{2}$/.test(ymd) ? ymd < today : false;
-}
+import InviteCreateCard from '@/components/my/InviteCreateCard';
+import MyTabs from '@/components/my/MyTabs';
+import ReservationsTab from '@/components/my/ReservationsTab';
+import ReviewsTab from '@/components/my/ReviewsTab';
 
 export default function Page() {
-  const [tab, setTab] = useState<'reserve' | 'review'>('reserve');
+  const [tab, setTab] = useState<'reserve' | 'review' | 'invite'>('reserve');
   const [sheetOpen, setSheetOpen] = useState(false);
+
   const { data: profile, loading: profLoading, error: profErr } = useMyProfile();
   const { data: reservations, loading: resLoading, error: resErr } = useMyReservations();
   const { items: reviews, loading: revLoading, error: revErr, hasMore, loadMore } = useMyReviews(9);
+
+  const router = useRouter();
 
   const profileTarget = useMemo(
     () => resolveWeddingTarget(profile?.weddingDay) ?? '2026-05-10',
     [profile?.weddingDay],
   );
 
-  const router = useRouter();
-
   const hasPastReservation = useMemo(
-    () => reservations.some(r => isPastYMDSeoul(r.reservationDate)),
+    () => reservations.some((r) => isPastYMDSeoul(r.reservationDate)),
     [reservations],
   );
-
-  // ✅ 피커에는 "지난 예약"만 전달
   const pastOnlyReservations = useMemo(
-    () => reservations.filter(r => isPastYMDSeoul(r.reservationDate)),
+    () => reservations.filter((r) => isPastYMDSeoul(r.reservationDate)),
     [reservations],
   );
 
   return (
     <main className="min-h-screen bg-background pb-24">
-      <Header 
-        showBack
-        onBack={()=>router.back()}
-        value="마이" />
+      <Header showBack onBack={() => router.back()} value="마이" />
+
       <section className="mx-auto max-w-96 px-5 pt-2">
         <ProfileHeader
           loading={profLoading}
@@ -71,19 +60,14 @@ export default function Page() {
 
         <DdayCard target={profileTarget} className="mx-auto h-36 w-80" />
 
-        <div className="mt-6 flex gap-6">
-          <button onClick={() => setTab('reserve')} className={tab === 'reserve' ? 'border-b-2' : ''}>
-            내 예약
-          </button>
-          <button onClick={() => setTab('review')} className={tab === 'review' ? 'border-b-2' : ''}>
-            후기
-          </button>
-        </div>
+        <MyTabs value={tab} onChange={setTab} />
 
-        {tab === 'reserve' ? (
-          <ReservationsSection items={reservations} loading={resLoading} error={resErr} vendorMap={{}} />
-        ) : (
-          <ReviewsSection
+        {tab === 'reserve' && (
+          <ReservationsTab items={reservations} loading={resLoading} error={resErr} />
+        )}
+
+        {tab === 'review' && (
+          <ReviewsTab
             items={reviews}
             loading={revLoading}
             error={revErr ?? undefined}
@@ -91,11 +75,16 @@ export default function Page() {
             onMore={loadMore}
             onWriteClick={() => setSheetOpen(true)}
             onCardClick={(id) => router.push(`/review/${id}`)}
-            allowWrite={hasPastReservation} // ✅ 지난 예약이 없으면 버튼 숨김
+            allowWrite={hasPastReservation}
           />
         )}
+
+        {tab === 'invite' && <InviteCreateCard />}
       </section>
+
       <BottomNav innerMax="max-w-96" />
+
+      {/* 후기 작성 업체 선택 바텀시트 */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <h3 className="px-1 text-base font-semibold text-foreground">업체 선택</h3>
         <ReviewCompanyPicker
