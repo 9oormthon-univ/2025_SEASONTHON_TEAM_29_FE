@@ -109,7 +109,7 @@ export default function BasicInfoSection({
 
       {open && (
         <div id={panelId} role="region" aria-labelledby={headerId}>
-          <Hr className="my-4" />
+          <Hr className="-mt-8" />
           <div className="px-4 pt-3 pb-4">
             <FieldRow label="신랑 정보" className="mt-1">
               <div className="flex items-center gap-2">

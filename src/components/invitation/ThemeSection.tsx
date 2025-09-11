@@ -3,6 +3,7 @@
 import { useId, useState } from 'react';
 import clsx from 'clsx';
 import SvgObject from '@/components/common/atomic/SvgObject';
+import CheckComponent from '@/components/invitation/CheckComponent';
 type FontFamily = '나눔명조' | 'Pretendard' | 'SUIT' | 'Inter';
 type FontWeight = '얇게' | '보통' | '두껍게';
 type TemplateType = 'Film' | 'Letter' | 'Album';
@@ -26,7 +27,6 @@ type Props = {
 };
 
 const DEFAULT_ACCENTS = ['#F7C7C7', '#C8B7F0', '#FBEFCF'];
-
 const FONT_FAMILIES: FontFamily[] = ['나눔명조', 'Pretendard', 'SUIT', 'Inter'];
 const FONT_WEIGHTS: FontWeight[] = ['얇게', '보통', '두껍게'];
 const TEMPLATES: TemplateType[] = ['Film', 'Letter', 'Album'];
@@ -64,7 +64,10 @@ export default function ThemaSection({
 
   return (
     <section
-      className={clsx('w-80', className)}
+      className={clsx(
+        'w-80 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden',
+        className,
+      )}
       aria-labelledby={headerId}
       data-open={open}
     >
@@ -75,8 +78,7 @@ export default function ThemaSection({
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         className={clsx(
-          'w-80 h-12 px-4 py-2.5 rounded-lg',
-          'outline-[1.2px] outline-offset-[-1.2px] outline-box-line',
+          'w-full h-[52px] px-4 py-0',
           'inline-flex items-center justify-between gap-2',
         )}
       >
@@ -95,18 +97,10 @@ export default function ThemaSection({
         />
       </button>
       {open && (
-        <div
-          id={panelId}
-          role="region"
-          aria-labelledby={headerId}
-          className={clsx(
-            'mt-3 rounded-lg',
-            'outline-[1.2px] outline-offset-[-1.2px] outline-box-line',
-            'relative overflow-hidden',
-          )}
-        >
+        <div id={panelId} role="region" aria-labelledby={headerId}>
+          <Hr className="-mt-8" />
           <div className="px-4 pt-3 pb-6">
-            <FieldRow label="글꼴">
+            <FieldRow label="글꼴" className="mt-1">
               <div className="flex gap-2">
                 <SelectLike
                   value={value.fontFamily}
@@ -148,25 +142,37 @@ export default function ThemaSection({
               </div>
             </FieldRow>
 
-            <div className="my-4 w-full h-px outline-[0.5px] outline-offset-[-0.25px] outline-box-line" />
-            <div className="flex flex-col gap-3">
+            <Hr className="my-4" />
+            <FieldRow label="확대 방지">
               <CheckRow
                 label="청첩장 확대 방지"
                 checked={value.preventZoom}
                 onChange={() => handle.toggle('preventZoom')}
               />
+            </FieldRow>
+
+            <FieldRow label="등장 효과" className="mt-3">
               <CheckRow
                 label="스크롤 시, 자연스럽게 등장"
                 checked={value.revealOnScroll}
                 onChange={() => handle.toggle('revealOnScroll')}
               />
-            </div>
+            </FieldRow>
           </div>
-          <div className="w-full h-0 outline-[0.5px] outline-offset-[-0.25px] outline-box-line" />
-          <div className="w-full h-0 outline-[0.5px] outline-offset-[-0.25px] outline-box-line" />
         </div>
       )}
     </section>
+  );
+}
+
+function Hr({ className }: { className?: string }) {
+  return (
+    <div
+      className={clsx(
+        'w-full h-0 outline-[0.5px] outline-offset-[-0.25px] outline-box-line mb-8 ',
+        className,
+      )}
+    />
   );
 }
 function FieldRow({
@@ -179,11 +185,11 @@ function FieldRow({
   className?: string;
 }) {
   return (
-    <div className={clsx('mt-4', className)}>
-      <div className="text-text--default text-xs font-medium leading-normal mb-2">
+    <div className={clsx('mt-3 flex items-center gap-4', className)}>
+      <div className="w-16 shrink-0 whitespace-nowrap text-text--default text-xs font-medium leading-normal">
         {label}
       </div>
-      {children}
+      <div className="flex-1">{children}</div>
     </div>
   );
 }
@@ -210,12 +216,11 @@ function SelectLike<T extends string>({
       }}
       className={clsx(
         'h-8 px-3 rounded',
-        'bg-option-box-',
+        'bg-option-box',
         'inline-flex items-center justify-between gap-2',
         'w-24 text-left',
         className,
       )}
-      aria-label={`${value} 선택됨 (클릭해서 변경)`}
     >
       <span className="text-text--default text-xs leading-9">{value}</span>
       <SvgObject
@@ -243,7 +248,6 @@ function ColorSwatch({
     <button
       type="button"
       onClick={onClick}
-      aria-label={`강조 색상 ${color}${selected ? ' (선택됨)' : ''}`}
       className={clsx(
         'rounded-full border-[0.5px]',
         selected ? 'border-text--default' : 'border-box-line',
@@ -300,24 +304,9 @@ function CheckRow({
           }
         }}
         onClick={onChange}
-        className={clsx(
-          'w-4 h-4 inline-flex items-center justify-center',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 rounded-[4px]',
-          checked
-            ? 'outline-none bg-transparent'
-            : 'bg-transparent outline-1 outline-box-line',
-        )}
+        className="inline-flex items-center justify-center w-4 h-4 rounded-[4px] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60"
       >
-        {/* 체크 시엔 아이콘만 노출 */}
-        {checked && (
-          <SvgObject
-            src="/icons/check.svg"
-            alt=""
-            width={16}
-            height={16}
-            className="pointer-events-none"
-          />
-        )}
+        <CheckComponent selected={checked} />
       </span>
       <span className="text-xs font-medium leading-normal text-text--secondary">
         {label}
