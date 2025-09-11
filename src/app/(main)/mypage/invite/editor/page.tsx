@@ -1,36 +1,47 @@
-// src/app/mypage/invite/editor/page.tsx
 'use client';
 
-import {
-  defaultInviteForm,
-  type InviteForm,
-} from '@/types/invite';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
+import { defaultInviteForm, type InviteForm } from '@/types/invite';
 import Header from '@/components/common/monocules/Header';
-import BasicInfoSection from '@/components/invite/BasicInfoSection';
-import CeremonySection from '@/components/invite/CeremonySection';
-import GreetingSection from '@/components/invite/GreetingSection';
-import ThemeSection from '@/components/invite/ThemeSection';
-// (+ VenueSection, TransportSection, GallerySection, EndingSection, AccountsSection, EffectsSection import)
+import ThemeSection from '@/components/invitation/ThemeSection';
+import BasicInfoSection from '@/components/invitation/BasicInfoSection';
+import MessageSection from '@/components/invitation/MessageSection';
+import DateSection from '@/components/invitation/DateSection';
+import PlaceSection, {
+  type PlaceSectionValue,
+} from '@/components/invitation/PlaceSection';
+import Button from '@/components/common/atomic/Button';
+
+const DEFAULT_PLACE: PlaceSectionValue = {
+  venueName: '',
+  hallInfo: '',
+  showMap: true,
+};
 
 export default function InviteEditorPage() {
   const router = useRouter();
   const [form, setForm] = useState<InviteForm>(defaultInviteForm);
   const [saving, setSaving] = useState(false);
+  const [placeLocal, setPlaceLocal] =
+    useState<PlaceSectionValue>(DEFAULT_PLACE);
 
-  const setTheme    = (v: InviteForm['theme'])        => setForm(f => ({ ...f, theme: v }));
-  const setGreeting = (v: InviteForm['greeting'])     => setForm(f => ({ ...f, greeting: v }));
-  const setCeremony = (v: InviteForm['ceremony'])     => setForm(f => ({ ...f, ceremony: v }));
-  const setPeople   = (p: Partial<Pick<InviteForm,'bride'|'groom'|'order'>>) =>
-    setForm(f => ({ ...f, ...p }));
+  const setTheme = (v: any) => setForm((f) => ({ ...f, theme: v }));
+
+  const setBasic = (v: any) =>
+    setForm((f) => ({
+      ...f,
+      bride: v.bride,
+      groom: v.groom,
+      order: v.order,
+    }));
+  const setMessage = (v: any) => setForm((f) => ({ ...f, greeting: v }));
+  const setCeremony = (v: any) => setForm((f) => ({ ...f, ceremony: v }));
 
   const onSubmit = async () => {
     setSaving(true);
     try {
-      // await createInvitation(form);
-      router.replace('/mypage/invite/preview');
+      router.replace('/mypage/invite/view');
     } finally {
       setSaving(false);
     }
@@ -38,24 +49,34 @@ export default function InviteEditorPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-96 bg-background">
-      <Header value='청첩장 제작' onBack={()=>{router.back()}} showBack/>
-        <section className="mx-auto max-w-96 px-5 pt-2">
-
-        <ThemeSection value={form.theme} onChange={setTheme} />
-        <BasicInfoSection bride={form.bride} groom={form.groom} order={form.order} onChange={setPeople} />
-        <GreetingSection value={form.greeting} onChange={setGreeting} />
-        <CeremonySection value={form.ceremony} onChange={setCeremony} />
-
-        {/* TODO: VenueSection / TransportSection / GallerySection / EndingSection / AccountsSection / EffectsSection 추가 */}
-
-        <button
-          type="button"
-          onClick={onSubmit}
-          disabled={saving}
-          className="sticky bottom-4 left-0 right-0 mx-auto block w-full max-w-96 rounded-xl bg-rose-400 py-4 text-white shadow-lg disabled:opacity-60"
-        >
-          {saving ? '제작 중…' : '제작하기'}
-        </button>
+      <Header value="청첩장 제작" onBack={() => router.back()} showBack />
+      <section className="mx-auto max-w-96 px-5 pt-2 flex flex-col items-center gap-3">
+        <ThemeSection value={form.theme as any} onChange={setTheme} />
+        <BasicInfoSection
+          value={{
+            bride: form.bride as any,
+            groom: form.groom as any,
+            order: form.order as any,
+          }}
+          onChange={setBasic}
+        />
+        <MessageSection
+          value={(form as any).greeting ?? { title: '', body: '' }}
+          onChange={setMessage}
+        />
+        <DateSection value={form.ceremony as any} onChange={setCeremony} />
+        <PlaceSection value={placeLocal} onChange={setPlaceLocal} />
+        <div className="w-80 mx-auto pt-2 pb-6">
+          <Button
+            type="button"
+            onClick={onSubmit}
+            disabled={saving}
+            fullWidth
+            size="lg"
+          >
+            {saving ? '제작 중…' : '제작하기'}
+          </Button>
+        </div>
       </section>
     </main>
   );
