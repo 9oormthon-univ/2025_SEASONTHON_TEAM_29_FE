@@ -320,7 +320,7 @@ function BoxInput({
         placeholder={placeholder}
         className={clsx(
           'absolute inset-0 w-full h-full px-2.5',
-          'text-xs font-normal text-text--default placeholder:text-text-secondary',
+          '!text-xs font-normal text-text--default placeholder:text-text-secondary',
           'leading-8',
           'bg-transparent outline-none ring-0',
         )}
