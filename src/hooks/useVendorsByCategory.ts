@@ -1,13 +1,16 @@
-// src/hooks/useVendorsByCategory.ts
 'use client';
 
 import { vendorKey } from '@/lib/vendorKey';
-import { getVendorsByCategory, type VendorCategory } from '@/services/vendor.api';
-import type { VendorItem } from '@/types/vendor';
+import { getVendorsByCategory } from '@/services/vendor.api';
+import type { PageResponse, VendorCategory, VendorListItem } from '@/types/vendor';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export function useVendorsByCategory(category: VendorCategory, pageSize = 10, opts?: { auto?: boolean }) {
-  const [items, setItems] = useState<VendorItem[]>([]);
+export function useVendorsByCategory(
+  category: VendorCategory,
+  pageSize = 10,
+  opts?: { auto?: boolean },
+) {
+  const [items, setItems] = useState<VendorListItem[]>([]);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -28,18 +31,18 @@ export function useVendorsByCategory(category: VendorCategory, pageSize = 10, op
     setLoading(true);
 
     try {
-      const { items: chunk, hasNext } = await getVendorsByCategory(
-        category, pageRef.current, pageSize, { skipAuth: true }
+      const data: PageResponse<VendorListItem> = await getVendorsByCategory(
+        category, pageRef.current, pageSize, { skipAuth: true },
       );
 
-      // ✅ 중복 제거 병합 (StrictMode 2회 호출에도 안전)
       setItems(prev => {
-        const merged = [...prev, ...chunk];
-        const map = new Map<string, VendorItem>();
+        const merged = [...prev, ...data.content];
+        const map = new Map<string, VendorListItem>();
         for (const it of merged) map.set(vendorKey(it), it);
         return Array.from(map.values());
       });
 
+      const hasNext = !data.last;
       setHasMore(hasNext);
       setPage(p => p + 1);
       pageRef.current += 1;
