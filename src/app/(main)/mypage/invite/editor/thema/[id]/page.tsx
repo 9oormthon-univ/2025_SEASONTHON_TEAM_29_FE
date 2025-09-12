@@ -18,6 +18,13 @@ export default function ThemaEditorPage() {
     return Number.isFinite(n) ? Math.min(Math.max(1, n), 3) : 1;
   }, [sp]);
   const [mainPhoto, setMainPhoto] = useState<File | null>(null);
+  const [subPhotos, setSubPhotos] = useState<(File | null)[]>([
+    null,
+    null,
+    null,
+  ]);
+  const setSubAt = (i: number, f: File | null) =>
+    setSubPhotos((prev) => prev.map((v, idx) => (idx === i ? f : v)));
   const pushStep = (n: number) =>
     router.push(`/mypage/invite/editor/thema/${params.id}?step=${n}`);
 
@@ -50,7 +57,11 @@ export default function ThemaEditorPage() {
       )}
 
       {step === 2 && (
-        <Step2 onPrev={() => pushStep(1)} onNext={() => pushStep(3)} />
+        <Step2
+          files={subPhotos}
+          onChangeAt={setSubAt}
+          onNext={() => pushStep(3)}
+        />
       )}
 
       {step === 3 && <Step3 onPrev={() => pushStep(2)} />}
