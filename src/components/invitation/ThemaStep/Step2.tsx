@@ -129,11 +129,13 @@ export default function Step2({
             />
           </div>
         </div>
-        <img
+        <Image
           src="/film.svg"
           alt="film frame"
+          fill
+          priority
           className="absolute z-20 pointer-events-none select-none"
-          style={{ left: 0, top: 0, width: '100%', height: '100%' }}
+          sizes="100vw"
         />
       </div>
       <p className="mt-3 text-xs text-text--secondary text-center">

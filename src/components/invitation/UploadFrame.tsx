@@ -53,10 +53,13 @@ export default function UploadFrame({
           />
         )}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-30">
-          <img
+          <Image
             src="/LoveWinsAll.svg"
             alt="Love Wins All"
+            width={192}
+            height={192}
             className="w-48 h-auto opacity-90"
+            priority
           />
         </div>
       </div>

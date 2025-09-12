@@ -33,24 +33,13 @@ export default function GallerySection({
   defaultOpen = false,
   value,
   onChange,
-  uploadDomain,
-  uploadDomainId,
   maxTotal = 27,
-  concurrency = 3,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen);
   const sectionId = useId();
   const headerId = `${sectionId}-header`;
   const panelId = `${sectionId}-panel`;
-  const [files, setFiles] = useState<File[]>([]);
-
-  const handleSelectFiles = (added: File[]) => {
-    if (!added?.length) return;
-    const room = Math.max(0, maxTotal - files.length);
-    if (room <= 0) return;
-    setFiles((prev) => [...prev, ...added.slice(0, room)]);
-  };
-
+  const [files] = useState<File[]>([]);
   const patch = <K extends keyof GallerySectionValue>(
     key: K,
     v: GallerySectionValue[K],

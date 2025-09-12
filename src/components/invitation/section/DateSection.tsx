@@ -216,17 +216,16 @@ const DateButton = forwardRef<
     </button>
   );
 });
-type Opt = { value: number | string; label: string };
-
-function Dropdown({
+type Opt<T extends number | string> = { value: T; label: string };
+function Dropdown<T extends number | string>({
   options,
   selected,
   onSelect,
   className,
 }: {
-  options: readonly Opt[];
-  selected: number | string;
-  onSelect: (v: any) => void;
+  options: readonly Opt<T>[];
+  selected: T;
+  onSelect: (v: T) => void;
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -265,8 +264,7 @@ function Dropdown({
     </>
   );
 }
-
-function DropdownPopover({
+function DropdownPopover<T extends number | string>({
   open,
   anchorRef,
   options,
@@ -276,9 +274,9 @@ function DropdownPopover({
 }: {
   open: boolean;
   anchorRef: React.RefObject<HTMLButtonElement | null>;
-  options: readonly Opt[];
-  selected: number | string;
-  onSelect: (v: number | string) => void;
+  options: readonly Opt<T>[];
+  selected: T;
+  onSelect: (v: T) => void;
   onClose: () => void;
 }) {
   const panelRef = useRef<HTMLDivElement | null>(null);

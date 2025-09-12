@@ -39,22 +39,36 @@ export default function BasicInfoSection({
   const sectionId = useId();
   const headerId = `${sectionId}-header`;
   const panelId = `${sectionId}-panel`;
-
-  const patch = (
+  function patch(path: 'groom', v: BasicInfoPerson): void;
+  function patch(path: 'bride', v: BasicInfoPerson): void;
+  function patch(path: 'order', v: BasicInfoValue['order']): void;
+  function patch(
+    path:
+      | 'groom.fatherDeceased'
+      | 'groom.motherDeceased'
+      | 'bride.fatherDeceased'
+      | 'bride.motherDeceased',
+    v: boolean,
+  ): void;
+  function patch(
     path:
       | keyof BasicInfoValue
       | 'groom.fatherDeceased'
       | 'groom.motherDeceased'
       | 'bride.fatherDeceased'
       | 'bride.motherDeceased',
-    v: any,
-  ) => {
-    const next = structuredClone(value);
+    v: unknown,
+  ) {
+    const next: BasicInfoValue = structuredClone(value);
     switch (path) {
       case 'groom':
+        next.groom = v as BasicInfoPerson;
+        break;
       case 'bride':
+        next.bride = v as BasicInfoPerson;
+        break;
       case 'order':
-        (next as any)[path] = v;
+        next.order = v as BasicInfoValue['order'];
         break;
       case 'groom.fatherDeceased':
         next.groom.fatherDeceased = v as boolean;
@@ -70,7 +84,7 @@ export default function BasicInfoSection({
         break;
     }
     onChange(next);
-  };
+  }
 
   return (
     <section

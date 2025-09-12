@@ -31,9 +31,12 @@ export default function MessageSection({
   const headerId = `${sectionId}-header`;
   const panelId = `${sectionId}-panel`;
 
-  const patch = (path: keyof MessageSectionValue, v: any) => {
+  const patch = <K extends keyof MessageSectionValue>(
+    path: K,
+    v: MessageSectionValue[K],
+  ) => {
     const next = structuredClone(value);
-    (next as any)[path] = v;
+    next[path] = v;
     onChange(next);
   };
 

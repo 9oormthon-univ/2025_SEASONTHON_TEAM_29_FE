@@ -63,7 +63,7 @@ export default function ThemaEditorPage() {
           onChangeAt={setSubAt}
           onNext={() => {
             if (!SecondPhotos) return;
-            pushStep(2);
+            pushStep(3);
           }}
         />
       )}

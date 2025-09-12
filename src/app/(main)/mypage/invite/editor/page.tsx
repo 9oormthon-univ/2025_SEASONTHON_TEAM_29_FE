@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, type ComponentProps } from 'react';
 import { defaultInviteForm, type InviteForm } from '@/types/invite';
 import Header from '@/components/common/monocules/Header';
 import ThemaSection from '@/components/invitation/section/ThemaSection';
@@ -22,7 +22,14 @@ const DEFAULT_PLACE: PlaceSectionValue = {
   hallInfo: '',
   showMap: true,
 };
-
+type ThemaValue = ComponentProps<typeof ThemaSection>['value'];
+type ThemaOnChange = ComponentProps<typeof ThemaSection>['onChange'];
+type BasicValue = ComponentProps<typeof BasicInfoSection>['value'];
+type BasicOnChange = ComponentProps<typeof BasicInfoSection>['onChange'];
+type MessageValue = ComponentProps<typeof MessageSection>['value'];
+type MessageOnChange = ComponentProps<typeof MessageSection>['onChange'];
+type CeremonyValue = ComponentProps<typeof DateSection>['value'];
+type CeremonyOnChange = ComponentProps<typeof DateSection>['onChange'];
 export default function InviteEditorPage() {
   const router = useRouter();
   const [form, setForm] = useState<InviteForm>(defaultInviteForm);
@@ -34,11 +41,28 @@ export default function InviteEditorPage() {
     enablePopup: true,
     photos: [],
   });
-  const setTheme = (v: any) => setForm((f) => ({ ...f, theme: v }));
-  const setBasic = (v: any) =>
-    setForm((f) => ({ ...f, bride: v.bride, groom: v.groom, order: v.order }));
-  const setMessage = (v: any) => setForm((f) => ({ ...f, greeting: v }));
-  const setCeremony = (v: any) => setForm((f) => ({ ...f, ceremony: v }));
+  const setTheme: ThemaOnChange = (v) =>
+    setForm((f) => ({ ...f, theme: v as unknown as InviteForm['theme'] }));
+
+  const setBasic: BasicOnChange = (v) => {
+    const { bride, groom, order } = v as unknown as Pick<
+      InviteForm,
+      'bride' | 'groom' | 'order'
+    >;
+    setForm((f) => ({ ...f, bride, groom, order }));
+  };
+
+  const setMessage: MessageOnChange = (v) =>
+    setForm((f) => ({
+      ...f,
+      greeting: v as unknown as InviteForm['greeting'],
+    }));
+
+  const setCeremony: CeremonyOnChange = (v) =>
+    setForm((f) => ({
+      ...f,
+      ceremony: v as unknown as InviteForm['ceremony'],
+    }));
 
   const onSubmit = async () => {
     setSaving(true);
@@ -53,32 +77,48 @@ export default function InviteEditorPage() {
     <main className="mx-auto min-h-screen max-w-96 bg-background">
       <Header value="청첩장 제작" onBack={() => router.back()} showBack />
       <section className="mx-auto max-w-96 px-5 pt-2 flex flex-col items-center gap-3">
-        <ThemaSection value={form.theme as any} onChange={setTheme} />
+        {/* value도 컴포넌트 기대 타입으로 단언 (any 사용 X) */}
+        <ThemaSection
+          value={form.theme as unknown as ThemaValue}
+          onChange={setTheme}
+        />
+
         <BasicInfoSection
           defaultOpen={false}
-          value={{
-            bride: form.bride as any,
-            groom: form.groom as any,
-            order: form.order as any,
-          }}
+          value={
+            {
+              bride: form.bride,
+              groom: form.groom,
+              order: form.order,
+            } as unknown as BasicValue
+          }
           onChange={setBasic}
         />
         <MessageSection
           defaultOpen={false}
-          value={(form as any).greeting ?? { title: '', body: '' }}
+          value={
+            (form.greeting ?? {
+              title: '',
+              body: '',
+            }) as unknown as MessageValue
+          }
           onChange={setMessage}
         />
+
         <DateSection
           defaultOpen={false}
-          value={form.ceremony as any}
+          value={form.ceremony as unknown as CeremonyValue}
           onChange={setCeremony}
         />
+
         <PlaceSection
           defaultOpen={false}
           value={placeLocal}
           onChange={setPlaceLocal}
         />
+
         <PlainCollapsible title="교통수단" />
+
         <GallerySection
           value={galleryLocal}
           onChange={(next) => {

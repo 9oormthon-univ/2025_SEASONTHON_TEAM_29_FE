@@ -1,11 +1,10 @@
 'use client';
 
 import Button from '@/components/common/atomic/Button';
+import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function Step3({
-  files,
-  onChangeFile,
   onNext,
 }: {
   files: File | null;
@@ -39,10 +38,13 @@ export default function Step3({
         className="relative mx-auto mt-8 block w-45 md:w-80 aspect-[185/370] cursor-pointer"
       >
         {!url && (
-          <img
+          <Image
             src="/ticket.svg"
             alt="ticket"
+            fill
+            priority
             className="absolute inset-0 w-full h-full"
+            sizes="(max-width: 768px) 45vw, 80vw"
           />
         )}
         {url && (
