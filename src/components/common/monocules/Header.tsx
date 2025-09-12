@@ -1,9 +1,9 @@
-// src/components/common/monocules/Header.tsx
 'use client';
 
 import { cn } from '@/utills/cn';
 import { ChevronLeft } from 'lucide-react';
-import type { ReactNode } from 'react';
+import type { ForwardedRef, ReactNode } from 'react';
+import { forwardRef } from 'react';
 
 export type HeaderProps = {
   value: ReactNode;
@@ -14,23 +14,35 @@ export type HeaderProps = {
   children?: ReactNode;
   maxWidthClassName?: string;
   sticky?: boolean;
+  /** 배경/텍스트 커스텀 */
+  bgClassName?: string;
+  textClassName?: string;
 };
 
-export default function Header({
-  value,
-  showBack = false,
-  onBack,
-  className,
-  rightSlot,
-  children,
-  maxWidthClassName = 'max-w-[420px]',
-  sticky = true,
-}: HeaderProps) {
+/** ref로 높이 측정 가능하도록 forwardRef */
+const Header = forwardRef(function Header(
+  {
+    value,
+    showBack = false,
+    onBack,
+    className,
+    rightSlot,
+    children,
+    maxWidthClassName = 'max-w-[420px]',
+    sticky = true,
+    bgClassName = 'bg-white/70',
+    textClassName = 'text-black',
+  }: HeaderProps,
+  ref: ForwardedRef<HTMLElement>
+) {
   return (
     <header
+      ref={ref}
       className={cn(
-        sticky && 'sticky top-0 z-10 bg-white/70 backdrop-blur',
+        sticky && 'sticky top-0 z-10 backdrop-blur',
         'px-4',
+        bgClassName,
+        textClassName,
         className,
       )}
     >
@@ -50,7 +62,7 @@ export default function Header({
           </button>
         )}
 
-        <h1 className="text-md font-medium">{value}</h1>
+        <h1 className={cn('text-md font-medium', textClassName)}>{value}</h1>
 
         {rightSlot && (
           <div className="absolute right-0 top-1/2 -translate-y-1/2">
@@ -62,4 +74,6 @@ export default function Header({
       {children /* 예: ProgressBar 등 */}
     </header>
   );
-}
+});
+
+export default Header;

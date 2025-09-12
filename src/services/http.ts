@@ -120,13 +120,17 @@ async function toErr(res: Response) {
   return new Error(text || `HTTP ${res.status}`);
 }
 
+// ✅ Response를 clone 해서 json() 우선, 실패하면 text()로 파싱
 async function safeJson<T>(res: Response): Promise<T> {
-  // 204 등 바디 없는 응답 처리
-  const txt = await res.text().catch(() => '');
-  if (!txt) return {} as T;
   try {
-    return JSON.parse(txt) as T;
+    const r = res.clone();               // 본문 스트림 보존
+    return (await r.json()) as T;        // 가장 안전
   } catch {
-    return {} as T;
+    try {
+      const t = await res.text();        // 혹시 서버가 text/plain 으로 줄 수도 있음
+      return t ? (JSON.parse(t) as T) : ({} as T);
+    } catch {
+      return {} as T;
+    }
   }
 }
