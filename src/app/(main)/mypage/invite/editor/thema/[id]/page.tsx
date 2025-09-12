@@ -17,14 +17,15 @@ export default function ThemaEditorPage() {
     const n = Number(sp.get('step') ?? '1');
     return Number.isFinite(n) ? Math.min(Math.max(1, n), 3) : 1;
   }, [sp]);
-  const [mainPhoto, setMainPhoto] = useState<File | null>(null);
-  const [subPhotos, setSubPhotos] = useState<(File | null)[]>([
+  const [FirstPhoto, setFirstPhoto] = useState<File | null>(null);
+  const [SecondPhotos, setSecondPhotos] = useState<(File | null)[]>([
     null,
     null,
     null,
   ]);
+  const [ThirdPhoto, setThirdPhoto] = useState<File | null>(null);
   const setSubAt = (i: number, f: File | null) =>
-    setSubPhotos((prev) => prev.map((v, idx) => (idx === i ? f : v)));
+    setSecondPhotos((prev) => prev.map((v, idx) => (idx === i ? f : v)));
   const pushStep = (n: number) =>
     router.push(`/mypage/invite/editor/thema/${params.id}?step=${n}`);
 
@@ -47,10 +48,10 @@ export default function ThemaEditorPage() {
 
       {step === 1 && (
         <Step1
-          file={mainPhoto}
-          onChangeFile={setMainPhoto}
+          file={FirstPhoto}
+          onChangeFile={setFirstPhoto}
           onNext={() => {
-            if (!mainPhoto) return;
+            if (!FirstPhoto) return;
             pushStep(2);
           }}
         />
@@ -58,13 +59,25 @@ export default function ThemaEditorPage() {
 
       {step === 2 && (
         <Step2
-          files={subPhotos}
+          files={SecondPhotos}
           onChangeAt={setSubAt}
-          onNext={() => pushStep(3)}
+          onNext={() => {
+            if (!SecondPhotos) return;
+            pushStep(2);
+          }}
         />
       )}
 
-      {step === 3 && <Step3 onPrev={() => pushStep(2)} />}
+      {step === 3 && (
+        <Step3
+          files={ThirdPhoto}
+          onChangeFile={setThirdPhoto}
+          onNext={() => {
+            if (!ThirdPhoto) return;
+            pushStep(2);
+          }}
+        />
+      )}
     </div>
   );
 }
