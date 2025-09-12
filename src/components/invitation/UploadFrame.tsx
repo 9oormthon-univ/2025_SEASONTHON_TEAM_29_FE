@@ -37,7 +37,7 @@ export default function UploadFrame({
       <div
         onClick={handleClick}
         className={cn(
-          'relative w-80 h-72 rounded-lg border border-box-line bg-zinc-200 cursor-pointer overflow-hidden',
+          'relative w-82 h-70 border border-box-line bg-zinc-200 cursor-pointer overflow-hidden',
           className,
         )}
         aria-label="메인 사진 업로드 프레임"
