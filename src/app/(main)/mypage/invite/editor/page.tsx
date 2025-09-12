@@ -95,7 +95,7 @@ export default function InviteEditorPage() {
         <PlainCollapsible title="엔딩사진/문구" />
         <PlainCollapsible title="계좌번호" />
         <PlainCollapsible title="배경음악/파티클" />
-        <div className="w-80 mx-auto pt-25 pb-6">
+        <div className="w-80 mx-auto pt-15 pb-6">
           <Button
             type="button"
             onClick={onSubmit}
