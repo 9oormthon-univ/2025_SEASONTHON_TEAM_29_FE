@@ -52,7 +52,7 @@ export default function UploadFrame({
             unoptimized
           />
         )}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none pt-30">
           <img
             src="/LoveWinsAll.svg"
             alt="Love Wins All"
