@@ -12,7 +12,8 @@ import PlaceSection, {
   type PlaceSectionValue,
 } from '@/components/invitation/PlaceSection';
 import Button from '@/components/common/atomic/Button';
-
+import SvgObject from '@/components/common/atomic/SvgObject';
+import clsx from 'clsx';
 const DEFAULT_PLACE: PlaceSectionValue = {
   venueName: '',
   hallInfo: '',
@@ -27,14 +28,8 @@ export default function InviteEditorPage() {
     useState<PlaceSectionValue>(DEFAULT_PLACE);
 
   const setTheme = (v: any) => setForm((f) => ({ ...f, theme: v }));
-
   const setBasic = (v: any) =>
-    setForm((f) => ({
-      ...f,
-      bride: v.bride,
-      groom: v.groom,
-      order: v.order,
-    }));
+    setForm((f) => ({ ...f, bride: v.bride, groom: v.groom, order: v.order }));
   const setMessage = (v: any) => setForm((f) => ({ ...f, greeting: v }));
   const setCeremony = (v: any) => setForm((f) => ({ ...f, ceremony: v }));
 
@@ -53,6 +48,7 @@ export default function InviteEditorPage() {
       <section className="mx-auto max-w-96 px-5 pt-2 flex flex-col items-center gap-3">
         <ThemeSection value={form.theme as any} onChange={setTheme} />
         <BasicInfoSection
+          defaultOpen={false}
           value={{
             bride: form.bride as any,
             groom: form.groom as any,
@@ -61,12 +57,24 @@ export default function InviteEditorPage() {
           onChange={setBasic}
         />
         <MessageSection
+          defaultOpen={false}
           value={(form as any).greeting ?? { title: '', body: '' }}
           onChange={setMessage}
         />
-        <DateSection value={form.ceremony as any} onChange={setCeremony} />
-        <PlaceSection value={placeLocal} onChange={setPlaceLocal} />
-        <div className="w-80 mx-auto pt-2 pb-6">
+        <DateSection
+          defaultOpen={false}
+          value={form.ceremony as any}
+          onChange={setCeremony}
+        />
+        <PlaceSection
+          defaultOpen={false}
+          value={placeLocal}
+          onChange={setPlaceLocal}
+        />
+        <PlainCollapsible title="엔딩사진/문구" />
+        <PlainCollapsible title="계좌번호" />
+        <PlainCollapsible title="배경음악/파티클" />
+        <div className="w-80 mx-auto pt-25 pb-6">
           <Button
             type="button"
             onClick={onSubmit}
@@ -79,5 +87,67 @@ export default function InviteEditorPage() {
         </div>
       </section>
     </main>
+  );
+}
+function PlainCollapsible({
+  title,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  children?: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const headerId = `${title}-header`;
+  const panelId = `${title}-panel`;
+
+  return (
+    <section
+      className="w-80 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden"
+      aria-labelledby={headerId}
+      data-open={open}
+    >
+      <button
+        id={headerId}
+        type="button"
+        aria-expanded={open}
+        aria-controls={panelId}
+        onClick={() => setOpen((v) => !v)}
+        className="w-full h-[52px] px-4 py-0 inline-flex items-center justify-between"
+      >
+        <span className="text-text--default text-sm font-semibold leading-normal">
+          {title}
+        </span>
+        <SvgObject
+          src="/icons/down.svg"
+          alt=""
+          width={20}
+          height={20}
+          className={clsx(
+            'transition-transform opacity-60',
+            open && 'rotate-180',
+          )}
+        />
+      </button>
+
+      {open && (
+        <div id={panelId} role="region" aria-labelledby={headerId}>
+          <Hr />
+          <div className="px-4 pt-3 pb-4">{children}</div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Hr({ className }: { className?: string }) {
+  return (
+    <div
+      className={clsx(
+        'w-full h-0 outline-[0.5px] outline-offset-[-0.25px] outline-box-line',
+        className,
+      )}
+    />
   );
 }
