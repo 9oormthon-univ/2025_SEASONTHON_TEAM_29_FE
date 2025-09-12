@@ -4,6 +4,7 @@ import { useId, useState } from 'react';
 import clsx from 'clsx';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import CheckComponent from '@/components/invitation/CheckComponent';
+import PhotoCard from '../PhotoCard';
 type FontFamily = '나눔명조' | 'Pretendard' | 'SUIT' | 'Inter';
 type FontWeight = '얇게' | '보통' | '두껍게';
 type TemplateType = 'Film' | 'Letter' | 'Album';
@@ -141,7 +142,9 @@ export default function ThemaSection({
                 ))}
               </div>
             </FieldRow>
-
+            <div className="mt-3 pl-20">
+              <PhotoCard files={[]} total={5} linkTo="/invite/editor/thema" />
+            </div>
             <Hr className="my-4" />
             <FieldRow label="확대 방지">
               <CheckRow
