@@ -6,20 +6,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SvgObject from '@/components/common/atomic/SvgObject';
 
-type Domain = 'VENDOR' | 'REVIEW';
-
 type Props = {
   files: File[];
   total: number;
   className?: string;
-  onUploadSelect?: (files: File[]) => void;
-  domain?: Domain;
-  domainId?: number;
-  onUploaded?: (s3Keys: string[]) => void;
-  onPresignedUrls?: (urls: string[]) => void;
-  concurrency?: number;
-  acceptMimes?: string[];
-  maxFileSize?: number;
+  linkTo?: string;
+  onTileClick?: () => void;
 };
 
 function useObjectURL(file?: File) {
@@ -73,7 +65,7 @@ function UploadTile({
         'outline-[1.2px] outline-offset-[-1.2px] outline-box-line',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
-      aria-label="갤러리 편집으로 이동"
+      aria-label="편집으로 이동"
     >
       <SvgObject
         src="/icons/photo.svg"
@@ -89,7 +81,13 @@ function UploadTile({
   );
 }
 
-export default function PhotoCard({ files, total, className }: Props) {
+export default function PhotoCard({
+  files,
+  total,
+  className,
+  linkTo,
+  onTileClick,
+}: Props) {
   const router = useRouter();
   const wrapRef = useRef<HTMLDivElement>(null);
   const [canRight, setCanRight] = useState(false);
@@ -111,6 +109,11 @@ export default function PhotoCard({ files, total, className }: Props) {
 
   const isFull = files.length >= total;
 
+  const handleTileClick = () => {
+    if (onTileClick) return onTileClick();
+    if (linkTo) router.push(linkTo);
+  };
+
   return (
     <div className={clsx('relative', className)}>
       <div
@@ -118,12 +121,11 @@ export default function PhotoCard({ files, total, className }: Props) {
         onScroll={checkScroll}
         className="flex items-center gap-1 overflow-x-auto py-2 pr-10 scrollbar-thin"
       >
-        {/* 업로드 버튼 대신 갤러리 편집 페이지로 이동 */}
         <UploadTile
           current={files.length}
           total={total}
           disabled={isFull}
-          onClick={() => router.push('/invite/editor/gallery')}
+          onClick={handleTileClick}
         />
         {files.map((f, i) => (
           <Thumb key={`${f.name}-${f.lastModified}-${f.size}-${i}`} file={f} />
