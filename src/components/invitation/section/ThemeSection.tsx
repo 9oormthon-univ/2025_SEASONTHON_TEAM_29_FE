@@ -143,7 +143,11 @@ export default function ThemaSection({
               </div>
             </FieldRow>
             <div className="mt-3 pl-20">
-              <PhotoCard files={[]} total={5} linkTo="/invite/editor/thema" />
+              <PhotoCard
+                files={[]}
+                total={5}
+                linkTo="/mypage/invite/editor/thema"
+              />
             </div>
             <Hr className="my-4" />
             <FieldRow label="확대 방지">

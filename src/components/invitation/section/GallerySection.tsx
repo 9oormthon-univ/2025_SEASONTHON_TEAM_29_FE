@@ -113,7 +113,7 @@ export default function GallerySection({
               <PhotoCard
                 files={files}
                 total={maxTotal}
-                linkTo="/invite/editor/gallery"
+                linkTo="mypage/invite/editor/gallery"
               />
             </div>
 
