@@ -1,7 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import DateSection, { DateSectionValue } from './DateSection';
-
 const meta: Meta<typeof DateSection> = {
   title: 'section/DateSection',
   component: DateSection,
