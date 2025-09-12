@@ -113,16 +113,7 @@ export default function GallerySection({
               <PhotoCard
                 files={files}
                 total={maxTotal}
-                onUploadSelect={handleSelectFiles}
-                domain={uploadDomain}
-                domainId={uploadDomainId}
-                concurrency={concurrency}
-                onUploaded={(s3Keys) => {
-                  if (!s3Keys?.length) return;
-                  const room = Math.max(0, maxTotal - value.photos.length);
-                  const picked = s3Keys.slice(0, room);
-                  patch('photos', [...value.photos, ...picked]);
-                }}
+                linkTo="/invite/editor/gallery"
               />
             </div>
 
