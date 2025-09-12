@@ -4,16 +4,19 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { defaultInviteForm, type InviteForm } from '@/types/invite';
 import Header from '@/components/common/monocules/Header';
-import ThemeSection from '@/components/invitation/ThemeSection';
-import BasicInfoSection from '@/components/invitation/BasicInfoSection';
-import MessageSection from '@/components/invitation/MessageSection';
-import DateSection from '@/components/invitation/DateSection';
+import ThemeSection from '@/components/invitation/section/ThemeSection';
+import BasicInfoSection from '@/components/invitation/section/BasicInfoSection';
+import MessageSection from '@/components/invitation/section/MessageSection';
+import DateSection from '@/components/invitation/section/DateSection';
 import PlaceSection, {
   type PlaceSectionValue,
-} from '@/components/invitation/PlaceSection';
+} from '@/components/invitation/section/PlaceSection';
 import Button from '@/components/common/atomic/Button';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import clsx from 'clsx';
+import GallerySection, {
+  type GallerySectionValue,
+} from '@/components/invitation/section/GallerySection';
 const DEFAULT_PLACE: PlaceSectionValue = {
   venueName: '',
   hallInfo: '',
@@ -26,7 +29,11 @@ export default function InviteEditorPage() {
   const [saving, setSaving] = useState(false);
   const [placeLocal, setPlaceLocal] =
     useState<PlaceSectionValue>(DEFAULT_PLACE);
-
+  const [galleryLocal, setGalleryLocal] = useState<GallerySectionValue>({
+    layout: 'GRID',
+    enablePopup: true,
+    photos: [],
+  });
   const setTheme = (v: any) => setForm((f) => ({ ...f, theme: v }));
   const setBasic = (v: any) =>
     setForm((f) => ({ ...f, bride: v.bride, groom: v.groom, order: v.order }));
@@ -70,6 +77,20 @@ export default function InviteEditorPage() {
           defaultOpen={false}
           value={placeLocal}
           onChange={setPlaceLocal}
+        />
+        <PlainCollapsible title="교통수단" />
+        <GallerySection
+          value={galleryLocal}
+          onChange={(next) => {
+            setGalleryLocal(next);
+            setForm((f) => ({
+              ...f,
+              gallery: next.photos,
+            }));
+          }}
+          uploadDomain="REVIEW"
+          uploadDomainId={123}
+          maxTotal={27}
         />
         <PlainCollapsible title="엔딩사진/문구" />
         <PlainCollapsible title="계좌번호" />

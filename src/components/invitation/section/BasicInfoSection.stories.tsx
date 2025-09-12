@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import BasicInfoSection, { type BasicInfoValue } from './BasicInfoSection';
+import BasicInfoSection, {
+  type BasicInfoValue,
+} from './section/BasicInfoSection';
 
 const DEFAULT_VALUE: BasicInfoValue = {
   groom: {

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import ThemaSection, { type ThemaSectionValue } from './ThemeSection';
+import ThemaSection, { type ThemaSectionValue } from './section/ThemeSection';
 
 const DEFAULT_VALUE: ThemaSectionValue = {
   fontFamily: '나눔명조',
