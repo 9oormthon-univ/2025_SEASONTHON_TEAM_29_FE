@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { defaultInviteForm, type InviteForm } from '@/types/invite';
 import Header from '@/components/common/monocules/Header';
-import ThemeSection from '@/components/invitation/section/ThemeSection';
+import ThemaSection from '@/components/invitation/section/ThemaSection';
 import BasicInfoSection from '@/components/invitation/section/BasicInfoSection';
 import MessageSection from '@/components/invitation/section/MessageSection';
 import DateSection from '@/components/invitation/section/DateSection';
@@ -53,7 +53,7 @@ export default function InviteEditorPage() {
     <main className="mx-auto min-h-screen max-w-96 bg-background">
       <Header value="청첩장 제작" onBack={() => router.back()} showBack />
       <section className="mx-auto max-w-96 px-5 pt-2 flex flex-col items-center gap-3">
-        <ThemeSection value={form.theme as any} onChange={setTheme} />
+        <ThemaSection value={form.theme as any} onChange={setTheme} />
         <BasicInfoSection
           defaultOpen={false}
           value={{

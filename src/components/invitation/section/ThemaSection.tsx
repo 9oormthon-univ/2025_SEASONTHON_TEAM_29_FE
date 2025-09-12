@@ -146,7 +146,7 @@ export default function ThemaSection({
               <PhotoCard
                 files={[]}
                 total={5}
-                linkTo="/mypage/invite/editor/thema"
+                linkTo="/mypage/invite/editor/thema/1"
               />
             </div>
             <Hr className="my-4" />
