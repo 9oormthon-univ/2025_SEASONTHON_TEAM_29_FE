@@ -6,9 +6,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 type Props = {
-  item: VendorListItem;     // ✅ 기존 VendorItem → VendorListItem
+  item: VendorListItem;
   href: string;
-  showPrice?: boolean;      // 사용 중이면 유지
+  showPrice?: boolean;
 };
 
 export default function VendorCard({ item, href, showPrice = false }: Props) {
@@ -34,7 +34,6 @@ export default function VendorCard({ item, href, showPrice = false }: Props) {
           fill
           sizes="160px"
           className="object-contain"
-          priority={false}
         />
       </div>
 

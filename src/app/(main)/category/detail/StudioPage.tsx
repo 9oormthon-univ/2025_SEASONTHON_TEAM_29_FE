@@ -63,22 +63,14 @@ export default function StudioListPage() {
       <section className="px-5 pt-4 pb-20">
         {error && <p className="text-sm text-red-500">{error}</p>}
         <div className="grid grid-cols-3 gap-x-3 gap-y-6">
-          {items.map((s) => (
-            <VendorCard
-              key={s.id}
-              item={{
-                id: s.id,
-                name: s.name,
-                region: s.region,
-                logo: s.logo,
-                rating: s.rating,
-                count: s.count,
-                price: s.price,
-                href: `/reservation/company/months?step=2&vendorId=${s.id}`,
-              }}
-              showPrice={true} // 가격 보이게 할지 여부
-            />
-          ))}
+        {items.map((s) => (
+          <VendorCard
+            key={s.vendorId}
+            item={s} 
+            href={`/reservation/company/months?step=2&vendorId=${s.vendorId}`}
+            showPrice={true}
+          />
+        ))}
         </div>
 
         {/* 더 보기 */}
