@@ -102,13 +102,12 @@ export default function ResultsScreen({
                       <VendorCard
                         key={it.id}
                         item={{
-                          id: it.id,
-                          name: it.name,
-                          region: it.region,
-                          logo: it.logo,
-                          rating: it.rating,
-                          count: it.count,
-                          price: it.price,
+                          vendorId: it.id,
+                          vendorName: it.name,
+                          logoImageUrl: it.logo,
+                          regionName: it.region,
+                          averageRating: it.rating,
+                          reviewCount: it.count,
                         }}
                         href={`/vendor/${it.cat}/${it.id}`}
                       />
