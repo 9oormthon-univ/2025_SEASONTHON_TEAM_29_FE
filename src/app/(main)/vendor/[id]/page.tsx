@@ -1,14 +1,15 @@
-import VendorDetailScreen from '@/components/vendor/VendorDetailScreen';
+// src/app/vendor/[id]/page.tsx
+import VendorDetailScreen from '@/components/vendor/VendorDetail';
 import { getVendorDetail } from '@/services/vendor.api';
 
-type Params = { category: string; id: string };
+type Params = { id: string };
 
 export default async function VendorDetailPage({
   params,
 }: {
-  params: Promise<Params>; // ✅ Next 15: Promise 타입
+  params: Promise<Params>; // Next 15
 }) {
-  const p = await params;            // ✅ 먼저 await
+  const p = await params;
   const id = Number(p.id);
 
   if (!Number.isFinite(id)) {

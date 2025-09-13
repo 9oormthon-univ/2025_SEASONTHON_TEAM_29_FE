@@ -1,10 +1,10 @@
+// src/components/vendor/VendorDetailScreen.tsx
 'use client';
 
 import Header from '@/components/common/monocules/Header';
-import PlaceSectionBlock from '@/components/vendor/place-section-block';
 import type { VendorDetail } from '@/types/vendor';
 import { useRouter } from 'next/navigation';
-import VendorActions from './VendorActions';
+import ProductSectionBlock from './ProductSectionBlock';
 import VendorHero from './VendorHero';
 import VendorInfo from './VendorInfo';
 
@@ -12,21 +12,22 @@ export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail })
   const router = useRouter();
   return (
     <main className="mx-auto w-full max-w-[420px] pb-[calc(env(safe-area-inset-bottom)+24px)]">
-      <Header 
+      <Header
         showBack
-        onBack={()=>router.back()}
-        value={vendor.title+' '+vendor.address?.dong} />
-      <VendorHero src={vendor.mainImage} alt={vendor.title} />
-      <VendorInfo
-        title={vendor.title}
-        category={vendor.category}
-        detail={vendor.detail}
-        phone={vendor.phone}
-        mapurl={vendor.mapurl}
-        dong={vendor.address?.dong}
+        onBack={() => router.back()}
+        value={`${vendor.vendorName}`}
       />
 
-      {/* 상단 소개 문단 */}
+      <VendorHero src={vendor.repMediaUrl} alt={vendor.vendorName} />
+
+      <VendorInfo
+        vendorName={vendor.vendorName}
+        vendorType={vendor.vendorType}
+        fullAddress={vendor.fullAddress}
+        phoneNumber={vendor.phoneNumber}
+        kakaoMapUrl={vendor.kakaoMapUrl}
+      />
+
       {!!vendor.description && (
         <section className="px-4">
           <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-gray-700">
@@ -35,12 +36,10 @@ export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail })
         </section>
       )}
 
-      <VendorActions vendorId={vendor.id} />
-
-      {/* Places */}
+      {/* 상품 섹션들 */}
       <div className="px-4 pb-10 mt-6">
-        {vendor.places.map((p, i) => (
-          <PlaceSectionBlock key={`${vendor.id}-${i}`} section={p} />
+        {vendor.products.map((p) => (
+          <ProductSectionBlock key={p.id} product={p} />
         ))}
       </div>
     </main>
