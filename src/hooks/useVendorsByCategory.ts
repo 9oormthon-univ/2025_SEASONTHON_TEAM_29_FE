@@ -41,6 +41,7 @@ export function useVendorsByCategory(
         for (const it of merged) map.set(vendorKey(it), it);
         return Array.from(map.values());
       });
+      console.log(data);
 
       const hasNext = !data.last;
       setHasMore(hasNext);
