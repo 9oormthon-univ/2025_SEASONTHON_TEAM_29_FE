@@ -17,6 +17,17 @@ export type VendorListItem = {
   reviewCount?: number;
 };
 
+export type VendorItem = {
+  id: number;
+  name: string;
+  region: string;
+  rating: number;
+  count: number;
+  price: number;
+  logo: string;
+  href: string;
+};
+
 export type VendorProductSummary = {
   id: number; name: string; description?: string; basePrice: number; imageUrls: string[];
 };
