@@ -1,16 +1,19 @@
-// src/services/http.ts
 import { refreshStore } from '@/lib/refreshStore';
 import { tokenStore } from '@/lib/tokenStore';
 
 const BASE = '/api';
 
 type HttpInit = RequestInit & { skipAuth?: boolean };
-export type ApiEnvelope<T> = { status: number; success: boolean; message?: string; data?: T };
+export type ApiEnvelope<T> = {
+  status: number;
+  success: boolean;
+  message?: string;
+  data?: T;
+};
 
 function absoluteUrl(path: string) {
   if (typeof window !== 'undefined') return path;
-  const site =
-    process.env.NEXT_PUBLIC_SITE_URL;
+  const site = process.env.NEXT_PUBLIC_SITE_URL;
   return new URL(path, site).toString();
 }
 
@@ -63,9 +66,11 @@ export async function reissueOnce(): Promise<boolean> {
 function redirectToLogin() {
   if (typeof window === 'undefined') return;
   const next = encodeURIComponent(window.location.pathname || '/');
+
   // 저장된 토큰 제거
   tokenStore.clear?.();
   refreshStore.clear?.();
+
   window.location.replace(`/login?next=${next}`);
 }
 
@@ -90,7 +95,11 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
   // 첫 요청
   let res: Response | null = null;
   try {
-    res = await fetch(url, { ...init, headers, cache: init.cache ?? 'no-store' });
+    res = await fetch(url, {
+      ...init,
+      headers,
+      cache: init.cache ?? 'no-store',
+    });
   } catch {
     throw new Error('네트워크 오류가 발생했습니다.');
   }
@@ -103,9 +112,12 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
         ...headers,
         Authorization: `Bearer ${tokenStore.get() || ''}`,
       };
-      res = await fetch(url, { ...init, headers: retriedHeaders, cache: init.cache ?? 'no-store' });
+      res = await fetch(url, {
+        ...init,
+        headers: retriedHeaders,
+        cache: init.cache ?? 'no-store',
+      });
     } else {
-      // 리프레시 실패 → 로그인
       redirectToLogin();
       throw new Error('인증이 만료되었습니다.');
     }
@@ -120,14 +132,13 @@ async function toErr(res: Response) {
   return new Error(text || `HTTP ${res.status}`);
 }
 
-// ✅ Response를 clone 해서 json() 우선, 실패하면 text()로 파싱
 async function safeJson<T>(res: Response): Promise<T> {
   try {
-    const r = res.clone();               // 본문 스트림 보존
-    return (await r.json()) as T;        // 가장 안전
+    const r = res.clone();
+    return (await r.json()) as T;
   } catch {
     try {
-      const t = await res.text();        // 혹시 서버가 text/plain 으로 줄 수도 있음
+      const t = await res.text();
       return t ? (JSON.parse(t) as T) : ({} as T);
     } catch {
       return {} as T;
