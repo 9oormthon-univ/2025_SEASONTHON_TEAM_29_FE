@@ -17,6 +17,6 @@ export type CartDetail = {
   totalActivePrice: number;
   weddingHalls: CartItem[];
   dresses: CartItem[];
-  makeUps: CartItem[];
+  makeups: CartItem[];
   studios: CartItem[];
 };

@@ -31,7 +31,7 @@ export default function EstimateCartPage() {
         const all: CartItem[] = [
           ...data.weddingHalls,
           ...data.dresses,
-          ...data.makeUps,
+          ...data.makeups,
           ...data.studios,
         ];
         setItems(all);
@@ -117,10 +117,9 @@ export default function EstimateCartPage() {
                         name={item.vendorName}
                         region={item.regionName}
                         imageSrc={item.logoImageUrl}
-                        priceText={KR(item.price)}
-                        selected={
-                          selectedByType[item.vendorType] === item.cartItemId
-                        }
+                        priceText={`${Math.floor(item.price / 10000)}만원`} // 🔑 "93만원"
+                        executionDateTime={item.executionDateTime}         // 🔑 날짜 표시
+                        selected={selectedByType[item.vendorType] === item.cartItemId}
                         onClick={() => toggleOne(item)}
                         className="shrink-0 snap-start"
                       />
