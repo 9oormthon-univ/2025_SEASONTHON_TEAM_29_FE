@@ -41,6 +41,7 @@ export default function CompanyCard({
   const textDimCls = dimImage ? 'opacity-40' : '';
 
   /** CART */
+  /** CART */
   if (variant === 'cart') {
     return (
       <button
@@ -48,25 +49,44 @@ export default function CompanyCard({
         onClick={onClick}
         className={cn('relative w-28 h-44', className)}
       >
+        {/* 이미지 박스 */}
         <div
           className={clsx(
-            'relative mb-12 -mr-4 w-28 h-28 rounded-lg bg-white overflow-hidden border',
-            selected ? 'border-primary-500' : 'border-box-line',
+            'relative w-28 h-28 rounded-lg bg-white overflow-hidden outline outline-1 outline-offset-[-1px]',
+            selected ? 'outline-primary-500' : 'outline-box-line',
           )}
         >
           <Image
             src={imageSrc}
             alt={altText}
-            fill               // ✅ 부모 크기를 꽉 채우는 기준
-            className="object-contain"  // ✅ 비율 유지하며 안쪽에 딱 맞춤
+            fill
+            className="object-contain"
             priority
             unoptimized
             sizes="112px"
           />
-          {dimImage && <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />}
+          {dimImage && (
+            <div className="absolute inset-0 rounded-lg bg-white/70 pointer-events-none" />
+          )}
         </div>
+
+        {/* 칩 2개 (이미지 하단에 오버랩) */}
+        <div className="absolute top-[125px] left-0 flex gap-1">
+          <div className="px-1.5 py-0.5 rounded-lg bg-primary-200 overflow-hidden">
+            <span className="text-primary-500/80 text-xs font-medium leading-tight">
+              라로브
+            </span>
+          </div>
+          <div className="px-1.5 py-0.5 rounded-lg bg-primary-200 overflow-hidden">
+            <span className="text-primary-500/80 text-xs font-medium leading-tight">
+              26.04.11
+            </span>
+          </div>
+        </div>
+
+        {/* 지역 · 이름 */}
         {(region || name) && (
-          <div className="absolute left-0 top-[122px] inline-flex items-center gap-1 pl-0.5">
+          <div className="absolute left-0 top-[154px] inline-flex items-center gap-1">
             {region && (
               <span className="text-text--secondary text-sm leading-normal shrink-0 whitespace-nowrap">
                 {region}
@@ -84,8 +104,10 @@ export default function CompanyCard({
             )}
           </div>
         )}
+
+        {/* 가격 */}
         {priceText && (
-          <div className="absolute left-0 top-[143px] pl-0.5 text-text--default text-xs font-semibold leading-normal">
+          <div className="absolute left-0 top-[175px] text-text--default text-xs font-semibold leading-normal">
             {priceText}
           </div>
         )}
@@ -113,13 +135,15 @@ export default function CompanyCard({
           <Image
             src={imageSrc}
             alt={altText}
-            fill               // ✅
-            className="object-contain"  // ✅
+            fill // ✅
+            className="object-contain" // ✅
             priority
             unoptimized
             sizes="112px"
           />
-          {dimImage && <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />}
+          {dimImage && (
+            <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
+          )}
         </div>
 
         <div className="mt-2 flex items-center gap-1">
@@ -165,13 +189,15 @@ export default function CompanyCard({
         <Image
           src={imageSrc}
           alt={altText}
-          fill               // ✅
-          className="object-contain"  // ✅
+          fill // ✅
+          className="object-contain" // ✅
           priority
           unoptimized
           sizes="112px"
         />
-        {dimImage && <div className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none" />}
+        {dimImage && (
+          <div className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none" />
+        )}
       </div>
 
       <div className={cn('mt-2 flex items-center gap-1 pl-0.5', textDimCls)}>
