@@ -1,8 +1,17 @@
-// src/components/search/ResultsScreen.tsx
 'use client';
 
 import Header from '@/components/common/monocules/Header';
 import { categories } from '@/data/homeData';
+import { resolveRegionName } from '@/lib/region';
+import {
+  dressProductionLabel,
+  dressStyleLabel,
+  hallMealLabel,
+  hallStyleLabel,
+  makeupStyleLabel,
+  studioShotLabel,
+  studioStyleLabel,
+} from '@/services/mappers/searchMapper';
 import type { CategoryKey } from '@/types/category';
 import type { SearchItem } from '@/types/search';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -12,118 +21,190 @@ import VendorCard from '../common/atomic/VendorCard';
 export default function ResultsScreen({
   items,
   loading = false,
+  onLoadMore,
+  isFetchingMore,
 }: {
   items: SearchItem[];
   loading?: boolean;
+  onLoadMore?: () => void;
+  isFetchingMore?: boolean;
 }) {
   const sp = useSearchParams();
   const router = useRouter();
 
-  // 칩스 만들기: URL 쿼리에서 표기용 텍스트만 추출
+  // ✅ 현재 카테고리
+  const cat = sp.get('cat') as CategoryKey | null;
+
+  // ✅ chips 생성 로직
   const chips = useMemo(() => {
     const out: string[] = [];
 
-    // 다중값
-    for (const k of ['region', 'style', 'meal']) {
-      sp.getAll(k).forEach((v) => v && out.push(v));
+    // 지역 → 마지막 단어만
+    sp.getAll('region').forEach((code) => {
+      const name = resolveRegionName(code);
+      if (name) {
+        const short = name.split(' ').slice(-1)[0];
+        out.push(short);
+      }
+    });
+
+    // 가격 (원 → 만원 변환)
+    const price = sp.get('price');
+    if (price) {
+      const num = Number(price);
+      if (!isNaN(num)) out.push(`${num / 10000}만원`);
     }
-    // 단일값
+
+    // 웨딩홀
+    sp.getAll('hallStyle').forEach((v) => out.push(hallStyleLabel[v] ?? v));
+    sp.getAll('hallMeal').forEach((v) => out.push(hallMealLabel[v] ?? v));
     const guest = sp.get('guest');
-    const price = sp.get('price'); // 만원 단위
-    if (guest) out.push(guest);
-    if (price) out.push(`${price}만원`);
-    // 기타(필요 시 확장)
+    if (guest) out.push(`${guest}명`);
+    if (sp.get('parking') === 'true') out.push('주차');
+
+    // 드레스
+    sp.getAll('dressStyle').forEach((v) => out.push(dressStyleLabel[v] ?? v));
+    sp.getAll('dressProduction').forEach((v) => out.push(dressProductionLabel[v] ?? v));
+
+    // 스튜디오
+    sp.getAll('studioStyle').forEach((v) => out.push(studioStyleLabel[v] ?? v));
+    sp.getAll('specialShots').forEach((v) => out.push(studioShotLabel[v] ?? v));
+    if (sp.get('iphoneSnap') === 'true') out.push('아이폰 스냅');
+
+    // 메이크업
+    sp.getAll('makeupStyle').forEach((v) => out.push(makeupStyleLabel[v] ?? v));
+    if (sp.get('stylist') === 'true') out.push('담당지정');
+    if (sp.get('room') === 'true') out.push('단독룸');
+
     return out;
   }, [sp]);
 
-  // 카테고리별 묶기
-  const grouped = items.reduce((acc, it) => {
-    (acc[it.cat] ??= []).push(it);
-    return acc;
-  }, {} as Partial<Record<CategoryKey, SearchItem[]>>);
+  const grouped = useMemo(() => {
+    return items.reduce((acc, it) => {
+      const list = (acc[it.cat] ??= []);
+      list.push(it);
+  
+      // 업체 단위로 가격 최소값 계산
+      if (it.price) {
+        list.minPrice = Math.min(list.minPrice ?? Infinity, it.price);
+      }
+  
+      return acc;
+    }, {} as Partial<Record<CategoryKey, (SearchItem[] & { minPrice?: number })>>);
+  }, [items]);
 
   return (
     <main
-      className="mx-auto w-full max-w-[420px] px-[22px] h-dvh flex flex-col overflow-hidden"
+      className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden"
       data-hide-bottombar
     >
-      <Header 
+      <Header
         showBack
-        onBack={()=>router.back()}
-        value="검색결과" />
+        onBack={() => {
+          if (cat) {
+            router.push(`/search/filters?cat=${cat}`);
+          } else {
+            router.push('/search/filters');
+          }
+        }}
+        value="검색결과"
+      />
+        <div className="px-[22px] flex-1 overflow-y-auto">
 
-      {/* 선택 칩스 */}
-      <div className="mb-2 -mx-[6px] flex flex-wrap gap-2 px-[6px]">
-        {chips.map((c, i) => (
-          <span
-            key={`${c}-${i}`}
-            className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[13px] font-medium text-rose-400"
-          >
-            {c}
-          </span>
-        ))}
-        {/* 다시 설정 */}
-        <button
-          type="button"
-          onClick={() => router.push('/search/filters' + (sp.toString() ? `?${sp.toString()}` : ''))}
-          className="ml-auto inline-flex items-center gap-1 rounded-full px-2 py-1 text-[13px] text-gray-400 hover:text-gray-600"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden>
-            <path d="M12 6v3l4-4-4-4v3C6.48 4 2 8.48 2 14a8 8 0 0 0 14.9 3h-2.3A6 6 0 1 1 12 6z" fill="currentColor"/>
-          </svg>
-          다시 설정
-        </button>
-      </div>
-
-      <div className="flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+12px)] space-y-6">
-        {loading ? (
-          // skeleton
-          <div className="space-y-4 animate-pulse">
-            <div className="h-5 w-28 bg-gray-200 rounded" />
-            <div className="grid grid-cols-3 gap-3">
-              {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i} className="aspect-[3/4] bg-gray-100 rounded-xl" />
-              ))}
-            </div>
+        {/* ✅ Chips: 가로 스크롤 */}
+        <div className="-mx-[6px] px-[6px] mb-2">
+          <div className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide">
+            {chips.map((c, i) => (
+              <span
+                key={`chip-${i}`}
+                className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[13px] font-medium text-rose-400"
+              >
+                {c}
+              </span>
+            ))}
           </div>
-        ) : (
-          <>
-            {categories.map(({ key, label }) => {
-              const list = grouped[key] ?? [];
-              if (!list.length) return null;
+        </div>
 
-              return (
-                <section key={key}>
-                  <h2 className="mb-3 px-1 text-[15px] font-extrabold text-gray-900">
-                    {label}
-                  </h2>
-                  <div className="grid grid-cols-3">
-                    {list.map((it) => (
-                      <VendorCard
-                        key={it.id}
-                        item={{
-                          vendorId: it.id,
-                          vendorName: it.name,
-                          logoImageUrl: it.logo,
-                          regionName: it.region,
-                          averageRating: it.rating,
-                          reviewCount: it.count,
-                        }}
-                        href={`/vendor/${it.cat}/${it.id}`}
-                      />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-
-            {!items.length && (
-              <div className="py-20 text-center text-sm text-gray-500">
-                조건에 맞는 결과가 없어요.
+        {/* 결과 */}
+        <div className="flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom)+12px)] space-y-6">
+          {loading ? (
+            <div className="space-y-4 animate-pulse">
+              <div className="h-5 w-28 bg-gray-200 rounded" />
+              <div className="grid grid-cols-3 gap-3">
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <div key={i} className="aspect-[3/4] bg-gray-100 rounded-xl" />
+                ))}
               </div>
-            )}
-          </>
-        )}
+            </div>
+            
+            
+          ) : (
+            <>
+              {categories.map(({ key, label }) => {
+                const list = grouped[key] ?? [];
+                if (!list.length) return null;
+
+                return (
+                  <section key={key} className="px-1 pt-5">
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-[15px] font-extrabold text-gray-900">
+                        {label}
+                      </h2>
+                      {cat === key && (
+                        <button
+                          onClick={() => {
+                            const cat = sp.get('cat');
+                            const params = new URLSearchParams();
+                            if (cat) params.set('cat', cat); // ✅ 카테고리만 유지
+                            router.push(`/search/filters?${params.toString()}`);
+                          }}
+                          className="text-xs text-gray-400 hover:text-gray-600"
+                        >
+                          다시 설정
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3">
+                      {list.map((it) => (
+                        <VendorCard
+                          key={it.id}
+                          item={{
+                            vendorId: it.id,
+                            vendorName: it.name,
+                            logoImageUrl: it.logo,
+                            regionName: it.region,
+                            averageRating: it.rating,
+                            reviewCount: it.count,
+                            minPrice: grouped[key]?.minPrice, // ✅ 추가
+                          }}
+                          href={`/vendor/${it.id}`}
+                        />
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
+
+              {!items.length && (
+                <div className="py-20 text-center text-sm text-gray-500">
+                  조건에 맞는 결과가 없어요.
+                </div>
+              )}
+
+              {onLoadMore && (
+                <div className="text-center py-4">
+                  <button
+                    onClick={onLoadMore}
+                    disabled={isFetchingMore}
+                    className="px-4 py-2 rounded bg-primary-500 text-white"
+                  >
+                    {isFetchingMore ? '불러오는 중...' : '더보기'}
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </main>
   );

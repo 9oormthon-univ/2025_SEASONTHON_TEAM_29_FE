@@ -1,3 +1,4 @@
+//src/components/search/CategoryRow.tsx
 'use client';
 
 import { categories } from '@/data/homeData';

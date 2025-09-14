@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
 import ReservationButton from '@/components/reservation/ReservationButton';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 
 type TypeKey = 'consult' | 'company';
 
@@ -12,6 +12,7 @@ export default function ReservationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const vendorId = searchParams.get('vendor');
+  const productId = searchParams.get('productId'); // 🔑 상품 예약 시 필요
 
   return (
     <ReservationLayout
@@ -23,16 +24,19 @@ export default function ReservationPage() {
       active={!!selected}
       onPrimary={() => {
         if (!selected) return;
-        if (!vendorId) {
-          alert('vendorId가 없습니다.');
-          return;
-        }
+
         if (selected === 'consult') {
+          if (!vendorId) {
+            alert('vendorId가 없습니다.');
+            return;
+          }
           router.push(`/reservation/consult/days?step=2&vendorId=${vendorId}`);
         } else {
-          router.push(
-            `/reservation/company/months?step=2&vendorId=${vendorId}`,
-          );
+          if (!productId) {
+            alert('productId가 없습니다.');
+            return;
+          }
+          router.push(`/reservation/company/months?step=2&productId=${productId}`);
         }
       }}
     >

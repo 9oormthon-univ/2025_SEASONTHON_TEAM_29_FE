@@ -1,7 +1,5 @@
-// src/hooks/useMyReservations.ts
-import { fetchMyReservations } from '@/lib/mypageUtils';
-import { getErrorMessage } from '@/services/mypage.api';
-import type { MyReservation } from '@/types/mypage';
+import { getMyReservations } from '@/services/reservation.api';
+import type { MyReservation } from '@/types/reservation';
 import { useEffect, useState } from 'react';
 
 export function useMyReservations() {
@@ -13,9 +11,9 @@ export function useMyReservations() {
     (async () => {
       try {
         setLoading(true);
-        setData(await fetchMyReservations());
+        setData(await getMyReservations());
       } catch (e) {
-        setErr(getErrorMessage(e));
+        setErr(e instanceof Error ? e.message : '예약 조회 실패');
       } finally {
         setLoading(false);
       }

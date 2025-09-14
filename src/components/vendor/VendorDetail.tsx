@@ -5,6 +5,7 @@ import Header from '@/components/common/monocules/Header';
 import type { VendorDetail } from '@/types/vendor';
 import { useRouter } from 'next/navigation';
 import ProductSectionBlock from './ProductSectionBlock';
+import VendorActions from './VendorActions';
 import VendorHero from './VendorHero';
 import VendorInfo from './VendorInfo';
 
@@ -35,11 +36,11 @@ export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail })
           </p>
         </section>
       )}
-
+      <VendorActions vendorId={vendor.vendorId} />
       {/* 상품 섹션들 */}
       <div className="px-4 pb-10 mt-6">
         {vendor.products.map((p) => (
-          <ProductSectionBlock key={p.id} product={p} />
+          <ProductSectionBlock key={p.id} product={p} vendorId={vendor.vendorId} />
         ))}
       </div>
     </main>

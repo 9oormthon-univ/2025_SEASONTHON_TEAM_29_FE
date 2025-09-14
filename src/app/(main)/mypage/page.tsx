@@ -7,17 +7,17 @@ import BottomSheet from '@/components/my/CompanyModal';
 import DdayCard from '@/components/my/D-dayCheck';
 import ProfileHeader from '@/components/my/ProfileHeader';
 import ReviewCompanyPicker from '@/components/my/ReviewCompanyPicker';
+import { useMyContracts } from '@/hooks/useMyContracts'; // ✅ 교체
 import { useMyProfile } from '@/hooks/useMyProfile';
-import { useMyReservations } from '@/hooks/useMyReservations';
 import { useMyReviews } from '@/hooks/useMyReviews';
 import { isPastYMDSeoul } from '@/lib/dateKR';
 import { resolveWeddingTarget } from '@/services/mypage.api';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
+import ContractsTab from '@/components/my/ContractsTab';
 import InviteCreateCard from '@/components/my/InviteCreateCard';
 import MyTabs from '@/components/my/MyTabs';
-import ReservationsTab from '@/components/my/ReservationsTab';
 import ReviewsTab from '@/components/my/ReviewsTab';
 
 export default function Page() {
@@ -25,8 +25,9 @@ export default function Page() {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const { data: profile, loading: profLoading, error: profErr } = useMyProfile();
-  const { data: reservations, loading: resLoading, error: resErr } = useMyReservations();
-  const { items: reviews, loading: revLoading, error: revErr, hasMore, loadMore } = useMyReviews(9);
+  const { data: contractsRes, loading: resLoading, error: resErr } = useMyContracts(); // ✅ 계약 데이터
+  const { items: reviews, loading: revLoading, error: revErr, hasMore, loadMore } =
+    useMyReviews(9);
 
   const router = useRouter();
 
@@ -35,13 +36,22 @@ export default function Page() {
     [profile?.weddingDay],
   );
 
-  const hasPastReservation = useMemo(
-    () => reservations.some((r) => isPastYMDSeoul(r.reservationDate)),
-    [reservations],
+  // 계약 목록 평탄화
+  const contracts = useMemo(
+    () => contractsRes?.contractGroups.flatMap((g) =>
+      g.contracts.map((c) => ({ ...c, executionDate: g.executionDate })),
+    ) ?? [],
+    [contractsRes],
   );
-  const pastOnlyReservations = useMemo(
-    () => reservations.filter((r) => isPastYMDSeoul(r.reservationDate)),
-    [reservations],
+
+  const hasPastContract = useMemo(
+    () => contracts.some((c) => isPastYMDSeoul(c.executionDate)),
+    [contracts],
+  );
+
+  const pastOnlyContracts = useMemo(
+    () => contracts.filter((c) => isPastYMDSeoul(c.executionDate)),
+    [contracts],
   );
 
   return (
@@ -63,7 +73,11 @@ export default function Page() {
         <MyTabs value={tab} onChange={setTab} />
 
         {tab === 'reserve' && (
-          <ReservationsTab items={reservations} loading={resLoading} error={resErr} />
+          <ContractsTab
+            groups={contractsRes?.contractGroups ?? []}
+            loading={resLoading}
+            error={resErr}
+          />
         )}
 
         {tab === 'review' && (
@@ -75,7 +89,7 @@ export default function Page() {
             onMore={loadMore}
             onWriteClick={() => setSheetOpen(true)}
             onCardClick={(id) => router.push(`/review/${id}`)}
-            allowWrite={hasPastReservation}
+            allowWrite={hasPastContract}
           />
         )}
 
@@ -88,7 +102,15 @@ export default function Page() {
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <h3 className="px-1 text-base font-semibold text-foreground">업체 선택</h3>
         <ReviewCompanyPicker
-          reservations={pastOnlyReservations}
+          reservations={pastOnlyContracts.map((c) => ({
+            id: c.contractId,
+            vendorId: c.vendorId,
+            vendorName: c.vendorName,
+            reservationDate: c.executionDate,
+            reservationTime: '',
+            createdAt: '',
+            updatedAt: '',
+          }))}
           loading={resLoading}
           error={resErr ?? undefined}
           onPick={({ vendorId, vendorName, reservationId, date, time }) => {

@@ -4,6 +4,7 @@
 import type { VendorListItem } from '@/types/vendor';
 import Image from 'next/image';
 import Link from 'next/link';
+import SvgObject from './SvgObject';
 
 type Props = {
   item: VendorListItem;
@@ -11,9 +12,9 @@ type Props = {
   showPrice?: boolean;
 };
 
-export default function VendorCard({ item, href, showPrice = false }: Props) {
+export default function VendorCard({ item, href }: Props) {
   const {
-    vendorId,
+    vendorId: _vendorId,
     vendorName,
     logoImageUrl,
     regionName,
@@ -24,9 +25,10 @@ export default function VendorCard({ item, href, showPrice = false }: Props) {
   return (
     <Link
       href={href}
-      className="block p-3 rounded-xl bg-white shadow-sm border border-gray-100"
+      className="block"
       aria-label={`${vendorName} 상세보기`}
     >
+      {/* 로고 */}
       <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-50">
         <Image
           src={logoImageUrl || '/logos/placeholder.png'}
@@ -37,21 +39,32 @@ export default function VendorCard({ item, href, showPrice = false }: Props) {
         />
       </div>
 
+      {/* 텍스트 영역 */}
       <div className="mt-2">
-        <div className="text-sm font-semibold truncate">{vendorName}</div>
-        <div className="mt-0.5 text-xs text-gray-500 truncate">
-          {regionName ?? '-'}
+        {/* 지역 + 이름 */}
+        <div className="text-sm font-semibold truncate">
+          <span className="text-gray-500 mr-1">{regionName ?? '-'}</span>
+          <span className="text-gray-900">{vendorName}</span>
         </div>
 
-        <div className="mt-1 flex items-center gap-1 text-xs text-gray-600">
+        {/* 별점 + 리뷰 수 */}
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-600">
+          <SvgObject
+            src="/icons/PinkRing.svg"
+            alt="rating-ring"
+            width={12}
+            height={12}
+          />
           <span className="font-medium">
             {averageRating != null ? averageRating.toFixed(1) : '0.0'}
           </span>
-          <span>· 리뷰 {reviewCount ?? 0}</span>
+          <span className="text-gray-500">({reviewCount ?? 0})</span>
         </div>
 
-        {showPrice && (
-          <div className="mt-1 text-xs text-gray-700">가격 정보 준비중</div>
+        {item.minPrice && (
+          <div className="mt-1 text-sm font-semibold text-gray-900">
+            {item.minPrice / 10000}만원~
+          </div>
         )}
       </div>
     </Link>

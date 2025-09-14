@@ -12,7 +12,7 @@ const withPwa = withPWA({
 const baseConfig = {
   output: 'standalone',
   images: {
-    domains: ['wedit.me'],
+    domains: ['wedit.me', 'cdn.wedit.me'],
     remotePatterns: [
       {
         protocol: 'https',

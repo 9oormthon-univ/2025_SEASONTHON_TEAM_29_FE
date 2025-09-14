@@ -20,8 +20,17 @@ type Props = {
   className?: string;
   onClick?: () => void;
   selected?: boolean;
-  /** 지난 예약 등: 이미지 영역에만 반투명 오버레이 */
+  executionDateTime?: string;
   dimImage?: boolean;
+};
+
+const formatDate = (iso?: string) => {
+  if (!iso) return null;
+  const d = new Date(iso);
+  const yy = String(d.getFullYear()).slice(2); // '26'
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yy}.${mm}.${dd}`;
 };
 
 export default function CompanyCard({
@@ -36,6 +45,7 @@ export default function CompanyCard({
   onClick,
   selected = false,
   dimImage = false,
+  executionDateTime,
 }: Props) {
   const altText = alt ?? name;
   const textDimCls = dimImage ? 'opacity-40' : '';
@@ -47,7 +57,7 @@ export default function CompanyCard({
       <button
         type="button"
         onClick={onClick}
-        className={cn('relative w-28 h-44', className)}
+        className={cn('relative w-28 flex flex-col items-start', className)} 
       >
         {/* 이미지 박스 */}
         <div
@@ -66,50 +76,29 @@ export default function CompanyCard({
             sizes="112px"
           />
           {dimImage && (
-            <div className="absolute inset-0 rounded-lg bg-white/70 pointer-events-none" />
+            <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
           )}
         </div>
 
-        {/* 칩 2개 (이미지 하단에 오버랩) */}
-        <div className="absolute top-[125px] left-0 flex gap-1">
-          <div className="px-1.5 py-0.5 rounded-lg bg-primary-200 overflow-hidden">
-            <span className="text-primary-500/80 text-xs font-medium leading-tight">
-              라로브
-            </span>
-          </div>
-          <div className="px-1.5 py-0.5 rounded-lg bg-primary-200 overflow-hidden">
-            <span className="text-primary-500/80 text-xs font-medium leading-tight">
-              26.04.11
-            </span>
-          </div>
-        </div>
+        {/* 🔑 날짜 뱃지 */}
+        {executionDateTime && (
+          <span className="mb-1 rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-500">
+            {formatDate(executionDateTime)}
+          </span>
+        )}
 
-        {/* 지역 · 이름 */}
+        {/* 이름 */}
         {(region || name) && (
-          <div className="absolute left-0 top-[154px] inline-flex items-center gap-1">
-            {region && (
-              <span className="text-text--secondary text-sm leading-normal shrink-0 whitespace-nowrap">
-                {region}
-              </span>
-            )}
-            {region && name && (
-              <span className="text-text--secondary text-sm leading-normal">
-                ·
-              </span>
-            )}
-            {name && (
-              <span className="text-text--default text-sm font-medium leading-normal max-w-[6.5rem] truncate">
-                {name}
-              </span>
-            )}
-          </div>
+          <span className="text-text--default text-sm font-medium leading-normal truncate max-w-[6.5rem]">
+            {name}
+          </span>
         )}
 
         {/* 가격 */}
         {priceText && (
-          <div className="absolute left-0 top-[175px] text-text--default text-xs font-semibold leading-normal">
-            {priceText}
-          </div>
+          <span className="text-text--default text-xs font-semibold leading-normal">
+            {priceText}~
+          </span>
         )}
       </button>
     );
