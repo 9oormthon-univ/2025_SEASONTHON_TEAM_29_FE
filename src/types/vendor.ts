@@ -84,6 +84,7 @@ export type CreateVendorRequest = {
 /** ---------- 공통 ---------- */
 type CreateProductBase = {
   name: string;
+  description: string;
   productImages: { mediaKey: string; contentType: string; sortOrder: number }[];
   basePrice: number;
   durationInMinutes: number;
