@@ -20,7 +20,15 @@ export async function searchDresses(
   const page = body.page ?? 0;
   const size = body.size ?? 12;
 
-  const url = `/v1/vendor/conditionSearch/dress?page=${page}&size=${size}`;
+  const qs = new URLSearchParams();
+  if (body.regionCode.length > 0) qs.set('regionCode', body.regionCode.join(','));
+  qs.set('price', String(body.price));
+  if (body.dressStyle.length > 0) qs.set('dressStyle', body.dressStyle.join(','));
+  if (body.dressProduction.length > 0) qs.set('dressProduction', body.dressProduction.join(','));
+  qs.set('page', String(page));
+  qs.set('size', String(size));
+
+  const url = `/v1/vendor/conditionSearch/dress?${qs.toString()}`;
   const res = await http<ApiEnvelope<DressSearchRes>>(url, {
     method: 'GET',
     skipAuth: opts?.skipAuth,

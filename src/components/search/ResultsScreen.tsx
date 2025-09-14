@@ -98,7 +98,17 @@ export default function ResultsScreen({
       className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden"
       data-hide-bottombar
     >
-      <Header showBack onBack={() => router.back()} value="검색결과" />
+      <Header
+        showBack
+        onBack={() => {
+          if (cat) {
+            router.push(`/search/filters?cat=${cat}`);
+          } else {
+            router.push('/search/filters');
+          }
+        }}
+        value="검색결과"
+      />
         <div className="px-[22px] flex-1 overflow-y-auto">
 
         {/* ✅ Chips: 가로 스크롤 */}

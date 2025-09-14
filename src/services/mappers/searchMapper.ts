@@ -100,7 +100,6 @@ export const hallStyleLabel: Record<string, string> = {
   HOTEL: '호텔',
   CONVENTION: '컨벤션',
   HOUSE: '하우스',
-  CHAPEL: '채플',
 };
 export const hallStyleMap: Record<string, string> =
   Object.fromEntries(Object.entries(hallStyleLabel).map(([k, v]) => [v, k]));
