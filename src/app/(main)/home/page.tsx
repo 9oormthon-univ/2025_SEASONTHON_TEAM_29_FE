@@ -24,23 +24,47 @@ export default function HomePage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto px-[22px] pb-24">
-      <SearchBar showCart={true} />
+      <SearchBar showCart={true} showTag={true} />
       <BannerSquareCarousel items={banners} />
       <CategoryQuick items={categories} />
 
-      {reviews.items.length > 0 && <ReviewSquareCarousel items={reviews.items} />}
-      {reviews.loading && <p className="mt-2 text-xs text-text-secondary">리뷰 불러오는 중…</p>}
-      {reviews.error && <p className="mt-2 text-xs text-red-500">{reviews.error}</p>}
+      {reviews.items.length > 0 && (
+        <ReviewSquareCarousel items={reviews.items} />
+      )}
+      {reviews.loading && (
+        <p className="mt-2 text-xs text-text-secondary">리뷰 불러오는 중…</p>
+      )}
+      {reviews.error && (
+        <p className="mt-2 text-xs text-red-500">{reviews.error}</p>
+      )}
 
       <StoryWideCarousel items={stories} />
 
-      <VendorSquareCarousel title="웨딧터가 고른 메이크업" items={makeup.items} />
-      {makeup.loading && <p className="mt-2 text-xs text-text-secondary">메이크업 불러오는 중…</p>}
-      {makeup.error && <p className="mt-2 text-xs text-red-500">{makeup.error}</p>}
+      <VendorSquareCarousel
+        title="웨딧터가 고른 메이크업"
+        items={makeup.items}
+      />
+      {makeup.loading && (
+        <p className="mt-2 text-xs text-text-secondary">
+          메이크업 불러오는 중…
+        </p>
+      )}
+      {makeup.error && (
+        <p className="mt-2 text-xs text-red-500">{makeup.error}</p>
+      )}
 
-      <VendorSquareCarousel title="지금 주목할 만한 스튜디오" items={studio.items} />
-      {studio.loading && <p className="mt-2 text-xs text-text-secondary">스튜디오 불러오는 중…</p>}
-      {studio.error && <p className="mt-2 text-xs text-red-500">{studio.error}</p>}
+      <VendorSquareCarousel
+        title="지금 주목할 만한 스튜디오"
+        items={studio.items}
+      />
+      {studio.loading && (
+        <p className="mt-2 text-xs text-text-secondary">
+          스튜디오 불러오는 중…
+        </p>
+      )}
+      {studio.error && (
+        <p className="mt-2 text-xs text-red-500">{studio.error}</p>
+      )}
     </main>
   );
 }
