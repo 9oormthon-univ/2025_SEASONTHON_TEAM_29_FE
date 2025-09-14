@@ -1,3 +1,4 @@
+//src/app/(main)/search/page.tsx
 import SearchPage from '@/components/search/SearchPage';
 import type { CategoryKey } from '@/types/category';
 import { Suspense } from 'react';

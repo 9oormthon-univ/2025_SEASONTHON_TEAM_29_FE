@@ -1,14 +1,4 @@
-export type SearchParams = {
-  cat?: string | string[];
-  region?: string | string[];
-  price?: string;
-  style?: string | string[];
-  meal?: string | string[];
-  guest?: string;
-  trans?: string | string[];
-};
-
-import type { CategoryKey } from '@/types/category';
+import type { CategoryKey } from './category';
 
 export type SearchItem = {
   id: number;
@@ -17,7 +7,14 @@ export type SearchItem = {
   cat: CategoryKey;
   price: number;
   logo?: string;
-  tags?: string[];
   rating?: number;
   count?: number;
+  tags?: string[];
+};
+
+export type SearchResult = {
+  items: SearchItem[];
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
 };

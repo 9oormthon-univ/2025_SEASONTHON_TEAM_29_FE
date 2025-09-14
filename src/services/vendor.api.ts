@@ -34,6 +34,7 @@ export async function getVendorDetail(
     `/v1/vendor/${vendorId}`,
     { method: 'GET', skipAuth: opts?.skipAuth }
   );
+  console.log(res);
   if (!res.data) throw new Error('업체 상세 데이터를 불러오지 못했습니다.');
   return res.data;
 }

@@ -1,11 +1,14 @@
-// src/types/vendor.ts
-
 export type VendorCategory = 'WEDDING_HALL' | 'STUDIO' | 'DRESS' | 'MAKEUP';
 
-/** 공통 페이지 응답 */
 export type PageResponse<T> = {
-  totalElements: number; totalPages: number; size: number; content: T[];
-  number: number; first: boolean; last: boolean; empty: boolean;
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  content: T[];
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
 };
 
 export type VendorListItem = {
@@ -15,6 +18,7 @@ export type VendorListItem = {
   regionName?: string;
   averageRating?: number;
   reviewCount?: number;
+  minPrice?: number;
 };
 
 export type VendorItem = {
@@ -29,46 +33,67 @@ export type VendorItem = {
 };
 
 export type VendorProductSummary = {
-  id: number; name: string; description?: string; basePrice: number; imageUrls: string[];
+  id: number;
+  name: string;
+  description?: string;
+  basePrice: number;
+  imageUrls: string[];
 };
 
 export type VendorDetail = {
-  vendorId: number; vendorName: string; description?: string; phoneNumber?: string;
-  vendorType: VendorCategory; fullAddress: string; addressDetail?: string;
-  latitude: number; longitude: number; kakaoMapUrl?: string; repMediaUrl?: string;
+  vendorId: number;
+  vendorName: string;
+  description?: string;
+  phoneNumber?: string;
+  vendorType: VendorCategory;
+  fullAddress: string;
+  addressDetail?: string;
+  latitude: number;
+  longitude: number;
+  kakaoMapUrl?: string;
+  repMediaUrl?: string;
   products: VendorProductSummary[];
 };
 
 export type VendorProductDetail = {
-  productId: number; productName: string; basePrice: number; description?: string;
-  imageUrls: string[]; vendorId: number; vendorName: string; details: unknown;
+  productId: number;
+  productName: string;
+  basePrice: number;
+  description?: string;
+  imageUrls: string[];
+  vendorId: number;
+  vendorName: string;
+  details: unknown;
 };
 
 export type CreateVendorRequest = {
-  name: string; phoneNumber: string; description: string; vendorType: VendorCategory; regionCode: number;
+  name: string;
+  phoneNumber: string;
+  description: string;
+  vendorType: VendorCategory;
+  regionCode: number;
   logoImage: { mediaKey: string; contentType: string };
   mainImage: { mediaKey: string; contentType: string };
-  fullAddress: string; addressDetail?: string; latitude: number; longitude: number; kakaoMapUrl?: string;
+  fullAddress: string;
+  addressDetail?: string;
+  latitude: number;
+  longitude: number;
+  kakaoMapUrl?: string;
 };
 
-/** ------- 상품 생성: 카테고리별 DU ------- */
-
-// 공통 필드
+/** ---------- 공통 ---------- */
 type CreateProductBase = {
   name: string;
   productImages: { mediaKey: string; contentType: string; sortOrder: number }[];
   basePrice: number;
-  /** 스웨거 예시들에 공통 존재 */
   durationInMinutes: number;
 };
 
-// 확장 가능한 string-literal(새 값 들어와도 컴파일 유지)
-type Extensible<T extends string> = T | (string & {});
+export type Extensible<T extends string> = T | (string & {});
 
-// 웨딩홀
-export type HallStyle = 'HOTEL' | 'CONVENTION' | 'CHAPEL' | 'HOUSE';
-export type HallMeal =
-  | 'BUFFET' | 'COURSE' | 'ONE_TABLE_SETTING' | 'TABLE_SETTING';
+/** ---------- 웨딩홀 ---------- */
+export type HallStyle = 'HOTEL' | 'CONVENTION' | 'HOUSE';
+export type HallMeal = 'BUFFET' | 'COURSE' | 'SEMI_COURSE';
 
 export type CreateWeddingHallProduct = CreateProductBase & {
   vendorType: 'WEDDING_HALL';
@@ -78,9 +103,9 @@ export type CreateWeddingHallProduct = CreateProductBase & {
   hasParking: boolean;
 };
 
-// 스튜디오 (예시 기준)
-export type StudioStyle = 'PORTRAIT_FOCUSED' | 'NATURAL_LIGHT' | 'CLASSIC';
-export type SpecialShot = 'HANOK' | 'NIGHT' | 'OUTDOOR';
+/** ---------- 스튜디오 ---------- */
+export type StudioStyle = 'PORTRAIT_FOCUSED' | 'NATURAL' | 'EMOTIONAL' | 'CLASSIC' | 'BLACK_AND_WHITE';
+export type SpecialShot = 'HANOK' | 'UNDERWATER' | 'WITH_PET';
 
 export type CreateStudioProduct = CreateProductBase & {
   vendorType: 'STUDIO';
@@ -89,9 +114,9 @@ export type CreateStudioProduct = CreateProductBase & {
   iphoneSnap?: boolean;
 };
 
-// 드레스 (예시 기준)
-export type DressStyle = 'ROMANTIC' | 'MODERN' | 'PRINCESS' | 'MERMAID';
-export type DressProduction = 'IMPORTED' | 'DOMESTIC';
+/** ---------- 드레스 ---------- */
+export type DressStyle = 'MODERN' | 'CLASSIC' | 'ROMANTIC' | 'DANAH' | 'UNIQUE' | 'HIGH_END';
+export type DressProduction = 'DOMESTIC' | 'IMPORTED';
 
 export type CreateDressProduct = CreateProductBase & {
   vendorType: 'DRESS';
@@ -99,8 +124,8 @@ export type CreateDressProduct = CreateProductBase & {
   dressProduction: Extensible<DressProduction>;
 };
 
-// 메이크업 (예시 기준)
-export type MakeupStyle = 'NATURAL' | 'GLAM' | 'DEWY';
+/** ---------- 메이크업 ---------- */
+export type MakeupStyle = 'INNOCENT' | 'ROMANTIC' | 'NATURAL' | 'GLAM';
 
 export type CreateMakeupProduct = CreateProductBase & {
   vendorType: 'MAKEUP';
@@ -115,5 +140,9 @@ export type CreateProductRequest =
   | CreateDressProduct
   | CreateMakeupProduct;
 
-/** API Envelope */
-export type ApiEnvelope<T> = { status: number; success: boolean; message?: string; data?: T };
+export type ApiEnvelope<T> = {
+  status: number;
+  success: boolean;
+  message?: string;
+  data?: T;
+};

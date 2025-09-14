@@ -20,6 +20,7 @@ export default function VendorSearchField({
       setSelected(detail);
       onSelect(detail);
     } catch (e) {
+      console.log(e);
       alert('업체를 찾을 수 없습니다.');
     }
   };

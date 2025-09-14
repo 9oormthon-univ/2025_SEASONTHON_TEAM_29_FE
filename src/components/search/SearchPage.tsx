@@ -1,9 +1,14 @@
+// src/components/search/SearchPage.tsx
 'use client';
 
+import { resolveRegionCode } from '@/lib/region';
+import {
+  dressProductionMap, dressStyleMap, hallMealMap, hallStyleMap, makeupStyleMap,
+  studioShotMap, studioStyleMap,
+} from '@/services/mappers/searchMapper';
 import { CategoryKey } from '@/types/category';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Button from '../common/atomic/Button';
 import Header from '../common/monocules/Header';
 import CategoryRow from './CategoryRow';
@@ -11,141 +16,200 @@ import { ChipGroup, ChipSingle } from './Chips';
 import PriceRange from './PriceRange';
 import QueryInput from './QueryInput';
 
-const STYLE = ['채플', '호텔', '컨벤션', '하우스'] as const;
-const MEAL = ['뷔페', '코스', '한상차림'] as const;
-const GUEST = ['50명', '100명', '300명'] as const;
-const TRANS = ['지하철', '버스', '자차'] as const;
-
 export default function SearchPage({ initialCat = null as CategoryKey | null }) {
   const router = useRouter();
+
+  // 공통 상태
   const [query, setQuery] = useState('');
-  const [cat, setCat] = useState<CategoryKey | null>(null);
+  const [cat, setCat] = useState<CategoryKey | null>(initialCat);
   const [price, setPrice] = useState<number | null>(null);
-  const [style, setStyle] = useState<string[]>([]);
-  const [meal, setMeal] = useState<string[]>([]);
-  const [guest, setGuest] = useState<string | null>(null);
-  const [trans, setTrans] = useState<string[]>([]);
   const [areas, setAreas] = useState<string[]>([]);
 
-  useEffect(() => {
-    if (initialCat) setCat(initialCat);
-  }, [initialCat]);
+  // 웨딩홀
+  const [hallStyle, setHallStyle] = useState<string[]>([]);
+  const [hallMeal, setHallMeal] = useState<string[]>([]);
+  const [guest, setGuest] = useState<string | null>(null);
+  const [parking, setParking] = useState<string | null>(null);
 
-  const isHall = cat === 'hall';
+  // 드레스
+  const [dressStyle, setDressStyle] = useState<string[]>([]);
+  const [dressProduction, setDressProduction] = useState<string[]>([]);
 
+  // 스튜디오
+  const [studioStyle, setStudioStyle] = useState<string[]>([]);
+  const [studioShot, setStudioShot] = useState<string[]>([]);
+  const [iphoneSnap, setIphoneSnap] = useState<string | null>(null);
+
+  // 메이크업
+  const [makeupStyle, setMakeupStyle] = useState<string[]>([]);
+  const [stylist, setStylist] = useState<string | null>(null);
+  const [room, setRoom] = useState<string | null>(null);
+
+  /** ✅ 카테고리별 필수 조건 검사 */
   const canSearch = useMemo(() => {
-    if (!isHall) return false;
-    return areas.length > 0 && cat !== null;
-  }, [isHall, areas, cat]);
+    if (!cat || areas.length === 0 || price === null) return false;
+
+    switch (cat) {
+      case 'hall':
+        return (
+          hallStyle.length > 0 &&
+          hallMeal.length > 0 &&
+          guest !== null &&
+          parking !== null
+        );
+      case 'dress':
+        return dressStyle.length > 0 && dressProduction.length > 0;
+      case 'studio':
+        return studioStyle.length > 0 && iphoneSnap !== null;
+      case 'makeup':
+        return makeupStyle.length > 0 && stylist !== null && room !== null;
+      default:
+        return false;
+    }
+  }, [cat, areas, price, hallStyle, hallMeal, guest, parking, dressStyle, dressProduction, studioStyle, iphoneSnap, makeupStyle, stylist, room]);
 
   const toggle = (list: string[], v: string, set: (v: string[]) => void) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
+  /** 검색 실행 */
   function goResults() {
     const p = new URLSearchParams();
-    areas.forEach((a) => p.append('region', a));
+
+    // 지역
+    areas.forEach((a) => {
+      const code = resolveRegionCode(a);
+      if (code) p.append('region', String(code));
+    });
+
+    // 공통
     if (cat) p.set('cat', cat);
-    if (price !== null) p.set('price', String(price));
-    style.forEach((v) => p.append('style', v));
-    meal.forEach((v) => p.append('meal', v));
-    trans.forEach((v) => p.append('trans', v));
+    if (price !== null) p.set('price', String(price * 10000));
+
+    // 웨딩홀
+    hallStyle.forEach((v) => p.append('hallStyle', hallStyleMap[v]));
+    hallMeal.forEach((v) => p.append('hallMeal', hallMealMap[v]));
     if (guest) p.set('guest', guest);
+    if (parking) p.set('parking', parking === '있음' ? 'true' : 'false');
+
+    // 드레스
+    dressStyle.forEach((v) => p.append('dressStyle', dressStyleMap[v]));
+    dressProduction.forEach((v) => p.append('dressProduction', dressProductionMap[v]));
+
+    // 스튜디오
+    studioStyle.forEach((v) => p.append('studioStyle', studioStyleMap[v]));
+    studioShot.forEach((v) => p.append('specialShots', studioShotMap[v]));
+    if (iphoneSnap) p.set('iphoneSnap', iphoneSnap === '있음' ? 'true' : 'false');
+
+    // 메이크업
+    makeupStyle.forEach((v) => p.append('makeupStyle', makeupStyleMap[v]));
+    if (stylist) p.set('stylist', stylist === '가능' ? 'true' : 'false');
+    if (room) p.set('room', room === '있음' ? 'true' : 'false');
+
     router.push(`/search/results?${p.toString()}`);
   }
 
   return (
-    <main className="mx-auto px-[22px] w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
-      <Header
-        showBack
-        onBack={()=>router.back()} 
-        value="검색" />
+    <main className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
+      <Header showBack onBack={() => router.back()} value="검색" />
+      <div className="px-[22px] flex-1 overflow-y-auto">
 
-      <section className="px-0">
-        <QueryInput
-          query={query}
-          onQueryChange={setQuery}
-          selected={areas}
-          onSelectedChange={setAreas}
-        />
-      </section>
+        <section className="px-0">
+          <QueryInput
+            query={query}
+            onQueryChange={setQuery}
+            selected={areas}
+            onSelectedChange={setAreas}
+          />
+        </section>
 
-      <section className="mt-4 px-0">
-        <CategoryRow value={cat} onChange={setCat} />
-      </section>
+        <section className="mt-4 px-0">
+          <CategoryRow value={cat} onChange={setCat} />
+        </section>
 
-      <div
-        className="flex-1 overflow-y-auto px-3 pb-[80px] overflow-scroll [&::-webkit-scrollbar]:hidden"
-        style={{
-          WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-        }}
-      >
-        {isHall ? (
-          <>
-            <PriceRange
-              value={price ?? 10}
-              selected={price !== null}
-              onFirstPick={() => setPrice(10)}
-              onChange={(v) => setPrice(v)}
-            />
+        <div className="flex-1 overflow-y-auto px-3 pb-[80px] overflow-scroll [&::-webkit-scrollbar]:hidden">
+          {/* 웨딩홀 */}
+          {cat === 'hall' && (
+            <>
+              <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
+                <ChipGroup values={['채플', '호텔', '컨벤션', '하우스']} selected={hallStyle} onToggle={(v) => toggle(hallStyle, v, setHallStyle)} />
+              </section>
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">식사</h3>
+                <ChipGroup values={['뷔페', '코스', '세미코스']} selected={hallMeal} onToggle={(v) => toggle(hallMeal, v, setHallMeal)} />
+              </section>
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">하객 수</h3>
+                <ChipSingle values={['50명', '100명', '300명']} value={guest} onChange={setGuest} />
+              </section>
+              <section className="mt-2 mb-4">
+                <h3 className="mb-3 font-bold text-gray-800">주차장</h3>
+                <ChipSingle values={['있음', '없음']} value={parking} onChange={setParking} />
+              </section>
+            </>
+          )}
 
-            <section className="mt-2">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">스타일</h3>
-              <ChipGroup
-                values={STYLE}
-                selected={style}
-                onToggle={(v) => toggle(style, v, setStyle)}
-              />
-            </section>
+          {/* 드레스 */}
+          {cat === 'dress' && (
+            <>
+              <PriceRange value={price ?? 100} selected={price !== null} onFirstPick={() => setPrice(100)} onChange={setPrice} />
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">주력스타일</h3>
+                <ChipGroup values={['모던', '클래식', '로맨틱', '단아', '유니크', '하이엔드']} selected={dressStyle} onToggle={(v) => toggle(dressStyle, v, setDressStyle)} />
+              </section>
+              <section className="mt-2 mb-4">
+                <h3 className="mb-3 font-bold text-gray-800">제작사</h3>
+                <ChipGroup values={['국내', '수입']} selected={dressProduction} onToggle={(v) => toggle(dressProduction, v, setDressProduction)} />
+              </section>
+            </>
+          )}
 
-            <section className="mt-2">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">식사</h3>
-              <ChipGroup
-                values={MEAL}
-                selected={meal}
-                onToggle={(v) => toggle(meal, v, setMeal)}
-              />
-            </section>
+          {/* 스튜디오 */}
+          {cat === 'studio' && (
+            <>
+              <PriceRange value={price ?? 100} selected={price !== null} onFirstPick={() => setPrice(100)} onChange={setPrice} />
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
+                <ChipGroup values={['인물중심', '자연', '감성', '클래식', '흑백']} selected={studioStyle} onToggle={(v) => toggle(studioStyle, v, setStudioStyle)} />
+              </section>
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">특수촬영</h3>
+                <ChipGroup values={['한옥', '수중', '반려동물']} selected={studioShot} onToggle={(v) => toggle(studioShot, v, setStudioShot)} />
+              </section>
+              <section className="mt-2 mb-4">
+                <h3 className="mb-3 font-bold text-gray-800">아이폰 스냅</h3>
+                <ChipSingle values={['있음', '없음']} value={iphoneSnap} onChange={setIphoneSnap} />
+              </section>
+            </>
+          )}
 
-            <section className="mt-2">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">하객 수</h3>
-              <ChipSingle values={GUEST} value={guest} onChange={setGuest} />
-            </section>
+          {/* 메이크업 */}
+          {cat === 'makeup' && (
+            <>
+              <PriceRange value={price ?? 50} selected={price !== null} onFirstPick={() => setPrice(50)} onChange={setPrice} />
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
+                <ChipGroup values={['청순', '로맨틱', '내추럴', '글램']} selected={makeupStyle} onToggle={(v) => toggle(makeupStyle, v, setMakeupStyle)} />
+              </section>
+              <section className="mt-2">
+                <h3 className="mb-3 font-bold text-gray-800">담당지정</h3>
+                <ChipSingle values={['가능', '불가능']} value={stylist} onChange={setStylist} />
+              </section>
+              <section className="mt-2 mb-4">
+                <h3 className="mb-3 font-bold text-gray-800">단독룸</h3>
+                <ChipSingle values={['있음', '없음']} value={room} onChange={setRoom} />
+              </section>
+            </>
+          )}
+        </div>
 
-            <section className="mt-2 mb-4">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">교통 조건</h3>
-              <ChipGroup
-                values={TRANS}
-                selected={trans}
-                onToggle={(v) => toggle(trans, v, setTrans)}
-              />
-            </section>
-          </>
-        ) : (
-          <div className="flex flex-col items-center justify-center mt-12">
-            <div className="rounded-2xl px-10">
-              <Image
-                src="/lock.png"
-                alt=""
-                width={200}
-                height={200}
-                className="h-[200px] w-[200px] object-contain"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                }}
-              />
-            </div>
-            <p className="text-lg pt-5 font-bold text-gray-500">곧 만나요!</p>
+        <div className="fixed inset-x-0 bottom-0 z-10">
+          <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+            <Button fullWidth size="lg" disabled={!canSearch} onClick={goResults}>
+              검색하기
+            </Button>
           </div>
-        )}
-      </div>
-
-      <div className="fixed inset-x-0 bottom-0 z-10">
-        <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
-          <Button fullWidth size="lg" disabled={!canSearch} onClick={goResults}>
-            검색하기
-          </Button>
         </div>
       </div>
     </main>

@@ -1,4 +1,3 @@
-// src/lib/region.ts
 import mapJson from '@/generated/regions.map.json';
 import treeJson from '@/generated/regions.tree.json';
 
@@ -13,6 +12,13 @@ export const regionTree = treeJson as Record<string, RegionTree>;
 /** 정확 매칭: "서울특별시 강남구 역삼동" → 1168010100 */
 export function resolveRegionCode(fullName: string): number | null {
   return regionMap[normalize(fullName)] ?? null;
+}
+
+/** 코드 → 이름 매핑 */
+export function resolveRegionName(code: number | string): string | null {
+  const c = Number(code);
+  const entry = Object.entries(regionMap).find(([_, v]) => v === c);
+  return entry ? entry[0] : null;
 }
 
 /** 단계 선택 매칭 */
