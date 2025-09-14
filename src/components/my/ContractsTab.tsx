@@ -15,9 +15,11 @@ export default function ContractsTab({
   loading: boolean;
   error: string | null;
 }) {
-  if (loading) return <p className="text-sm text-text-secondary">불러오는 중…</p>;
+  if (loading)
+    return <p className="text-sm text-text-secondary">불러오는 중…</p>;
   if (error) return <p className="text-sm text-red-500">{error}</p>;
-  if (!groups.length) return <p className="text-sm text-text-secondary">계약 내역이 없어요.</p>;
+  if (!groups.length)
+    return <p className="text-sm text-text-secondary">계약 내역이 없어요.</p>;
 
   return (
     <div className="flex flex-col gap-6 pt-5">
@@ -42,9 +44,16 @@ export default function ContractsTab({
   );
 }
 
-function ContractCarousel({ contracts }: { contracts: ContractGroup['contracts'] }) {
-  const [ref, api] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
-  const [selected, setSelected] = useState(0);
+function ContractCarousel({
+  contracts,
+}: {
+  contracts: ContractGroup['contracts'];
+}) {
+  const [ref, api] = useEmblaCarousel({
+    align: 'start',
+    containScroll: 'trimSnaps',
+  });
+  const [, setSelected] = useState(0);
 
   useEffect(() => {
     if (!api) return;

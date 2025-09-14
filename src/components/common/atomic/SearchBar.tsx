@@ -7,6 +7,7 @@ import SvgObject from './SvgObject';
 type Props = {
   placeholder?: string;
   showCart?: boolean;
+  showTag?: boolean;
 };
 
 export default function SearchBar({
@@ -16,23 +17,30 @@ export default function SearchBar({
   const router = useRouter();
 
   return (
-    <div className="flex items-center gap-3 py-5">
-      <button
-        onClick={() => router.push('/search')}
-        className={`flex h-11 items-center gap-2 rounded-full bg-gray-100 px-4 text-left 
-          ${showCart ? 'flex-1' : 'w-full'}`}
-      >
-        <span className="flex-1 text-[15px] text-gray-500">{placeholder}</span>
-        <Search className="h-5 w-5 text-gray-500" />
-      </button>
-
+    <div className="flex items-center py-5 gap-[10px]">
+      <div className="flex flex-1 min-w-0">
+        <button
+          onClick={() => router.push('/search')}
+          className="flex h-11 flex-1 min-w-0 items-center rounded-full bg-gray-100 px-[19px] text-left"
+        >
+          <span className="flex-1 truncate text-[15px] text-gray-500">
+            {placeholder}
+          </span>
+          <Search className="h-5 w-5 text-gray-500" />
+        </button>
+      </div>
       {showCart && (
         <button
           aria-label="장바구니"
-          className="grid h-11 w-11 place-items-center rounded-full active:scale-95"
+          className="grid size-10 place-items-center rounded-full active:scale-95"
           onClick={() => router.push('/cart')}
         >
-          <SvgObject src="/icons/Cart.svg" alt="" width={40} height={40} />
+          <SvgObject
+            src="/icons/Cart.svg"
+            alt="장바구니"
+            width={35}
+            height={29}
+          />
         </button>
       )}
     </div>

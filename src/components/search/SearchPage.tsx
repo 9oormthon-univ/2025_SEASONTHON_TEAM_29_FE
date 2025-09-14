@@ -15,7 +15,6 @@ import CategoryRow from './CategoryRow';
 import { ChipGroup, ChipSingle } from './Chips';
 import PriceRange from './PriceRange';
 import QueryInput from './QueryInput';
-
 export default function SearchPage({ initialCat = null as CategoryKey | null }) {
   const router = useRouter();
 

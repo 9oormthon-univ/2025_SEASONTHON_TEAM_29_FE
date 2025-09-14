@@ -7,7 +7,11 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 
 type Mode = 'schedule' | 'event';
-type SheetItem = { id: string; title: string; sticker: keyof typeof STICKER_SRC };
+type SheetItem = {
+  id: string;
+  title: string;
+  sticker: keyof typeof STICKER_SRC;
+};
 
 export default function CalSheet({
   ymd,
@@ -22,7 +26,9 @@ export default function CalSheet({
 }) {
   // ESC 닫기
   useEffect(() => {
-    function onKey(e: KeyboardEvent) { if (e.key === 'Escape') onClose(); }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
     if (ymd) window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [ymd, onClose]);
@@ -30,13 +36,18 @@ export default function CalSheet({
   if (!ymd) return null;
 
   const d = new Date(ymd);
-  const weekdays = ['일','월','화','수','목','금','토'];
-  const title = `${d.getMonth()+1}월 ${d.getDate()}일 ${weekdays[d.getDay()]}요일`;
+  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+  const title = `${d.getMonth() + 1}월 ${d.getDate()}일 ${weekdays[d.getDay()]}요일`;
 
   const isEvent = mode === 'event';
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50"
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
       <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]" />
 
       <div
@@ -47,8 +58,8 @@ export default function CalSheet({
       >
         <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-gray-200" />
 
-        <h2 className="text-[18px] font-semibold text-gray-900">{title}</h2>
-        <p className="mt-1 text-[13px] text-gray-400">
+        <h2 className="text-lg font-medium text-text-default">{title}</h2>
+        <p className="mt-1 text-xs text-text-tertiary">
           오늘은 어떤 {isEvent ? '행사가 있을까요?' : '이벤트가 있으신가요?'}
         </p>
 
@@ -57,11 +68,13 @@ export default function CalSheet({
           {!isEvent && (
             <Link
               href={`/calendar/new?date=${ymd}`}
-              className="flex items-center gap-2 rounded-xl
+              className="flex items-center rounded-xl
                         text-gray-400 hover:bg-gray-50 active:scale-[0.98] gap-3"
             >
-              <div className="h-7 w-7 rounded border border-dashed border-gray-300" />
-              <span className="text-[15px]">새로운 일정을 등록해주세요.</span>
+              <div className="size-10 rounded border border-dashed border-gray-300" />
+              <span className="text-xs font-normal !text-text-tertiary">
+                새로운 일정을 등록해주세요.
+              </span>
             </Link>
           )}
         </div>
@@ -69,8 +82,17 @@ export default function CalSheet({
         <ul className="mt-5 space-y-3">
           {items.map((it) => (
             <li key={it.id}>
-              <Link href="/coming-soon" className="flex items-center gap-3 active:opacity-90">
-                <Image src={STICKER_SRC[it.sticker]} alt="" width={28} height={28} className="h-7 w-7" />
+              <Link
+                href="/coming-soon"
+                className="flex items-center gap-3 active:opacity-90"
+              >
+                <Image
+                  src={STICKER_SRC[it.sticker]}
+                  alt=""
+                  width={28}
+                  height={28}
+                  className="h-7 w-7"
+                />
                 <span className="text-[15px] text-gray-700">{it.title}</span>
               </Link>
             </li>

@@ -1,5 +1,6 @@
 // src/app/(main)/editorials/[id]/page.tsx
 import ShareButton from '@/components/common/atomic/ShareButton';
+import Up from '@/components/common/atomic/Up';
 import Header from '@/components/common/monocules/Header';
 import { EDITORIAL_COMPONENTS } from '@/data/editorials';
 import { getEditorialById } from '@/lib/editorials';
@@ -60,10 +61,7 @@ export default async function EditorialDetailPage({
 
   return (
     <main className="mx-auto w-full max-w-[420px] pb-24" data-hide-bottombar>
-      <Header
-        value="매거진"
-        className="h-[50px] px-[22px]"
-      />
+      <Header value="매거진" className="h-[50px] px-[22px]" />
 
       {/* 썸네일 + 오버레이 */}
       <section className="relative">
@@ -132,6 +130,7 @@ export default async function EditorialDetailPage({
           )}
         </footer>
       )}
+      <Up />
     </main>
   );
 }

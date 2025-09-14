@@ -1,6 +1,14 @@
 'use client';
 
-import { Bodies, Body, Composite, Engine, Render, Runner, World } from 'matter-js';
+import {
+  Bodies,
+  Body,
+  Composite,
+  Engine,
+  Render,
+  Runner,
+  World,
+} from 'matter-js';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 type LoadedTex = { url: string; width: number };
@@ -52,11 +60,16 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
 
   // 외부에서 drop 호출 가능
   useImperativeHandle(ref, () => ({
-    dropOne: () => { if (engineRef.current && texRef.current) spawnOne(); },
+    dropOne: () => {
+      if (engineRef.current && texRef.current) spawnOne();
+    },
     dropInitial: (count: number) => {
       let i = 0;
       const timer = setInterval(() => {
-        if (i >= count) { clearInterval(timer); return; }
+        if (i >= count) {
+          clearInterval(timer);
+          return;
+        }
         if (engineRef.current && texRef.current) spawnOne();
         i++;
       }, 70);
@@ -64,7 +77,9 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
     removeOne: () => {
       const engine = engineRef.current;
       if (!engine) return;
-      const bodies = Composite.allBodies(engine.world).filter((b) => !b.isStatic);
+      const bodies = Composite.allBodies(engine.world).filter(
+        (b) => !b.isStatic,
+      );
       const target = bodies.at(-1) ?? bodies[0];
       if (target) {
         fadingBodiesRef.current.push({
@@ -77,10 +92,13 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
     },
   }));
 
-  // 최초 1회만 엔진 생성
   useEffect(() => {
     if (!wrapRef.current || !canvasRef.current) return;
-    let alive = true;
+
+    let cancelled = false;
+    let rafId = 0;
+    let render: Render | null = null;
+    let runner: Runner | null = null;
 
     // 텍스처 로딩
     const loaders = textures.map(
@@ -94,7 +112,7 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
     );
 
     Promise.all(loaders).then((loaded) => {
-      if (!alive) return;
+      if (cancelled) return;
       texRef.current = loaded;
 
       const el = wrapRef.current!;
@@ -104,28 +122,47 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
       const engine = (engineRef.current = Engine.create());
       engine.world.gravity.y = gravity;
 
-      const render = Render.create({
+      render = Render.create({
         engine,
         canvas: canvasRef.current!,
-        options: { width, height: h, wireframes: false, background: 'transparent' },
+        options: {
+          width,
+          height: h,
+          wireframes: false,
+          background: 'transparent',
+        },
       });
 
-      // 바닥
+      // 바닥/벽
       const FLOOR_THICK = 120;
-      const floor = Bodies.rectangle(width / 2, h + FLOOR_THICK / 2, width * 2, FLOOR_THICK, {
-        isStatic: true,
-        render: { fillStyle: 'transparent' },
-      });
+      const floor = Bodies.rectangle(
+        width / 2,
+        h + FLOOR_THICK / 2,
+        width * 2,
+        FLOOR_THICK,
+        {
+          isStatic: true,
+          render: { fillStyle: 'transparent' },
+        },
+      );
       floorRef.current = floor;
 
       const WALL_THICK = 80;
-      const left = Bodies.rectangle(-WALL_THICK / 2, h / 2, WALL_THICK, h, { isStatic: true });
-      const right = Bodies.rectangle(width + WALL_THICK / 2, h / 2, WALL_THICK, h, { isStatic: true });
+      const left = Bodies.rectangle(-WALL_THICK / 2, h / 2, WALL_THICK, h, {
+        isStatic: true,
+      });
+      const right = Bodies.rectangle(
+        width + WALL_THICK / 2,
+        h / 2,
+        WALL_THICK,
+        h,
+        { isStatic: true },
+      );
 
       World.add(engine.world, [floor, left, right]);
 
       Render.run(render);
-      const runner = Runner.create();
+      runner = Runner.create();
       Runner.run(runner, engine);
 
       // 🔽 페이드/스케일 아웃 루프
@@ -138,11 +175,10 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
           const scale = 1 - progress;
 
           const sprite = fb.body.render.sprite;
-          if (sprite) {
-            if (sprite.xScale && sprite.yScale) {
-              sprite.xScale *= scale;
-              sprite.yScale *= scale;
-            }
+          if (sprite && sprite.xScale && sprite.yScale) {
+            // 비율을 누적 곱하기 대신, 프레임당 덮어쓰고 싶다면 원본 스케일을 보관해야 합니다.
+            sprite.xScale *= scale;
+            sprite.yScale *= scale;
           }
 
           if (progress >= 1) {
@@ -150,13 +186,36 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
             fadingBodiesRef.current.splice(i, 1);
           }
         }
-        requestAnimationFrame(loop);
+        rafId = requestAnimationFrame(loop);
       };
-      requestAnimationFrame(loop);
+      rafId = requestAnimationFrame(loop);
     });
+    return () => {
+      cancelled = true;
+      if (rafId) cancelAnimationFrame(rafId);
 
-    return () => { alive = false; };
-  }, []);
+      if (runner && engineRef.current) {
+        Runner.stop(runner);
+      }
+      if (render) {
+        Render.stop(render);
+        const c = render.canvas as HTMLCanvasElement | undefined;
+        if (c) {
+          const ctx = c.getContext('2d');
+          if (ctx) ctx.clearRect(0, 0, c.width, c.height);
+        }
+      }
+      if (engineRef.current) {
+        World.clear(engineRef.current.world, false);
+        Engine.clear(engineRef.current);
+        engineRef.current = null;
+      }
+
+      floorRef.current = null;
+      fadingBodiesRef.current = [];
+      texRef.current = null;
+    };
+  }, [textures, height, gravity]);
 
   // bottomOffset이 변하면 floor만 옮김
   useEffect(() => {
@@ -165,7 +224,10 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
     const h = height;
     const FLOOR_THICK = 120;
     const floorTop = h - bottomOffset + 10;
-    Body.setPosition(floor, { x: widthRef.current / 2, y: floorTop + FLOOR_THICK / 2 });
+    Body.setPosition(floor, {
+      x: widthRef.current / 2,
+      y: floorTop + FLOOR_THICK / 2,
+    });
   }, [bottomOffset, height]);
 
   // 하트 생성 함수
@@ -181,15 +243,28 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
     const x = rand(visR + 24, width - visR - 24);
     const y = -visR - 40;
 
-    const body = Bodies.circle(x, y, physR, { restitution: 0.12, frictionAir: 0.002 });
+    const body = Bodies.circle(x, y, physR, {
+      restitution: 0.12,
+      frictionAir: 0.002,
+    });
     const scale = (visR * scaleFactor) / tex.width;
-    body.render.sprite = { texture: tex.url, xScale: scale, yScale: scale, xOffset: 0.5, yOffset: 0.5 };
+    body.render.sprite = {
+      texture: tex.url,
+      xScale: scale,
+      yScale: scale,
+      xOffset: 0.5,
+      yOffset: 0.5,
+    };
 
     World.add(engine.world, body);
   };
 
   return (
-    <div ref={wrapRef} className="pointer-events-none w-full" style={{ height }}>
+    <div
+      ref={wrapRef}
+      className="pointer-events-none w-full"
+      style={{ height }}
+    >
       <canvas ref={canvasRef} className="block w-full h-full" />
     </div>
   );

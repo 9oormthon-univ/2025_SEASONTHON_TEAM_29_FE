@@ -51,6 +51,7 @@ export default function CompanyCard({
   const textDimCls = dimImage ? 'opacity-40' : '';
 
   /** CART */
+  /** CART */
   if (variant === 'cart') {
     return (
       <button
@@ -61,8 +62,8 @@ export default function CompanyCard({
         {/* 이미지 박스 */}
         <div
           className={clsx(
-            'relative mb-2 w-28 h-28 rounded-lg bg-white overflow-hidden border',
-            selected ? 'border-primary-500' : 'border-box-line',
+            'relative w-28 h-28 rounded-lg bg-white overflow-hidden outline outline-1 outline-offset-[-1px]',
+            selected ? 'outline-primary-500' : 'outline-box-line',
           )}
         >
           <Image
@@ -123,13 +124,15 @@ export default function CompanyCard({
           <Image
             src={imageSrc}
             alt={altText}
-            fill               // ✅
-            className="object-contain"  // ✅
+            fill // ✅
+            className="object-contain" // ✅
             priority
             unoptimized
             sizes="112px"
           />
-          {dimImage && <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />}
+          {dimImage && (
+            <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
+          )}
         </div>
 
         <div className="mt-2 flex items-center gap-1">
@@ -175,13 +178,15 @@ export default function CompanyCard({
         <Image
           src={imageSrc}
           alt={altText}
-          fill               // ✅
-          className="object-contain"  // ✅
+          fill // ✅
+          className="object-contain" // ✅
           priority
           unoptimized
           sizes="112px"
         />
-        {dimImage && <div className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none" />}
+        {dimImage && (
+          <div className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none" />
+        )}
       </div>
 
       <div className={cn('mt-2 flex items-center gap-1 pl-0.5', textDimCls)}>

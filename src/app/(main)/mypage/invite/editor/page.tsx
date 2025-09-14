@@ -76,8 +76,7 @@ export default function InviteEditorPage() {
   return (
     <main className="mx-auto min-h-screen max-w-96 bg-background">
       <Header value="청첩장 제작" onBack={() => router.back()} showBack />
-      <section className="mx-auto max-w-96 px-5 pt-2 flex flex-col items-center gap-3">
-        {/* value도 컴포넌트 기대 타입으로 단언 (any 사용 X) */}
+      <section className="mx-auto max-w-100 px-2 pt-2 flex flex-col items-center gap-3">
         <ThemaSection
           value={form.theme as unknown as ThemaValue}
           onChange={setTheme}
@@ -135,7 +134,7 @@ export default function InviteEditorPage() {
         <PlainCollapsible title="엔딩사진/문구" />
         <PlainCollapsible title="계좌번호" />
         <PlainCollapsible title="배경음악/파티클" />
-        <div className="w-80 mx-auto pt-15 pb-6">
+        <div className="w-90 mx-auto pt-15 pb-6">
           <Button
             type="button"
             onClick={onSubmit}
@@ -165,7 +164,7 @@ function PlainCollapsible({
 
   return (
     <section
-      className="w-80 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden"
+      className="w-90 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden"
       aria-labelledby={headerId}
       data-open={open}
     >
@@ -183,10 +182,10 @@ function PlainCollapsible({
         <SvgObject
           src="/icons/down.svg"
           alt=""
-          width={20}
-          height={20}
+          width={12}
+          height={6}
           className={clsx(
-            'transition-transform opacity-60',
+            'shrink-0 transition-transform',
             open && 'rotate-180',
           )}
         />

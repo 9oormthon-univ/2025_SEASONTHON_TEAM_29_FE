@@ -10,7 +10,9 @@ export type InputVisualType =
   | 'hover'
   | 'variant4'
   | 'variant5'
-  | 'incorrect';
+  | 'incorrect'
+  | 'defaultStrong';
+
 export type InputVariant = 'plain' | 'with-badge';
 
 export type InputProps = Omit<
@@ -46,7 +48,6 @@ export default function Input({
 }: InputProps) {
   const base =
     'relative inline-flex items-center gap-2.5 overflow-hidden rounded-lg px-4 py-2.5 h-12 outline outline-[1.2px] outline-offset-[-1.2px] bg-transparent';
-
   const frame =
     uiType === 'incorrect'
       ? 'outline-red-500'
@@ -54,14 +55,15 @@ export default function Input({
         ? 'outline-box-line'
         : uiType === 'variant4' || uiType === 'variant5'
           ? 'outline-input-box--active'
-          : 'outline-gray-100';
-
+          : 'outline-box-line';
   const text =
     uiType === 'incorrect'
       ? 'text-red-500'
       : uiType === 'variant4' || uiType === 'variant5'
         ? 'text-text--default'
-        : 'text-text--tertiary';
+        : uiType === 'defaultStrong'
+          ? 'text-text--default'
+          : 'text-text--tertiary';
 
   const ph =
     uiType === 'incorrect'

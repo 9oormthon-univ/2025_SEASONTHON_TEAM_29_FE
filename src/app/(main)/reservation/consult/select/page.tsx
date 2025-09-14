@@ -1,10 +1,7 @@
 'use client';
 
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
-import {
-  createReservation,
-  getDailySlots
-} from '@/services/reservation.api';
+import { createReservation, getDailySlots } from '@/services/reservation.api';
 import { ReservationSlot } from '@/types/reservation';
 import clsx from 'clsx';
 import Image from 'next/image';
@@ -40,7 +37,6 @@ function TimeChip({
     </button>
   );
 }
-
 export default function ConsultTimePage() {
   const router = useRouter();
   const sp = useSearchParams();
@@ -55,7 +51,9 @@ export default function ConsultTimePage() {
   const [yy, mm, dd] = rawDate.split('-').map(Number);
 
   const [slots, setSlots] = React.useState<ReservationSlot[]>([]);
-  const [selectedSlotId, setSelectedSlotId] = React.useState<number | null>(null);
+  const [selectedSlotId, setSelectedSlotId] = React.useState<number | null>(
+    null,
+  );
   const [loading, setLoading] = React.useState(false);
   const [posting, setPosting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -71,7 +69,12 @@ export default function ConsultTimePage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getDailySlots({ vendorId, year: yy, month: mm, day: dd });
+        const data = await getDailySlots({
+          vendorId,
+          year: yy,
+          month: mm,
+          day: dd,
+        });
         setSlots(data);
       } catch (e) {
         setError(e instanceof Error ? e.message : '시간 조회 실패');
@@ -101,7 +104,6 @@ export default function ConsultTimePage() {
       setPosting(false);
     }
   };
-
   return (
     <ReservationLayout
       title="예약하기"
@@ -112,7 +114,9 @@ export default function ConsultTimePage() {
       active={!!selectedSlotId && !posting}
       onPrimary={handleReserve}
     >
-      {loading && <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>}
+      {loading && (
+        <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>
+      )}
       {error && <div className="text-sm text-red-500">오류: {error}</div>}
 
       <div className="grid grid-cols-3 gap-4">
