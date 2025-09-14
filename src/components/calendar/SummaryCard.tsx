@@ -1,20 +1,30 @@
-// components/calendar/SummaryCard.tsx
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
+import SvgObject from '../common/atomic/SvgObject';
 
 export default function SummaryCard() {
   return (
     <Link
       href="/calendar/list"
-      className="flex w-[320px] h-16 items-center justify-center
-                 rounded-lg border border-zinc-300/50 bg-white
-                 shadow-[0_1px_0_rgba(0,0,0,0.02)] px-4"
+      className="
+        flex w-86 h-20 items-center justify-center
+        rounded-lg border border-zinc-300/50 bg-white
+        px-3 py-2.5 shadow-sm
+        transition hover:shadow-md hover:border-zinc-300
+      "
     >
-      <div className="flex items-center gap-3">
-        <Image alt="" src="/icons/love.png" width={30} height={30} />
-        <span className="text-text--default text-[15px] font-medium leading-normal">
+      <div className="flex items-center gap-2.5">
+        <div className="flex size-[45px] items-center justify-center">
+          <SvgObject
+            alt="일정"
+            src="/icons/love.svg"
+            width={45}
+            height={45}
+            className="object-contain"
+          />
+        </div>
+        <span className="text-text--default text-sm font-normal leading-normal">
           일정 모아보기
         </span>
       </div>
