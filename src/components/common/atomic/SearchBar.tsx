@@ -13,7 +13,6 @@ type Props = {
 export default function SearchBar({
   placeholder = '검색어를 입력해 주세요',
   showCart = false,
-  showTag = false,
 }: Props) {
   const router = useRouter();
 
@@ -30,17 +29,6 @@ export default function SearchBar({
           <Search className="h-5 w-5 text-gray-500" />
         </button>
       </div>
-
-      {showTag && (
-        <button
-          aria-label="태그"
-          className="grid size-10 place-items-center rounded-full active:scale-95"
-          onClick={() => router.push('/tags')}
-        >
-          <SvgObject src="/tag.svg" alt="태그" width={30} height={30} />
-        </button>
-      )}
-
       {showCart && (
         <button
           aria-label="장바구니"

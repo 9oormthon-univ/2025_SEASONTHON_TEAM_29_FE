@@ -25,7 +25,7 @@ export default function HomePage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto px-[22px] pb-24">
-      <SearchBar showCart={true} showTag={true} />
+      <SearchBar showCart={true} />
       <BannerSquareCarousel items={banners} />
       <CategoryQuick items={categories} />
 
