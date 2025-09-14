@@ -19,23 +19,24 @@ export default function TodoPage() {
 
   const [todos, setTodos] = useState<TodoItemApi[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [initialDone, setInitialDone] = useState<number | null>(null);
 
   // ✅ 최초 로딩
   useEffect(() => {
     (async () => {
       const data = await getTodoList();
       setTodos(data.todoItems);
+      setInitialDone(data.todoItems.filter((t) => t.isCompleted).length);
       setLoaded(true);
     })();
   }, []);
 
   // ✅ 로딩 후 초기 하트 떨어뜨리기
   useEffect(() => {
-    if (loaded) {
-      const count = todos.filter((t) => t.isCompleted).length;
-      heartsRef.current?.dropInitial(count);
+    if (loaded && initialDone !== null) {
+      heartsRef.current?.dropInitial(initialDone);
     }
-  }, [loaded]); // todos는 의존성 제거 → 매번 초기화 방지
+  }, [loaded, initialDone]); // todos는 의존성 제거 → 매번 초기화 방지
 
   // ✅ 헤더 높이 기반으로 하트 레이어 높이 계산
   const headerRef = useRef<HTMLElement>(null);
@@ -74,10 +75,13 @@ export default function TodoPage() {
 
   // ✅ 칩 토글 (낙관적 업데이트 + 하트 제어)
   const onToggleChip = async (templateId: number) => {
-    const before = todos.find((t) => t.templateId === templateId)?.isCompleted ?? false;
+    const before =
+      todos.find((t) => t.templateId === templateId)?.isCompleted ?? false;
 
     setTodos((prev) =>
-      prev.map((t) => (t.templateId === templateId ? { ...t, isCompleted: !t.isCompleted } : t)),
+      prev.map((t) =>
+        t.templateId === templateId ? { ...t, isCompleted: !t.isCompleted } : t,
+      ),
     );
     if (!before) heartsRef.current?.dropOne();
     else heartsRef.current?.removeOne();
@@ -87,7 +91,9 @@ export default function TodoPage() {
     } catch {
       // 실패 롤백
       setTodos((prev) =>
-        prev.map((t) => (t.templateId === templateId ? { ...t, isCompleted: before } : t)),
+        prev.map((t) =>
+          t.templateId === templateId ? { ...t, isCompleted: before } : t,
+        ),
       );
       if (before) heartsRef.current?.dropOne();
       else heartsRef.current?.removeOne();
@@ -109,7 +115,10 @@ export default function TodoPage() {
       {heartHeight !== null && heartHeight > 0 && (
         <div
           className="fixed left-1/2 -translate-x-1/2 pointer-events-none w-full max-w-[420px] z-[60]"
-          style={{ top: headerRef.current?.offsetHeight ?? 0, height: heartHeight }}
+          style={{
+            top: headerRef.current?.offsetHeight ?? 0,
+            height: heartHeight,
+          }}
         >
           <div className="absolute inset-0 px-[22px] py-6 z-0">
             <p className="text-2xl font-semibold whitespace-pre-line text-white/95">
@@ -142,7 +151,10 @@ export default function TodoPage() {
         dragConstraints={{ top: 0, bottom: CLOSED_OFFSET }}
         dragElastic={0.15}
         onDragEnd={(_, info) => {
-          const next = info.velocity.y < -200 || y.get() < CLOSED_OFFSET / 2 ? 0 : CLOSED_OFFSET;
+          const next =
+            info.velocity.y < -200 || y.get() < CLOSED_OFFSET / 2
+              ? 0
+              : CLOSED_OFFSET;
           animate(y, next, { type: 'spring', stiffness: 100, damping: 30 });
         }}
       >
@@ -160,8 +172,13 @@ export default function TodoPage() {
             <div className="h-1.5 w-14 rounded-full bg-neutral-300" />
           </button>
 
-          <div className="px-4 pt-3 pb-6 overflow-y-auto" style={{ height: SHEET_OPEN - HANDLE_H }}>
-            <p className="font-semibold text-neutral-700 mb-3">수행한 항목을 선택해 주세요.</p>
+          <div
+            className="px-4 pt-3 pb-6 overflow-y-auto"
+            style={{ height: SHEET_OPEN - HANDLE_H }}
+          >
+            <p className="font-semibold text-neutral-700 mb-3">
+              수행한 항목을 선택해 주세요.
+            </p>
             {!loaded ? (
               <p className="text-sm text-neutral-500">불러오는 중…</p>
             ) : (

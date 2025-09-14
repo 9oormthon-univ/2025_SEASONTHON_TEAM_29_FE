@@ -5,7 +5,7 @@ import { STICKER_SRC } from '@/components/calendar/stickers';
 import Header from '@/components/common/monocules/Header';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import Input from '@/components/common/atomic/Input';
 import TextField from '@/components/common/atomic/TextField';

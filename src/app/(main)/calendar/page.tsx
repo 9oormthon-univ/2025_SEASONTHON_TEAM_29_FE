@@ -12,9 +12,8 @@ import {
   MOCK_WEDDING_DATE,
   expandFairsToDays,
 } from '@/data/calendarData';
-import { addMonths, dday, toYMD } from '@/lib/calendar';
+import { dday, toYMD } from '@/lib/calendar';
 import { EventItem } from '@/types/calendar';
-import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 

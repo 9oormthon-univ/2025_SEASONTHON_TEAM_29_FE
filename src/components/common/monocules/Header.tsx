@@ -1,7 +1,6 @@
 'use client';
 
 import { cn } from '@/utills/cn';
-import { ChevronLeft } from 'lucide-react';
 import type { ForwardedRef, ReactNode } from 'react';
 import { forwardRef } from 'react';
 import SvgObject from '../atomic/SvgObject';
