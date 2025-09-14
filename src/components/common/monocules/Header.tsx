@@ -4,6 +4,7 @@ import { cn } from '@/utills/cn';
 import { ChevronLeft } from 'lucide-react';
 import type { ForwardedRef, ReactNode } from 'react';
 import { forwardRef } from 'react';
+import SvgObject from '../atomic/SvgObject';
 
 export type HeaderProps = {
   value: ReactNode;
@@ -33,7 +34,7 @@ const Header = forwardRef(function Header(
     bgClassName = 'bg-white/70',
     textClassName = 'text-black',
   }: HeaderProps,
-  ref: ForwardedRef<HTMLElement>
+  ref: ForwardedRef<HTMLElement>,
 ) {
   return (
     <header
@@ -58,7 +59,13 @@ const Header = forwardRef(function Header(
             onClick={onBack}
             className="absolute left-0 disabled:opacity-40"
           >
-            <ChevronLeft className="h-7 w-7" />
+            <SvgObject
+              src="/icons/arrowRight.svg"
+              alt="back"
+              width={28}
+              height={28}
+              className="rotate-180"
+            />
           </button>
         )}
 
