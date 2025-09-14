@@ -1,65 +1,85 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import ReservationStepLayout from '@/components/reservation/layout/ReservationLayout';
 import ReservationCard from '@/components/reservation/ReservationCard';
 import { useContractSlots } from '@/hooks/useContractSlots';
 import { formatMoney, formatSlot } from '@/lib/format';
-import type { ContractSlot } from '@/types/estimate';
-import { createEstimate } from '@/services/estimates.api';
+import { addCartItem } from '@/services/cart.api'; // ✅ 새 cart API
+import { createContract } from '@/services/contract.api';
+import type { ContractSlot } from '@/types/contract';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 function toReservationCardPropsFromContract(s: ContractSlot) {
   return {
-    date: formatSlot(s.dateISO),
-    hallFee: formatMoney(s.hallFee),
-    minGuests: `${s.minGuests}명`,
-    mealFee: formatMoney(s.mealFee),
+    date: formatSlot(s.startTime),
+    hallFee: formatMoney(s.price),
+    minGuests: s.details?.expectedGuests ? `${s.details.expectedGuests}명` : '-',
+    mealFee: s.details?.expectedMealCost
+      ? formatMoney(Number(s.details.expectedMealCost))
+      : '-',
   };
-}
-
-function splitISOForApi(iso: string) {
-  const [datePart, timeWithZone = ''] = iso.split('T');
-  const timePart = timeWithZone.slice(0, 8);
-  return { date: datePart, time: timePart || '00:00:00' };
 }
 
 export default function SlotSelectPage() {
   const router = useRouter();
   const sp = useSearchParams();
-  const vendorId = useMemo(() => Number(sp.get('vendorId') ?? 1), [sp]);
+  const productId = useMemo(() => Number(sp.get('productId') ?? 0), [sp]);
 
-  const { slots, loading, error, refetch } = useContractSlots({ vendorId });
+  const months = useMemo(() => {
+    const now = new Date();
+    const m = now.getMonth() + 1;
+    return [m, m + 1, m + 2].map((x) => ((x - 1) % 12) + 1);
+  }, []);
+  
+  const { slots, loading, error, refetch } = useContractSlots(productId, months);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [sheetOpen, setSheetOpen] = useState<null | 'estimate' | 'contract'>(null);
   const [adding, setAdding] = useState(false);
-  const [addErr, setAddErr] = useState<string | null>(null);
+  const [posting, setPosting] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  // 계약 생성
+  const handleCreateContract = async () => {
+    if (!selectedId) return;
+    try {
+      setPosting(true);
+      setErr(null);
+      await createContract({ availableSlotId: selectedId });
+      setSheetOpen('contract');
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : '계약 생성에 실패했어요.');
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  // 견적 담기 → cart API
+  const handleAddEstimate = async () => {
+    if (!selectedId) return;
+    const slot = slots.find((s) => s.availableSlotId === selectedId);
+    if (!slot) return;
+
+    try {
+      setAdding(true);
+      setErr(null);
+      await addCartItem(productId, slot.startTime);
+      setSheetOpen('estimate');
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : '견적 담기에 실패했어요.');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  // 완료 후 홈으로 이동
   useEffect(() => {
     if (!sheetOpen) return;
     const t = setTimeout(() => router.push('/home'), 2000);
     return () => clearTimeout(t);
   }, [sheetOpen, router]);
-
-  const handleAddEstimate = async () => {
-    if (!selectedId) return;
-    const slot = slots.find((s) => s.id === selectedId);
-    if (!slot) return;
-
-    const { date, time } = splitISOForApi(slot.dateISO);
-
-    try {
-      setAdding(true);
-      setAddErr(null);
-      await createEstimate(vendorId, { date, time });
-      setSheetOpen(true);
-    } catch (e) {
-      setAddErr(e instanceof Error ? e.message : '견적 담기에 실패했어요.');
-    } finally {
-      setAdding(false);
-    }
-  };
 
   return (
     <ReservationStepLayout
@@ -73,14 +93,9 @@ export default function SlotSelectPage() {
         </>
       }
       mode="double"
-      leftText="계약금 결제"
+      leftText={posting ? '계약 중…' : '계약금 결제'}
       rightText={adding ? '담는 중…' : '견적서 담기'}
-      onLeft={() =>
-        selectedId &&
-        router.push(
-          `/reservation/company/finish?vendorId=${vendorId}&slotId=${selectedId}`,
-        )
-      }
+      onLeft={handleCreateContract}
       onRight={handleAddEstimate}
     >
       {error && (
@@ -91,9 +106,7 @@ export default function SlotSelectPage() {
           </button>
         </p>
       )}
-      {addErr && (
-        <p className="text-sm text-red-500 text-center my-1">{addErr}</p>
-      )}
+      {err && <p className="text-sm text-red-500 text-center my-1">{err}</p>}
 
       <div className="flex flex-col gap-4 items-center">
         {loading &&
@@ -109,11 +122,11 @@ export default function SlotSelectPage() {
           const cardProps = toReservationCardPropsFromContract(s);
           return (
             <ReservationCard
-              key={s.id}
+              key={s.availableSlotId}
               {...cardProps}
-              selected={selectedId === s.id}
-              variant={selectedId === s.id ? 'pink' : 'white'}
-              onClick={() => setSelectedId(s.id)}
+              selected={selectedId === s.availableSlotId}
+              variant={selectedId === s.availableSlotId ? 'pink' : 'white'}
+              onClick={() => setSelectedId(s.availableSlotId)}
             />
           );
         })}
@@ -130,21 +143,23 @@ export default function SlotSelectPage() {
           <button
             aria-label="닫기"
             className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
-            onClick={() => setSheetOpen(false)}
+            onClick={() => setSheetOpen(null)}
           />
           <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[420px] h-96 bg-white rounded-t-xl overflow-hidden">
             <div className="w-11 h-0.5 mx-auto mt-3 rounded-full bg-neutral-300" />
             <div className="h-full flex flex-col items-center justify-center gap-6">
               <Image
-                src="/cartCheck.png"
-                alt="견적 담기 완료"
+                src={sheetOpen === 'contract' ? '/congratu.png' : '/cartCheck.png'}
+                alt={sheetOpen === 'contract' ? '계약 완료' : '견적 담기 완료'}
                 width={160}
                 height={160}
                 priority
                 className="w-[160px] h-[160px] select-none pointer-events-none"
               />
               <p className="text-[16px] font-semibold text-text--default">
-                견적서에 잘 담았어요!
+                {sheetOpen === 'contract'
+                  ? '계약이 완료 되었어요!'
+                  : '견적서에 잘 담았어요!'}
               </p>
             </div>
           </div>
