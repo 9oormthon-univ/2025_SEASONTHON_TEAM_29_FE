@@ -22,7 +22,7 @@ export default function WelcomeClient() {
       />
 
       {/* 콘텐츠 */}
-      <div className="relative z-10 flex flex-col flex-1 pt-22">
+      <div className="relative z-10 flex flex-col flex-1 pt-17">
         <div className="touch-pan-y">
           <OnboardingSlider />
         </div>
