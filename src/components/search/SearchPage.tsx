@@ -16,7 +16,9 @@ const MEAL = ['뷔페', '코스', '한상차림'] as const;
 const GUEST = ['50명', '100명', '300명'] as const;
 const TRANS = ['지하철', '버스', '자차'] as const;
 
-export default function SearchPage({ initialCat = null as CategoryKey | null }) {
+export default function SearchPage({
+  initialCat = null as CategoryKey | null,
+}) {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [cat, setCat] = useState<CategoryKey | null>(null);
@@ -55,10 +57,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   return (
     <main className="mx-auto px-[22px] w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
-      <Header
-        showBack
-        onBack={()=>router.back()} 
-        value="검색" />
+      <Header showBack onBack={() => router.back()} value="검색" />
 
       <section className="px-0">
         <QueryInput
@@ -91,7 +90,9 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
             />
 
             <section className="mt-2">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">스타일</h3>
+              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">
+                스타일
+              </h3>
               <ChipGroup
                 values={STYLE}
                 selected={style}
@@ -100,7 +101,9 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
             </section>
 
             <section className="mt-2">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">식사</h3>
+              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">
+                식사
+              </h3>
               <ChipGroup
                 values={MEAL}
                 selected={meal}
@@ -109,12 +112,16 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
             </section>
 
             <section className="mt-2">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">하객 수</h3>
+              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">
+                하객 수
+              </h3>
               <ChipSingle values={GUEST} value={guest} onChange={setGuest} />
             </section>
 
             <section className="mt-2 mb-4">
-              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">교통 조건</h3>
+              <h3 className="mb-3 text-[15px] font-extrabold text-gray-800">
+                교통 조건
+              </h3>
               <ChipGroup
                 values={TRANS}
                 selected={trans}
@@ -141,7 +148,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
         )}
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-10">
+      <div className="fixed inset-x-0 bottom-0 z-10 pb-10">
         <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
           <Button fullWidth size="lg" disabled={!canSearch} onClick={goResults}>
             검색하기
