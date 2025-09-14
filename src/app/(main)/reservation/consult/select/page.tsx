@@ -1,10 +1,7 @@
 'use client';
 
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
-import {
-  createReservation,
-  getDailySlots
-} from '@/services/reservation.api';
+import { createReservation, getDailySlots } from '@/services/reservation.api';
 import { ReservationSlot } from '@/types/reservation';
 import clsx from 'clsx';
 import Image from 'next/image';
@@ -54,7 +51,9 @@ export default function ConsultTimePage() {
   const [yy, mm, dd] = rawDate.split('-').map(Number);
 
   const [slots, setSlots] = React.useState<ReservationSlot[]>([]);
-  const [selectedSlotId, setSelectedSlotId] = React.useState<number | null>(null);
+  const [selectedSlotId, setSelectedSlotId] = React.useState<number | null>(
+    null,
+  );
   const [loading, setLoading] = React.useState(false);
   const [posting, setPosting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -70,7 +69,12 @@ export default function ConsultTimePage() {
       setLoading(true);
       setError(null);
       try {
-        const data = await getDailySlots({ vendorId, year: yy, month: mm, day: dd });
+        const data = await getDailySlots({
+          vendorId,
+          year: yy,
+          month: mm,
+          day: dd,
+        });
         setSlots(data);
       } catch (e) {
         setError(e instanceof Error ? e.message : '시간 조회 실패');
@@ -109,7 +113,6 @@ export default function ConsultTimePage() {
       primaryText={posting ? '예약 중...' : '예약하기'}
       active={!!selectedSlotId && !posting}
       onPrimary={handleReserve}
-
     >
       {loading && (
         <div className="text-sm text-text--secondary">시간을 불러오는 중…</div>
@@ -139,12 +142,6 @@ export default function ConsultTimePage() {
             <div className="w-11 h-0.5 mx-auto mt-3 rounded-full bg-neutral-300" />
             <div className="h-full flex flex-col items-center justify-center gap-6">
               <Image
-                src={sheet === 'book' ? '/congratu.png' : '/cartCheck.png'}
-                alt={
-                  sheet === 'book'
-                    ? '예약이 완료 되었어요!'
-                    : '견적서에 잘 담았어요!'
-                }
                 src="/congratu.png"
                 alt="예약 완료"
                 width={160}
