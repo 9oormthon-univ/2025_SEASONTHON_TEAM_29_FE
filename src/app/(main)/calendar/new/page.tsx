@@ -14,9 +14,6 @@ type StickerKey = keyof typeof STICKER_SRC;
 
 export default function CalendarNewPage() {
   const router = useRouter();
-  const qs = useSearchParams();
-  const pickedDate = qs.get('date') ?? '';
-
   const [title, setTitle] = useState('');
   const [titleStarted, setTitleStarted] = useState(false);
   const [memo, setMemo] = useState('');
