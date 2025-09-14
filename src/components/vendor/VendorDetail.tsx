@@ -40,7 +40,7 @@ export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail })
       {/* 상품 섹션들 */}
       <div className="px-4 pb-10 mt-6">
         {vendor.products.map((p) => (
-          <ProductSectionBlock key={p.id} product={p} />
+          <ProductSectionBlock key={p.id} product={p} vendorId={vendor.vendorId} />
         ))}
       </div>
     </main>
