@@ -12,6 +12,7 @@ type Props = {
   width?: number;
   height?: number;
   className?: string;
+  style?: React.CSSProperties;
   /** 아이콘을 클릭-스루(장식용)로 만들고 싶을 때 true(기본 true) */
   decorative?: boolean;
 };
