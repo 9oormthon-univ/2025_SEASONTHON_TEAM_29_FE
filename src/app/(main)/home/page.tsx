@@ -2,6 +2,7 @@
 'use client';
 
 import SearchBar from '@/components/common/atomic/SearchBar';
+import Up from '@/components/common/atomic/Up';
 import BannerSquareCarousel from '@/components/home/BannerSquareCarousel';
 import CategoryQuick from '@/components/home/CategoryQuick';
 import ReviewSquareCarousel from '@/components/home/ReviewSquareCarousel';
@@ -65,6 +66,7 @@ export default function HomePage() {
       {studio.error && (
         <p className="mt-2 text-xs text-red-500">{studio.error}</p>
       )}
+      <Up />
     </main>
   );
 }
