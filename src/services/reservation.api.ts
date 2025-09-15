@@ -50,3 +50,13 @@ export async function getMyReservations(): Promise<MyReservation[]> {
   );
   return res.data ?? [];
 }
+
+export async function createConsultationSlots(params: {
+  vendorId: number;
+  startTimes: string[];
+}) {
+  return http<ApiResponse<string>>(`/v1/reservation/slots`, {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}

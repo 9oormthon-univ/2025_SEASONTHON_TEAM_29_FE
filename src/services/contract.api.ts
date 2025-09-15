@@ -95,3 +95,13 @@ export async function getContractDetail(contractId: number) {
   );
   return res.data!;
 }
+
+export async function createAvailableSlots(params: {
+  productId: number;
+  startTimes: string[];
+}) {
+  return http<ApiResponse<string>>(`/v1/contracts/available-slots`, {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}

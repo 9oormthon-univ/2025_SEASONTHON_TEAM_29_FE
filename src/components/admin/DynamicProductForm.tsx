@@ -172,7 +172,7 @@ export default function DynamicProductForm({
                 specialShot: v as CreateStudioProduct['specialShot'],
               }))
             }
-            options={['HANOK', 'UNDERWATER', 'WITH_PET']}
+            options={['', 'HANOK', 'UNDERWATER', 'WITH_PET']}
           />
           <label className="flex items-center gap-2 text-sm">
             <input
