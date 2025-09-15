@@ -16,7 +16,7 @@ export default function MainImage({
     <>
       <div
         className={cn(
-          'relative w-82 h-70 border border-box-line bg-zinc-200 overflow-hidden',
+          'relative w-85 h-70 border border-box-line bg-zinc-200 overflow-hidden',
           className,
         )}
         aria-label="메인 사진 프레임"
@@ -40,6 +40,10 @@ export default function MainImage({
             priority
           />
         </div>
+      </div>
+      <div className="mt-2 justify-start text-text--secondary text-[10px] font-normal font-di leading-tight">
+        *곧 저희들의 영화가 막을 올립니다. 즐거운 마음으로 관람해주시기
+        바랍니다.*
       </div>
     </>
   );

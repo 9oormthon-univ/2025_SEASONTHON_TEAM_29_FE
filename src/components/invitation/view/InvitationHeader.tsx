@@ -1,4 +1,3 @@
-// src/components/invitation/InvitationHeader.tsx
 'use client';
 
 import clsx from 'clsx';
@@ -40,12 +39,10 @@ export default function InvitationHeader({
         padding: '24px 0',
       }}
     >
-      {/* ✅ 세 칸 모두 auto 로 붙이고, columnGap을 작게 */}
       <div
         className="grid items-start"
         style={{ gridTemplateColumns: 'auto auto auto', columnGap: GAP_MAIN }}
       >
-        {/* 연도 */}
         <div
           className="shrink-0 leading-none"
           style={{
@@ -56,8 +53,6 @@ export default function InvitationHeader({
         >
           {year}
         </div>
-
-        {/* REC (고정 px) */}
         <div
           className="flex items-start justify-center"
           style={{ paddingTop: 6 }}
@@ -71,8 +66,6 @@ export default function InvitationHeader({
             style={{ width: REC_W, height: REC_H, display: 'block' }}
           />
         </div>
-
-        {/* 날짜 + 멘트 (날짜를 왼쪽으로 당김) */}
         <div
           className="shrink-0 text-right"
           style={{ transform: `translateX(${DATE_SHIFT_L}px)` }}
@@ -87,8 +80,6 @@ export default function InvitationHeader({
           >
             {mm}.{dd}
           </div>
-
-          {/* 멘트 SVG: 오른쪽으로 밀기 */}
           <div
             style={{
               marginTop: 12,
