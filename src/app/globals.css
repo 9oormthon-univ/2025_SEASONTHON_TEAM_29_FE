@@ -43,6 +43,8 @@
   --color-box-line: #dddddd;
   --color-option-box: #f2f2f2;
   --color-stroke-dash: #8c8c8c;
+  --font-di: 'DI', var(--font-inter);
+  --font-og: 'OG', var(--font-inter);
 }
 
 @theme inline {
