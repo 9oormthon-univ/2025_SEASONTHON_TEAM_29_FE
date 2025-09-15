@@ -75,7 +75,16 @@ export default function InviteEditorPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-96 bg-background">
-      <Header value="청첩장 제작" onBack={() => router.back()} showBack />
+      <Header
+        value="청첩장 제작"
+        showBack
+        onBack={() => history.back()}
+        rightSlot={
+          <a href="#" className="text-xs text-primary-500 underline">
+            미리보기
+          </a>
+        }
+      />
       <section className="mx-auto max-w-100 px-2 pt-2 flex flex-col items-center gap-3">
         <ThemaSection
           value={form.theme as unknown as ThemaValue}
