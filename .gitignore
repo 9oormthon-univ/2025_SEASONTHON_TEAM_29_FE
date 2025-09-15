@@ -57,4 +57,4 @@ yarn-error.log*
 
 # next-pwa generated service workers
 public/sw.js
-public/workbox-*.js
+public/workbox-*.js.npmrc

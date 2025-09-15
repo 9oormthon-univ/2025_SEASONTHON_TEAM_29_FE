@@ -225,7 +225,6 @@ export default forwardRef<HeartRainHandle, Props>(function HeartRain(
       restitution: 0.12,
       frictionAir: 0.002,
     });
-
     const scale = (visR * scaleFactor) / tex.width;
     body.render.sprite = {
       texture: tex.url,

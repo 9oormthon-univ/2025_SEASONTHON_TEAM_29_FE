@@ -3,9 +3,9 @@
 import { BannerItem } from '@/types/banner';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
+import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import Section from '../common/Section';
-import Image from 'next/image';
 
 export default function BannerSquareCarousel({
   items,
@@ -46,6 +46,7 @@ export default function BannerSquareCarousel({
                   sizes="(max-width: 768px) 92vw, 420px"
                   className="object-cover"
                   loading="lazy"
+                  unoptimized
                 />
 
                 {/* 텍스트 오버레이 */}
