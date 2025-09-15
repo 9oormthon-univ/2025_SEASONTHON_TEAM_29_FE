@@ -10,6 +10,7 @@ import ProgressBar from '../common/atomic/ProgressBar';
 import StepBasic from './steps/StepBasic';
 import StepExtra from './steps/StepExtra';
 import StepTerms from './steps/StepTerms';
+import Header from '../common/monocules/Header';
 
 export default function SignupWizard() {
   const router = useRouter();
@@ -59,20 +60,15 @@ export default function SignupWizard() {
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 bg-white/70 backdrop-blur px-4">
-        <div className="relative mx-auto flex h-16 max-w-[420px] items-center justify-center">
-          <button
-            aria-label="back"
-            onClick={prev}
-            className="absolute left-0 disabled:opacity-40"
-          >
-            <ChevronLeft className="h-7 w-7" />
-          </button>
-          <h1 className="text-md font-medium">회원가입 ({index + 1}/3)</h1>
-        </div>
-
+      <Header
+        value="회원가입"
+        showBack
+        onBack={prev}
+        bgClassName="bg-white/70"
+        textClassName="text-text--default"
+      >
         <ProgressBar value={index + 1} max={3} size="xs" className="w-full" />
-      </header>
+      </Header>
 
       <div className="flex-1 overflow-hidden mx-5.5" ref={emblaRef}>
         <div className="flex">

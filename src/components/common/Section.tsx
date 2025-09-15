@@ -29,8 +29,8 @@ export default function Section({
     {
       sm: 'text-sm font-bold',
       md: 'text-[14px] font-extrabold',
-      lg: 'text-[18px] font-extrabold tracking-[-0.2px]',
-      xl: 'text-[20px] font-extrabold tracking-[-0.2px]',
+      lg: 'text-[18px] font-extrabold ',
+      xl: 'text-[20px] font-extrabold ',
     }[titleSize] + ' text-text--default leading-tight';
 
   return (
@@ -75,7 +75,7 @@ export default function Section({
 
       {/* 2) 콘텐츠 */}
       {bleed === 'viewport' ? (
-        <div className="pl-1 relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
+        <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
           {contentAlign === 'container' ? (
             <div className="mx-auto w-full" style={{ maxWidth: CONTAINER_MAX }}>
               {children}
