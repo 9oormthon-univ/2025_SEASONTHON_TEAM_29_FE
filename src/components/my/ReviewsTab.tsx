@@ -13,6 +13,7 @@ export default function ReviewsTab({
   onWriteClick,
   onCardClick,
   allowWrite,
+  writeDisabled,
 }: {
   items: ReviewCompany[];
   loading: boolean;
@@ -22,6 +23,7 @@ export default function ReviewsTab({
   onWriteClick: () => void;
   onCardClick: (id: string) => void;
   allowWrite: boolean;
+  writeDisabled?: boolean;
 }) {
   return (
     <ReviewsSection
@@ -33,6 +35,7 @@ export default function ReviewsTab({
       onWriteClick={onWriteClick}
       onCardClick={onCardClick}
       allowWrite={allowWrite}
+      writeDisabled={writeDisabled}
     />
   );
 }

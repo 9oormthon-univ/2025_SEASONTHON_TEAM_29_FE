@@ -1,5 +1,5 @@
 # dependencies
-node_modules/
+**/node_modules/
 .pnp.cjs
 .pnp.loader.mjs
 .yarn/*
@@ -9,21 +9,20 @@ node_modules/
 !.yarn/versions
 
 # next.js build & cache
-.next/
-.next/cache/
-out/
+**/.next/
+**/out/
 
 # production / build
-build/
-dist/
+**/build/
+**/dist/
 
 # storybook
-storybook-static/
+**/storybook-static/
 *.storybook.log
 src/stories/*
 
 # coverage / testing
-coverage/
+**/coverage/
 
 # env
 .env*
@@ -31,7 +30,7 @@ coverage/
 
 # vercel / turbo
 .vercel/
-.turbo/
+**/.turbo/
 
 # misc
 .DS_Store
@@ -43,18 +42,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 .eslintcache
-
 .idea/
 .vscode/
 
-**/.next/
-**/out/
-**/build/
-**/dist/
-**/storybook-static/
+# npm caches & local config
+.npm-cache/
+.npm/
+.npmrc
 
-**/node_modules/
-
-# next-pwa generated service workers
+# next-pwa / Workbox generated artifacts
+public/workbox-*.js
+public/worker-*.js
+public/fallback-*.js
 public/sw.js
-public/workbox-*.js.npmrc

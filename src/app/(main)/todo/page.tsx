@@ -8,7 +8,7 @@ import { animate, motion, useMotionValue } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-const TABBAR_H = 84;
+const TABBAR_H = 75;
 const HANDLE_H = 15;
 const SHEET_OPEN = 280;
 const CLOSED_OFFSET = SHEET_OPEN - HANDLE_H;

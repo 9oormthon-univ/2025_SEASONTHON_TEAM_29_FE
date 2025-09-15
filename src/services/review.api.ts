@@ -75,3 +75,22 @@ export async function getHomeReviews(page: number, size: number) {
   const hasNext = raw ? !raw.last : false;
   return { items, hasNext };
 }
+
+export type ReviewableContract = {
+  contractId: number;
+  vendorId: number;
+  vendorName: string;
+  logoImageUrl?: string;
+};
+
+export async function fetchMyReviewables(page: number, size: number) {
+  const res = await http<ApiEnvelope<Paged<ReviewableContract>>>(
+    `/v1/contracts/my/reviewable?page=${page}&size=${size}`,
+    { method: 'GET' },
+  );
+  const raw = res?.data;
+  return {
+    items: raw?.content ?? [],
+    hasNext: raw ? !raw.last : false,
+  };
+}
