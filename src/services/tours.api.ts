@@ -56,7 +56,7 @@ function toAppItem(x: TourListItemApi): DressTourItem {
 }
 
 /** 기존 컴포넌트 호환을 위한 번들 변환 */
-export async function getTours(params?: { page?: number; size?: number; sort?: string }): Promise<ToursBundle> {
+export async function getTours(params?: { page?: number; size?: number; }): Promise<ToursBundle> {
   const res = await getToursPage(params);
   const list = res.data?.content ?? [];
   const dressTour = list.map(toAppItem);

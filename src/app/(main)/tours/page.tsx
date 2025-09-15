@@ -58,7 +58,7 @@ export default function ToursPage() {
     let alive = true;
     (async () => {
       try {
-        const bundle = await getTours({ page: 0, size: 50, sort: 'tourId,desc' });
+        const bundle = await getTours({ page: 0, size: 50 });
         if (!alive) return;
         setData(bundle);
       } catch (e) {

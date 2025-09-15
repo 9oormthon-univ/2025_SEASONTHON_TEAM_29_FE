@@ -44,10 +44,8 @@ export interface PageApi<T> {
   last: boolean;
   numberOfElements: number;
   empty: boolean;
-  sort?: { empty: boolean; sorted: boolean; unsorted: boolean };
   pageable?: {
     offset: number;
-    sort: { empty: boolean; sorted: boolean; unsorted: boolean };
     paged: boolean;
     pageNumber: number;
     pageSize: number;
