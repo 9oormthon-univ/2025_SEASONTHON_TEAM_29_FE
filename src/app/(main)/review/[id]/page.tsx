@@ -12,8 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 type ReviewData = {
   reviewId: number;
   rating: number;
-  contentBest: string;
-  contentWorst: string;
+  content: string;
   imagesUrls: string[];
   createdAt: string;
   writerName: string;

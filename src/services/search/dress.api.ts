@@ -6,7 +6,7 @@ export type DressSearchReq = {
   regionCode: string[];
   price: number;
   dressStyle: string[];
-  dressProduction: string[];
+  dressOrigin: string[];
   page?: number;
   size?: number;
 };
@@ -24,7 +24,7 @@ export async function searchDresses(
   if (body.regionCode.length > 0) qs.set('regionCode', body.regionCode.join(','));
   qs.set('price', String(body.price));
   if (body.dressStyle.length > 0) qs.set('dressStyle', body.dressStyle.join(','));
-  if (body.dressProduction.length > 0) qs.set('dressProduction', body.dressProduction.join(','));
+  if (body.dressOrigin.length > 0) qs.set('dressOrigin', body.dressOrigin.join(','));
   qs.set('page', String(page));
   qs.set('size', String(size));
 

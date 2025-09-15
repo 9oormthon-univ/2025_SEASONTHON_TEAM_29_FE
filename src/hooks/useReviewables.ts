@@ -1,6 +1,5 @@
-// src/hooks/useReviewables.ts
+import { getReviewableContracts, type ReviewableContract } from '@/services/contract.api';
 import { getErrorMessage } from '@/services/mypage.api';
-import { fetchMyReviewables, type ReviewableContract } from '@/services/review.api';
 import { useCallback, useEffect, useState } from 'react';
 
 export function useReviewables(pageSize = 30) {
@@ -14,8 +13,17 @@ export function useReviewables(pageSize = 30) {
     if (loading || !hasMore) return;
     try {
       setLoading(true);
-      const { items: chunk, hasNext } = await fetchMyReviewables(page, pageSize);
-      setItems((s) => [...s, ...chunk]);
+      const { items: chunk, hasNext } = await getReviewableContracts(page, pageSize);
+  
+      setItems((prev) => {
+        const merged = [...prev, ...chunk];
+        // contractId 기준 중복 제거
+        return merged.filter(
+          (item, idx, arr) =>
+            arr.findIndex((x) => x.contractId === item.contractId) === idx
+        );
+      });
+  
       setHasMore(hasNext);
       setPage((p) => p + 1);
     } catch (e) {

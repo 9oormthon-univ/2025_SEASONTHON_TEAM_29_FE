@@ -117,12 +117,12 @@ export type CreateStudioProduct = CreateProductBase & {
 
 /** ---------- 드레스 ---------- */
 export type DressStyle = 'MODERN' | 'CLASSIC' | 'ROMANTIC' | 'DANAH' | 'UNIQUE' | 'HIGH_END';
-export type DressProduction = 'DOMESTIC' | 'IMPORTED';
+export type DressOrigin = 'DOMESTIC' | 'IMPORTED';
 
 export type CreateDressProduct = CreateProductBase & {
   vendorType: 'DRESS';
   dressStyle: Extensible<DressStyle>;
-  dressProduction: Extensible<DressProduction>;
+  dressOrigin: Extensible<DressOrigin>;
 };
 
 /** ---------- 메이크업 ---------- */

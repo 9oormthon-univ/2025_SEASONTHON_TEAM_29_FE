@@ -36,9 +36,6 @@ export default function Page() {
     [profile?.weddingDay],
   );
 
-  const hasReviewable = reviewables.length > 0;
-  const canOpenWrite = rvLoading || !!rvErr || hasReviewable;
-
   return (
     <main className="min-h-screen bg-background pb-24">
       <Header showBack onBack={() => router.back()} value="마이" />

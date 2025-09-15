@@ -2,14 +2,17 @@ import { http, type ApiEnvelope } from '@/services/http';
 
 export type CreateReviewPayload = {
   vendorId: number;
-  rating: number;           // 1~5
-  contentBest: string;      // MAX_LEN 이하
-  contentWorst: string;     // MAX_LEN 이하
-  imageKeys: string[];      // S3 key 배열 (최대 MAX_PHOTOS)
+  rating: number;
+  contentBest: string;
+  contentWorst: string;
+  mediaList: {
+    mediaKey: string;
+    contentType: string;
+    sortOrder: number;
+  }[];
 };
 
 export async function createReview(payload: CreateReviewPayload) {
-  // http()가 /api prefix + Authorization 헤더 + 401 재발급까지 처리
   return http<ApiEnvelope<unknown>>('/v1/review/create', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -19,7 +22,7 @@ export async function createReview(payload: CreateReviewPayload) {
 export type RawHomeReview = {
   reviewId: number;
   vendorName: string;
-  reviewImageUrl: string | null;
+  mainImageUrl: string | null;
   content: string;
   rating: number; // 1~5
   writerName: string;
@@ -54,7 +57,7 @@ function mapToHomeItem(r: RawHomeReview): HomeReviewItem {
 
   return {
     id: r.reviewId,
-    src: r.reviewImageUrl ?? null,
+    src: r.mainImageUrl ?? null,
     href: `/review/${r.reviewId}`,
     alt: `${r.vendorName} 후기`,
     category: r.vendorName,
@@ -82,15 +85,3 @@ export type ReviewableContract = {
   vendorName: string;
   logoImageUrl?: string;
 };
-
-export async function fetchMyReviewables(page: number, size: number) {
-  const res = await http<ApiEnvelope<Paged<ReviewableContract>>>(
-    `/v1/contracts/my/reviewable?page=${page}&size=${size}`,
-    { method: 'GET' },
-  );
-  const raw = res?.data;
-  return {
-    items: raw?.content ?? [],
-    hasNext: raw ? !raw.last : false,
-  };
-}

@@ -6,8 +6,6 @@ import TourItem from './TourItem';
 
 export default function TourList({ data }: { data: ToursBundle }) {
   const router = useRouter();
-  console.log(data);
-
   return (
     <ul>
       {data.dressTour.map((it) => (

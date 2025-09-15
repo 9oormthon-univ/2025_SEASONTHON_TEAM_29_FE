@@ -3,6 +3,7 @@
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
 import { createReservation, getDailySlots } from '@/services/reservation.api';
 import { ReservationSlot } from '@/types/reservation';
+import { formatTimeHM } from '@/utills/time';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -96,7 +97,7 @@ export default function ConsultTimePage() {
     try {
       setPosting(true);
       setError(null);
-      await createReservation({ consultationSlotId: selectedSlotId });
+      await createReservation({ slotId: selectedSlotId });
       setDone(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : '예약 실패');
@@ -123,7 +124,7 @@ export default function ConsultTimePage() {
         {slots.map((s) => (
           <TimeChip
             key={s.slotId}
-            label={`${s.startTime}~${s.endTime}`}
+            label={`${formatTimeHM(s.startTime)}`}
             selected={selectedSlotId === s.slotId}
             disabled={s.status !== 'AVAILABLE'}
             onClick={() => setSelectedSlotId(s.slotId)}

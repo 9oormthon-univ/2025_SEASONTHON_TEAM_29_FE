@@ -8,7 +8,7 @@ export default function SummaryCard() {
     <Link
       href="/calendar/list"
       className="
-        flex w-86 h-20 items-center justify-center
+        flex h-20 items-center justify-center
         rounded-lg border border-zinc-300/50 bg-white
         px-3 py-2.5 shadow-sm
         transition hover:shadow-md hover:border-zinc-300

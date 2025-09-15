@@ -48,9 +48,9 @@ export default function DynamicProductForm({
     specialShot: undefined,
     iphoneSnap: false,
   });
-  const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressProduction'>>({
+  const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressOrigin'>>({
     dressStyle: 'ROMANTIC',
-    dressProduction: 'DOMESTIC',
+    dressOrigin: 'DOMESTIC',
   });
   const [makeup, setMakeup] = useState<Pick<CreateMakeupProduct, 'makeupStyle' | 'isStylistDesignationAvailable' | 'hasPrivateRoom'>>({
     makeupStyle: 'NATURAL',
@@ -202,11 +202,11 @@ export default function DynamicProductForm({
           />
           <SelectField
             label="제작 방식"
-            value={dress.dressProduction}
+            value={dress.dressOrigin}
             onChange={(v) =>
               setDress((prev) => ({
                 ...prev,
-                dressProduction: v as CreateDressProduct['dressProduction'],
+                dressOrigin: v as CreateDressProduct['dressOrigin'],
               }))
             }
             options={['DOMESTIC', 'IMPORTED']}

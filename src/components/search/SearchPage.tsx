@@ -3,7 +3,7 @@
 
 import { resolveRegionCode } from '@/lib/region';
 import {
-  dressProductionMap, dressStyleMap, hallMealMap, hallStyleMap, makeupStyleMap,
+  dressOriginMap, dressStyleMap, hallMealMap, hallStyleMap, makeupStyleMap,
   studioShotMap, studioStyleMap,
 } from '@/services/mappers/searchMapper';
 import { CategoryKey } from '@/types/category';
@@ -32,7 +32,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   // 드레스
   const [dressStyle, setDressStyle] = useState<string[]>([]);
-  const [dressProduction, setDressProduction] = useState<string[]>([]);
+  const [dressOrigin, setDressOrigin] = useState<string[]>([]);
 
   // 스튜디오
   const [studioStyle, setStudioStyle] = useState<string[]>([]);
@@ -57,7 +57,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           parking !== null
         );
       case 'dress':
-        return dressStyle.length > 0 && dressProduction.length > 0;
+        return dressStyle.length > 0 && dressOrigin.length > 0;
       case 'studio':
         return studioStyle.length > 0 && iphoneSnap !== null;
       case 'makeup':
@@ -65,7 +65,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
       default:
         return false;
     }
-  }, [cat, areas, price, hallStyle, hallMeal, guest, parking, dressStyle, dressProduction, studioStyle, iphoneSnap, makeupStyle, stylist, room]);
+  }, [cat, areas, price, hallStyle, hallMeal, guest, parking, dressStyle, dressOrigin, studioStyle, iphoneSnap, makeupStyle, stylist, room]);
 
   const toggle = (list: string[], v: string, set: (v: string[]) => void) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -92,7 +92,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
     // 드레스
     dressStyle.forEach((v) => p.append('dressStyle', dressStyleMap[v]));
-    dressProduction.forEach((v) => p.append('dressProduction', dressProductionMap[v]));
+    dressOrigin.forEach((v) => p.append('dressOrigin', dressOriginMap[v]));
 
     // 스튜디오
     studioStyle.forEach((v) => p.append('studioStyle', studioStyleMap[v]));
@@ -159,7 +159,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
               </section>
               <section className="mt-2 mb-4">
                 <h3 className="mb-3 font-bold text-gray-800">제작사</h3>
-                <ChipGroup values={['국내', '수입']} selected={dressProduction} onToggle={(v) => toggle(dressProduction, v, setDressProduction)} />
+                <ChipGroup values={['국내', '수입']} selected={dressOrigin} onToggle={(v) => toggle(dressOrigin, v, setDressOrigin)} />
               </section>
             </>
           )}

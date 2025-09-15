@@ -33,7 +33,7 @@ export async function getDailySlots(params: {
 
 /** 상담 예약 생성 */
 export async function createReservation(params: {
-  consultationSlotId: number;
+  slotId: number;
   memo?: string;
 }) {
   return http<ApiResponse<number>>(`/v1/reservations`, {

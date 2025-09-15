@@ -56,14 +56,18 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
                   aria-label={`${cell.getMonth() + 1}월 ${cell.getDate()}일`}
                   className="mt-[3px] w-10 h-10 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
                 >
-                  <Image
-                    src={STICKER_SRC[primary.sticker]}
-                    alt=""
-                    width={40}
-                    height={40}
-                    draggable={false}
-                    className="block w-10 h-10 object-contain"
-                  />
+                  {primary && STICKER_SRC[primary.sticker] ? (
+                    <Image
+                      src={STICKER_SRC[primary.sticker]}
+                      alt={primary.sticker}
+                      width={40}
+                      height={40}
+                      draggable={false}
+                      className="block w-10 h-10 object-contain"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-gray-100 rounded" />
+                  )}
                   {events.length > 1 && (
                     <span className="absolute right-0.5 top-0.5 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">
                       +{events.length - 1}
