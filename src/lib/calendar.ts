@@ -69,7 +69,7 @@ export function dateRangeYMD(startISO: string, endISO: string): string[] {
 }
 
 export function mapCategoryToSticker(cat: string): StickerKey {
-  return CAT_TO_STICKER[cat] ?? 'letter';
+  return CAT_TO_STICKER[cat] ?? 'INVITATION';
 }
 
 export type SheetEntry = {

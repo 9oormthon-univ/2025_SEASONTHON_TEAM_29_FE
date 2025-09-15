@@ -9,4 +9,4 @@ export const STICKER_SRC = {
   MAKEUP: '/icons/Calendar/makeup.png',
 } as const;
 
-export type StickerKey = keyof typeof STICKER_SRC; // 'letter' | 'cake'
+export type StickerKey = keyof typeof STICKER_SRC;
