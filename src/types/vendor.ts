@@ -106,7 +106,7 @@ export type CreateWeddingHallProduct = CreateProductBase & {
 
 /** ---------- 스튜디오 ---------- */
 export type StudioStyle = 'PORTRAIT_FOCUSED' | 'NATURAL' | 'EMOTIONAL' | 'CLASSIC' | 'BLACK_AND_WHITE';
-export type SpecialShot = 'HANOK' | 'UNDERWATER' | 'WITH_PET';
+export type SpecialShot = 'NONE' | 'HANOK' | 'UNDERWATER' | 'WITH_PET';
 
 export type CreateStudioProduct = CreateProductBase & {
   vendorType: 'STUDIO';

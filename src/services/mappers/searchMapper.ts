@@ -85,6 +85,7 @@ export const studioStyleMap: Record<string, string> =
 export const reverseStudioStyleMap = studioStyleLabel;
 
 export const studioShotLabel: Record<string, string> = {
+  NONE: '없음',
   HANOK: '한옥',
   UNDERWATER: '수중',
   WITH_PET: '반려동물',

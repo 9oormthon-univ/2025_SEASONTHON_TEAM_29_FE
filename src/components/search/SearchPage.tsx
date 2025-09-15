@@ -96,7 +96,11 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
     // 스튜디오
     studioStyle.forEach((v) => p.append('studioStyle', studioStyleMap[v]));
-    studioShot.forEach((v) => p.append('specialShots', studioShotMap[v]));
+    if (studioShot.length === 0) {
+      p.append('specialShots', 'NONE'); // ✅ 기본값
+    } else {
+      studioShot.forEach((v) => p.append('specialShots', studioShotMap[v]));
+    }
     if (iphoneSnap) p.set('iphoneSnap', iphoneSnap === '있음' ? 'true' : 'false');
 
     // 메이크업

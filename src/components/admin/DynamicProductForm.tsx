@@ -45,7 +45,7 @@ export default function DynamicProductForm({
   });
   const [studio, setStudio] = useState<Pick<CreateStudioProduct, 'studioStyle' | 'specialShot' | 'iphoneSnap'>>({
     studioStyle: 'PORTRAIT_FOCUSED',
-    specialShot: undefined,
+    specialShot: 'NONE',
     iphoneSnap: false,
   });
   const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressOrigin'>>({
@@ -172,7 +172,7 @@ export default function DynamicProductForm({
                 specialShot: v as CreateStudioProduct['specialShot'],
               }))
             }
-            options={['', 'HANOK', 'UNDERWATER', 'WITH_PET']}
+            options={['NONE', 'HANOK', 'UNDERWATER', 'WITH_PET']}
           />
           <label className="flex items-center gap-2 text-sm">
             <input
