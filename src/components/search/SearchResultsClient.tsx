@@ -45,7 +45,7 @@ export function SearchResultsClient() {
             regionCode,
             price,
             studioStyle: sp.getAll('studioStyle'),    // ✅
-            specialShot: sp.getAll('specialShots'),   // ✅
+            specialShots: sp.getAll('specialShots'),   // ✅
             iphoneSnap: sp.get('iphoneSnap') === 'true',
           },
         };

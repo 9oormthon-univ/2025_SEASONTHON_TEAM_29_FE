@@ -6,7 +6,7 @@ export type StudioSearchReq = {
   regionCode: string[];
   price: number;
   studioStyle: string[];
-  specialShot?: string[];
+  specialShots?: string[];
   iphoneSnap: boolean;
   page?: number;
   size?: number;
@@ -25,7 +25,7 @@ export async function searchStudios(
   if (body.regionCode.length > 0) qs.set('regionCode', body.regionCode.join(','));
   qs.set('price', String(body.price));
   if (body.studioStyle.length > 0) qs.set('studioStyle', body.studioStyle.join(','));
-  if (body.specialShot?.length) qs.set('specialShot', body.specialShot.join(','));
+  if (body.specialShots?.length) qs.set('specialShots', body.specialShots.join(','));
   qs.set('iphoneSnap', String(body.iphoneSnap));
   qs.set('page', String(page));
   qs.set('size', String(size));
