@@ -2,79 +2,82 @@
 'use client';
 
 import { STICKER_SRC } from '@/components/calendar/stickers';
+import Input from '@/components/common/atomic/Input';
+import TextField from '@/components/common/atomic/TextField';
 import Header from '@/components/common/monocules/Header';
+import { createCalendarEvent } from '@/services/calendar.api';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 type StickerKey = keyof typeof STICKER_SRC;
 
 export default function CalendarNewPage() {
   const router = useRouter();
-  const qs = useSearchParams();
-  const pickedDate = qs.get('date') ?? ''; // yyyy-mm-dd (있으면 표시 용도)
-
   const [title, setTitle] = useState('');
+  const [titleStarted, setTitleStarted] = useState(false);
   const [memo, setMemo] = useState('');
   const [sticker, setSticker] = useState<StickerKey | null>(null);
 
-  const memoMax = 500;
   const disabled = !title.trim() || !sticker;
 
   const stickers: StickerKey[] = useMemo(
-    () => ['letter', 'studio', 'hall', 'dress', 'drink', 'cake', 'makeup'],
-    []
+    () => ['INVITATION', 'STUDIO', 'WEDDING_HALL', 'DRESS', 'PARTY', 'BRIDAL_SHOWER', 'MAKEUP'],
+    [],
   );
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (disabled) return;
+  const [loading, setLoading] = useState(false);
 
-    router.back();
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (disabled || !sticker) return;
+  
+    try {
+      setLoading(true);
+      await createCalendarEvent({
+        title,
+        description: memo,
+        eventCategory: sticker.toUpperCase(), // 서버 enum이 'LETTER' 같은 UPPERCASE라면 변환 필요
+        startDateTime: new Date().toISOString(), // TODO: 날짜 선택 기능 붙이면 교체
+        endDateTime: new Date().toISOString(),
+        isAllDay: true,
+      });
+      router.back();
+    } catch (err) {
+      console.error('캘린더 등록 실패', err);
+      alert('일정 등록에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <main className="mx-auto w-full max-w-[420px]">
-      <Header 
-        showBack
-        onBack={()=>router.back()}
-        value="일정 등록하기" />
+      <Header showBack onBack={() => router.back()} value="일정 등록하기" />
+
       <form onSubmit={onSubmit} className="px-[22px] pb-8">
-        {pickedDate && (
-          <p className="mt-3 mb-1 text-[12px] text-text-secondary">
-            선택한 날짜: <span className="font-medium text-foreground">{pickedDate}</span>
-          </p>
-        )}
-
-        {/* 제목 */}
-        <input
+        <Input
+          type={titleStarted ? 'defaultStrong' : 'default'}
+          inputType="text"
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => {
+            const v = e.currentTarget.value;
+            setTitle(v);
+            if (!titleStarted && v.length > 0) setTitleStarted(true);
+          }}
           placeholder="오늘은 무엇을 하는 날인가요?"
-          className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3
-                     text-[14px] placeholder:text-gray-400 focus:outline-none focus:ring-2
-                     focus:ring-primary-300/60"
-          maxLength={80}
+          className="mt-2 w-full"
+          fullWidth
         />
-
-        {/* 메모 */}
-        <div className="relative mt-3">
-          <textarea
-            value={memo}
-            onChange={(e) => setMemo(e.target.value.slice(0, memoMax))}
-            placeholder="기억하고 싶은 내용을 적어주세요."
-            rows={5}
-            className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3
-                       text-[14px] placeholder:text-gray-400 focus:outline-none focus:ring-2
-                       focus:ring-primary-300/60"
-          />
-          <span className="pointer-events-none absolute bottom-2 right-3 text-[11px] text-gray-300">
-            {memo.length}/{memoMax}
-          </span>
-        </div>
-
-        {/* 스티커 선택 */}
+        <TextField
+          value={memo}
+          onChange={setMemo}
+          placeholder="기억하고 싶은 내용을 적어주세요."
+          className="mt-3 w-full"
+          textareaClassName="text-[14px]"
+          showCount
+        />
         <div className="mt-5 grid grid-cols-4 gap-2">
           {stickers.map((key) => {
             const active = sticker === key;
@@ -87,13 +90,12 @@ export default function CalendarNewPage() {
                   'h-18 w-18 rounded-xl border bg-white transition',
                   active
                     ? 'border-primary-400 ring-2 ring-primary-200'
-                    : 'border-gray-200 hover:bg-gray-50 active:scale-[0.98]'
+                    : 'border-gray-200 hover:bg-gray-50 active:scale-[0.98]',
                 )}
                 aria-pressed={active}
               >
-                {/* 이미지 크기는 디자인에 맞춰 48px 정도 */}
                 <Image
-                  src={`/${STICKER_SRC[key]}`}
+                  src={STICKER_SRC[key]}
                   alt={key}
                   width={35}
                   height={35}
@@ -104,19 +106,17 @@ export default function CalendarNewPage() {
             );
           })}
         </div>
-
-        {/* 제출 버튼 */}
         <button
           type="submit"
-          disabled={disabled}
+          disabled={disabled || loading}
           className={clsx(
             'mt-8 h-12 w-full rounded-2xl text-[15px] font-semibold transition',
-            disabled
+            disabled || loading
               ? 'bg-primary-200 text-rose-300 cursor-not-allowed'
-              : 'bg-primary-500 text-white active:scale-[0.98]'
+              : 'bg-primary-500 text-white active:scale-[0.98]',
           )}
         >
-          등록하기
+          {loading ? '등록 중…' : '등록하기'}
         </button>
       </form>
     </main>

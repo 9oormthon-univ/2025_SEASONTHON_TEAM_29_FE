@@ -65,7 +65,7 @@ export default function LoginForm() {
       </div>
 
       <form
-        className="mt-13 space-y-4"
+        className="mt-13 space-y-2 px-2"
         onSubmit={(e) => {
           e.preventDefault();
           onSubmit();
@@ -100,17 +100,17 @@ export default function LoginForm() {
           onMouseEnter={() => setFocusPw(true)}
           onMouseLeave={() => setFocusPw(false)}
         />
-
-        <Button
-          type="submit"
-          fullWidth
-          size="md"
-          disabled={!canSubmit}
-          className="max-w-[346px] text-[15px] font-extrabold shadow-sm disabled:opacity-40"
-        >
-          {loading ? '로그인 중…' : '로그인'}
-        </Button>
-
+        <div className="mt-2.5">
+          <Button
+            type="submit"
+            fullWidth
+            size="md"
+            disabled={!canSubmit}
+            className="max-w-[346px] text-[15px] font-extrabold shadow-sm disabled:opacity-40"
+          >
+            {loading ? '로그인 중…' : '로그인'}
+          </Button>
+        </div>
         {err && <p className="text-center text-sm text-red-500">{err}</p>}
 
         {/* 부가 링크 */}

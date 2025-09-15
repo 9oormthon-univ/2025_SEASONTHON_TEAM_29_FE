@@ -1,25 +1,29 @@
+// src/types/reservation.ts
 export type ApiResponse<T> = {
-  status: number;
-  success: boolean;
-  message?: string;
+  code: number;
+  message: string;
   data: T;
 };
-export type VendorItem = {
-  id: number;
-  name: string;
-  logoUrl?: string;
-  region?: string;
-  category?: 'WEDDING_HALL' | 'DRESS' | 'MAKEUP' | 'STUDIO' | string;
-  rating?: { score: number; count?: number };
-  priceText?: string;
-};
+
 export type ReservationDay = {
   date: string;
-  weekdayKo: string;
   available: boolean;
+  isBookable?: boolean;
+  totalSlots?: number;
+  availableSlots?: number;
 };
 
-export type ReservationTime = {
-  time: string;
-  available: boolean;
+export type ReservationSlot = {
+  slotId: number;
+  startTime: string; // "10:00"
+  endTime: string;   // "11:00"
+  status: 'AVAILABLE' | 'RESERVED' | 'UNAVAILABLE';
+};
+
+export type MyReservation = {
+  reservationId: number;
+  vendorName: string;
+  vendorType: string;
+  visitDateTime: string;
+  status: string;
 };

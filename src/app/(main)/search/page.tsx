@@ -19,9 +19,9 @@ export default function CategorySelectPage() {
   };
 
   return (
-    <main className="w-full max-w-[420px] mx-auto px-[22px]">
+    <main className="w-full max-w-[420px] mx-auto">
       <Header showBack onBack={() => router.back()} value="검색" />
-
+      <div className="px-[22px] flex-1 overflow-y-auto">
       <div className="pt-3">
         <h1 className="text-head-2 font-extrabold">
           검색할 카테고리를
@@ -65,6 +65,7 @@ export default function CategorySelectPage() {
             다음
           </Button>
         </div>
+      </div>
       </div>
     </main>
   );

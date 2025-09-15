@@ -17,7 +17,7 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
   const cells = daysMatrix5(monthBase);
 
   return (
-    <ul className="grid grid-cols-7 gap-[4px]">
+    <ul className="grid grid-cols-7 gap-[9px]">
       {cells.map((cell, i) => {
         const ymd = toYMD(cell);
         const isPrevNext = cell.getMonth() !== monthBase.getMonth();
@@ -36,32 +36,38 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
 
         return (
           <li key={i} className="flex justify-center">
-            <div className="relative h-[55px] w-9 overflow-hidden">
+            <div className="w-10 flex flex-col items-center overflow-hidden">
               <div
                 className={clsx(
-                  'absolute left-[12px] text-xs font-medium leading-normal',
-                  isPrevNext ? 'opacity-40 text-text--default' : 'text-text--default',
-                  !isPrevNext && isSun && 'text-[#FF6B6B]'
+                  'h-7 w-full flex items-center justify-center text-center',
+                  'text-xs font-medium leading-none',
+                  isPrevNext
+                    ? 'opacity-40 text-text--default'
+                    : 'text-text--default',
+                  !isPrevNext && isSun && 'text-[#FF6B6B]',
                 )}
               >
                 {cell.getDate()}
               </div>
-
               {primary ? (
                 <button
                   type="button"
                   onClick={() => onPickDay(cell)}
                   aria-label={`${cell.getMonth() + 1}월 ${cell.getDate()}일`}
-                  className="absolute left-0 top-[18px] h-9 w-9 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
+                  className="mt-[3px] w-10 h-10 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
                 >
-                  <Image
-                    src={STICKER_SRC[primary.sticker]}
-                    alt=""
-                    width={36}
-                    height={36}
-                    draggable={false}
-                    className="block h-9 w-9 object-contain"
-                  />
+                  {primary && STICKER_SRC[primary.sticker] ? (
+                    <Image
+                      src={STICKER_SRC[primary.sticker]}
+                      alt={primary.sticker}
+                      width={40}
+                      height={40}
+                      draggable={false}
+                      className="block w-10 h-10 object-contain"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-gray-100 rounded" />
+                  )}
                   {events.length > 1 && (
                     <span className="absolute right-0.5 top-0.5 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">
                       +{events.length - 1}
@@ -69,20 +75,22 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
                   )}
                 </button>
               ) : (
-                <>
+                <div className="relative mt-[9px] w-10 h-10">
                   <div
                     className={clsx(
-                      'absolute left-0 top-[18px] h-9 w-9 rounded',
-                      isPrevNext ? 'opacity-20 border border-text-secondary' : 'opacity-30 bg-box-line'
+                      'w-10 h-10 rounded',
+                      isPrevNext
+                        ? 'opacity-20 border border-text-secondary'
+                        : 'opacity-30 bg-box-line',
                     )}
                   />
                   <button
                     type="button"
                     onClick={() => onPickDay(cell)}
                     aria-label={`${cell.getMonth() + 1}월 ${cell.getDate()}일`}
-                    className="absolute left-0 top-[18px] h-9 w-9 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
+                    className="absolute inset-0 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
                   />
-                </>
+                </div>
               )}
             </div>
           </li>

@@ -1,3 +1,4 @@
+//src/components/search/Chips.tsx
 'use client';
 
 import Chips from '@/components/common/atomic/Chips';

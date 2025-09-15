@@ -4,7 +4,7 @@
   height: 8px;
   border-radius: 9999px;
   outline: none;
-  background: transparent;           /* 중요: 인풋 배경은 비워두기 */
+  background: transparent; /* 중요: 인풋 배경은 비워두기 */
   cursor: pointer;
 }
 
@@ -14,10 +14,10 @@
   border-radius: 9999px;
   background: linear-gradient(
     to right,
-    #6B5BD7 0%,
-    #6B5BD7 var(--pct, 0%),
-    #E5E7EB var(--pct, 0%),
-    #E5E7EB 100%
+    #ff9b9d 0%,
+    #ff9b9d var(--pct, 0%),
+    #e5e7eb var(--pct, 0%),
+    #e5e7eb 100%
   );
   transition: background 120ms ease;
 }
@@ -31,7 +31,7 @@
   border-radius: 50%;
   background: #fff;
   border: 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   margin-top: -8px; /* 트랙의 수직 중앙 */
 }
 
@@ -39,12 +39,12 @@
 .custom-range::-moz-range-track {
   height: 4px;
   border-radius: 9999px;
-  background: #E5E7EB;
+  background: #e5e7eb;
 }
 .custom-range::-moz-range-progress {
   height: 4px;
   border-radius: 9999px;
-  background: #6B5BD7;
+  background: #ff9b9d;
 }
 .custom-range::-moz-range-thumb {
   width: 14px;
@@ -52,7 +52,7 @@
   border-radius: 50%;
   background: #fff;
   border: 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
 }
 
 /* (선택) 포커스 표시 제거 */

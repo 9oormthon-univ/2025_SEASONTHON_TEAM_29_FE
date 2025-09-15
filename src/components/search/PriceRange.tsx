@@ -1,38 +1,50 @@
+//src/components/search/PriceRange.tsx
 'use client';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './range.css';
 
 const MARKS = [
-  10, 20, 30, 40, 50, 60, 70, 80, 90, 100,
-  200, 300, 400, 500, 600, 700, 800, 900, 1000,
+  10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800,
+  900, 1000,
 ];
 
 const THUMB = 28; // 손잡이 지름(px)
 
 type Props = {
-  value: number;                     // 표시할 값(미선택이면 10 전달)
+  value: number; // 표시할 값(미선택이면 10 전달)
   onChange: (v: number) => void;
-  selected?: boolean;                // ✅ 미선택/선택 상태
-  onFirstPick?: () => void;          // (선택) 최초 상호작용 콜백
+  selected?: boolean; // ✅ 미선택/선택 상태
+  onFirstPick?: () => void; // (선택) 최초 상호작용 콜백
 };
 
-export default function PriceRange({ value, onChange, selected=false, onFirstPick }: Props) {
+export default function PriceRange({
+  value,
+  onChange,
+  selected = false,
+  onFirstPick,
+}: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const index = useMemo(() => {
-    let best = 0, dmin = Infinity;
+    let best = 0,
+      dmin = Infinity;
     MARKS.forEach((m, i) => {
       const d = Math.abs(m - value);
-      if (d < dmin) { dmin = d; best = i; }
+      if (d < dmin) {
+        dmin = d;
+        best = i;
+      }
     });
     return best;
   }, [value]);
 
   const fraction = index / (MARKS.length - 1);
-  const pct = selected ? fraction * 100 : 0;          // ✅ 미선택이면 채움 0%
+  const pct = selected ? fraction * 100 : 0; // ✅ 미선택이면 채움 0%
 
   // 말풍선: 선택된 이후만 보이도록
   const [bubbleShown, setBubbleShown] = useState(false);
-  useEffect(() => { if (selected) setBubbleShown(true); }, [selected]);
+  useEffect(() => {
+    if (selected) setBubbleShown(true);
+  }, [selected]);
 
   // 말풍선 위치(px)를 계산해서 CSS 변수로 내려줌
   const [bubbleLeft, setBubbleLeft] = useState<string>('0px');
@@ -41,7 +53,7 @@ export default function PriceRange({ value, onChange, selected=false, onFirstPic
     if (!el) return;
 
     const compute = () => {
-      const w = el.clientWidth;             // 트랙 전체 폭
+      const w = el.clientWidth; // 트랙 전체 폭
       const usable = Math.max(0, w - THUMB); // 손잡이 이동 가능한 폭
       const px = THUMB / 2 + usable * fraction;
       // 가장자리 살짝 클램프
@@ -79,9 +91,7 @@ export default function PriceRange({ value, onChange, selected=false, onFirstPic
             }`}
             style={{ left: 'var(--bubble-left)' }}
           >
-            <div
-              className="rounded bg-[#6B5BD7] px-2 py-1 text-xs font-medium text-white shadow-sm whitespace-nowrap"
-            >
+            <div className="rounded bg-primary-500 px-2 py-1 text-xs font-medium text-white shadow-sm whitespace-nowrap">
               {MARKS[index]}만원
             </div>
             <div
@@ -89,7 +99,7 @@ export default function PriceRange({ value, onChange, selected=false, onFirstPic
               style={{
                 borderLeft: '4px solid transparent',
                 borderRight: '4px solid transparent',
-                borderTop: '6px solid #6B5BD7',
+                borderTop: '6px solid #FF9B9D',
               }}
             />
           </div>
@@ -104,16 +114,16 @@ export default function PriceRange({ value, onChange, selected=false, onFirstPic
             value={index}
             onChange={(e) => {
               const v = MARKS[Number(e.target.value)];
-              if (!selected) onFirstPick?.();      // 값이 바뀔 때도 최초 선택 처리
+              if (!selected) onFirstPick?.(); // 값이 바뀔 때도 최초 선택 처리
               onChange(v);
             }}
             onMouseDown={() => {
               setBubbleShown(true);
-              if (!selected) onFirstPick?.();      // ✅ 값이 안 변해도 최초 선택 처리
+              if (!selected) onFirstPick?.(); // ✅ 값이 안 변해도 최초 선택 처리
             }}
             onTouchStart={() => {
               setBubbleShown(true);
-              if (!selected) onFirstPick?.();      // ✅ 터치 시작 시에도 처리
+              if (!selected) onFirstPick?.(); // ✅ 터치 시작 시에도 처리
             }}
             className="custom-range w-full"
             aria-label="가격 범위"

@@ -45,7 +45,7 @@ export default function OnboardingSlider() {
             {/* ← 페이지 좌우 스크롤 완화 */}
             {slides.map((s, i) => (
               <section key={i} className="min-w-0 flex-[0_0_100%]">
-                <div className="mt-8">
+                <div className="mt-8 mb-13">
                   <h2 className="whitespace-pre-line pl-10 text-left text-[24px] font-bold leading-tight text-gray-900">
                     {s.title}
                   </h2>

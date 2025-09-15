@@ -1,90 +1,73 @@
 // src/components/common/atomic/VendorCard.tsx
 'use client';
 
+import type { VendorListItem } from '@/types/vendor';
 import Image from 'next/image';
 import Link from 'next/link';
 import SvgObject from './SvgObject';
 
-type CommonItem = {
-  id: number;
-  name: string;
-  region?: string;   // 캐러셀 데이터
-  logo?: string;
-  rating?: number;
-  count?: number;
-  price?: number;
-  href?: string;
+type Props = {
+  item: VendorListItem;
+  href: string;
+  showPrice?: boolean;
 };
 
-function formatManwon(v?: number) {
-  if (v == null) return '';
-  const man = Math.round(v / 10_000);
-  return `${man.toLocaleString()}만원~`;
-}
+export default function VendorCard({ item, href }: Props) {
+  const {
+    vendorId: _vendorId,
+    vendorName,
+    logoImageUrl,
+    regionName,
+    averageRating,
+    reviewCount,
+  } = item;
 
-export default function VendorCard({
-  item,
-  href,
-  square = true,
-  showPrice = true,   // ✅ 새 prop, 기본값 true
-}: {
-  item: CommonItem;
-  href?: string;
-  square?: boolean;
-  showPrice?: boolean;
-}) {
-  const displayRegion = item.region ?? '';
+  return (
+    <Link
+      href={href}
+      className="block"
+      aria-label={`${vendorName} 상세보기`}
+    >
+      {/* 로고 */}
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-50">
+        <Image
+          src={logoImageUrl || '/logos/placeholder.png'}
+          alt={vendorName}
+          fill
+          sizes="160px"
+          className="object-contain"
+          unoptimized
+        />
+      </div>
 
-  const content = (
-    <article className="bg-white p-1">
-      <div
-        className="relative w-full overflow-hidden rounded-md border border-gray-200"
-        style={square ? { aspectRatio: '1 / 1' } : undefined}
-      >
-        {item.logo ? (
-          <Image
-            src={item.logo}
-            alt={item.name}
-            fill
-            className="object-contain p-2"
-            sizes="(max-width:768px) 44vw, 320px"
-            unoptimized
+      {/* 텍스트 영역 */}
+      <div className="mt-2">
+        {/* 지역 + 이름 */}
+        <div className="text-sm font-semibold truncate">
+          <span className="text-gray-500 mr-1">{regionName ?? '-'}</span>
+          <span className="text-gray-900">{vendorName}</span>
+        </div>
+
+        {/* 별점 + 리뷰 수 */}
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-600">
+          <SvgObject
+            src="/icons/PinkRing.svg"
+            alt="rating-ring"
+            width={12}
+            height={12}
           />
-        ) : (
-          <div className="absolute inset-0 grid place-items-center text-xs text-gray-400">이미지 없음</div>
+          <span className="font-medium">
+            {averageRating != null ? averageRating.toFixed(1) : '0.0'}
+          </span>
+          <span className="text-gray-500">({reviewCount ?? 0})</span>
+        </div>
+
+        {item.minPrice && (
+          <div className="mt-1 text-sm font-semibold text-gray-900">
+            {item.minPrice / 10000}만원~
+          </div>
         )}
       </div>
-
-      <div className="mt-2 flex items-start gap-x-2">
-        <span className="shrink-0 text-[13px] leading-snug text-gray-400">{displayRegion}</span>
-        <span className="min-w-0 text-[14px] font-semibold leading-snug text-gray-800 line-clamp-2 break-keep">
-          {item.name}
-        </span>
-      </div>
-
-      {(item.rating !== undefined || item.count !== undefined) && (
-        <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-500">
-          <SvgObject src="/icons/ring.svg" alt="웨딧링" width={16} height={16} />
-          <span>
-            {item.rating !== undefined ? item.rating.toFixed(1) : '-'}
-            {item.count !== undefined ? ` (${item.count})` : ''}
-          </span>
-        </div>
-      )}
-      
-      {showPrice && item.price != null && (
-        <div className="mt-1 text-[13px] font-extrabold text-gray-900">
-          {formatManwon(item.price)}
-        </div>
-      )}
-    </article>
-  );
-
-  return href ? (
-    <Link href={href} className="block min-w-0">
-      {content}
     </Link>
-  ) : (
-    <div className="min-w-0">{content}</div>
   );
 }

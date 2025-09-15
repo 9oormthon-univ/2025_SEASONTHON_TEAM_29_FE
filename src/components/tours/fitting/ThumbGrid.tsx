@@ -38,6 +38,7 @@ export default function ThumbGrid<T extends Item>({
               width={64}
               height={64}
               className="mx-auto h-full w-auto object-contain"
+              unoptimized
             />
           </button>
         );

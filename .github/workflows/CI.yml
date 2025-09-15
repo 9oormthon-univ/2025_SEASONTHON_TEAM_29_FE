@@ -42,6 +42,7 @@ jobs:
           CI: false
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_KAKAO_REST_KEY: ${{ secrets.NEXT_PUBLIC_KAKAO_REST_KEY }}
 
       # 6. Storybook 빌드
       - name: Build Storybook

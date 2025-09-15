@@ -20,8 +20,17 @@ type Props = {
   className?: string;
   onClick?: () => void;
   selected?: boolean;
-  /** 지난 예약 등: 이미지 영역에만 반투명 오버레이 */
+  executionDateTime?: string;
   dimImage?: boolean;
+};
+
+const formatDate = (iso?: string) => {
+  if (!iso) return null;
+  const d = new Date(iso);
+  const yy = String(d.getFullYear()).slice(2); // '26'
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yy}.${mm}.${dd}`;
 };
 
 export default function CompanyCard({
@@ -36,22 +45,25 @@ export default function CompanyCard({
   onClick,
   selected = false,
   dimImage = false,
+  executionDateTime,
 }: Props) {
   const altText = alt ?? name;
   const textDimCls = dimImage ? 'opacity-40' : '';
 
+  /** CART */
   /** CART */
   if (variant === 'cart') {
     return (
       <button
         type="button"
         onClick={onClick}
-        className={cn('relative w-28 h-44', className)}
+        className={cn('relative w-28 flex flex-col items-start', className)} 
       >
+        {/* 이미지 박스 */}
         <div
           className={clsx(
-            'w-28 h-28 rounded-lg flex items-center justify-center bg-white overflow-hidden border relative mb-12 -mr-4',
-            selected ? 'border-primary-500' : 'border-box-line',
+            'relative w-28 h-28 rounded-lg bg-white overflow-hidden outline outline-1 outline-offset-[-1px]',
+            selected ? 'outline-primary-500' : 'outline-box-line',
           )}
         >
           <Image
@@ -67,29 +79,26 @@ export default function CompanyCard({
             <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
           )}
         </div>
-        {(region || name) && (
-          <div className="absolute left-0 top-[122px] inline-flex items-center gap-1 pl-0.5">
-            {region && (
-              <span className="text-text--secondary text-sm leading-normal shrink-0 whitespace-nowrap">
-                {region}
-              </span>
-            )}
-            {region && name && (
-              <span className="text-text--secondary text-sm leading-normal">
-                ·
-              </span>
-            )}
-            {name && (
-              <span className="text-text--default text-sm font-medium leading-normal max-w-[6.5rem] truncate">
-                {name}
-              </span>
-            )}
-          </div>
+
+        {/* 🔑 날짜 뱃지 */}
+        {executionDateTime && (
+          <span className="mb-1 rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-500">
+            {formatDate(executionDateTime)}
+          </span>
         )}
+
+        {/* 이름 */}
+        {(region || name) && (
+          <span className="text-text--default text-sm font-medium leading-normal truncate max-w-[6.5rem]">
+            {name}
+          </span>
+        )}
+
+        {/* 가격 */}
         {priceText && (
-          <div className="absolute left-0 top-[143px] pl-0.5 text-text--default text-xs font-semibold leading-normal">
-            {priceText}
-          </div>
+          <span className="text-text--default text-xs font-semibold leading-normal">
+            {priceText}~
+          </span>
         )}
       </button>
     );
@@ -108,18 +117,18 @@ export default function CompanyCard({
       >
         <div
           className={clsx(
-            'w-28 h-28 bg-white rounded-lg border border-box-line flex items-center justify-center relative overflow-hidden',
+            'relative w-28 h-28 bg-white rounded-lg border overflow-hidden',
             selected ? 'border-primary-500' : 'border-box-line',
           )}
         >
           <Image
             src={imageSrc}
             alt={altText}
-            width={112}
-            height={112}
-            className="object-contain"
+            fill // ✅
+            className="object-contain" // ✅
             priority
             unoptimized
+            sizes="112px"
           />
           {dimImage && (
             <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
@@ -165,15 +174,15 @@ export default function CompanyCard({
         className,
       )}
     >
-      <div className="w-28 h-28 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-box-line overflow-hidden relative">
+      <div className="relative w-28 h-28 bg-white rounded-lg outline-1 outline-offset-[-1px] outline-box-line overflow-hidden">
         <Image
           src={imageSrc}
           alt={altText}
-          width={112}
-          height={112}
-          className="w-28 h-28 object-cover"
+          fill // ✅
+          className="object-contain" // ✅
           priority
           unoptimized
+          sizes="112px"
         />
         {dimImage && (
           <div className="absolute inset-0 rounded-lg bg-white/80 pointer-events-none" />
