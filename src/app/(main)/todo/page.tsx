@@ -19,24 +19,23 @@ export default function TodoPage() {
 
   const [todos, setTodos] = useState<TodoItemApi[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [initialDone, setInitialDone] = useState<number | null>(null);
 
   // ✅ 최초 로딩
   useEffect(() => {
     (async () => {
       const data = await getTodoList();
       setTodos(data.todoItems);
-      setInitialDone(data.todoItems.filter((t) => t.isCompleted).length);
       setLoaded(true);
     })();
   }, []);
 
   // ✅ 로딩 후 초기 하트 떨어뜨리기
   useEffect(() => {
-    if (loaded && initialDone !== null) {
-      heartsRef.current?.dropInitial(initialDone);
+    if (loaded) {
+      const count = todos.filter((t) => t.isCompleted).length;
+      heartsRef.current?.dropInitial(count);
     }
-  }, [loaded, initialDone]); // todos는 의존성 제거 → 매번 초기화 방지
+  }, [loaded]); // todos는 의존성 제거 → 매번 초기화 방지
 
   // ✅ 헤더 높이 기반으로 하트 레이어 높이 계산
   const headerRef = useRef<HTMLElement>(null);
