@@ -36,6 +36,7 @@ export default function VendorCard({ item, href }: Props) {
           fill
           sizes="160px"
           className="object-contain"
+          unoptimized
         />
       </div>
 
