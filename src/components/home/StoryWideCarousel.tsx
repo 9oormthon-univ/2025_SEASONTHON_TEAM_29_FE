@@ -5,20 +5,26 @@ import type { StoryItem } from '@/types/story';
 import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
 
-export default function StoryWideCarousel({
-  items,
-}: {items:StoryItem[]}) {
-  const [ref] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
+export default function StoryWideCarousel({ items }: { items: StoryItem[] }) {
+  const [ref] = useEmblaCarousel({
+    align: 'start',
+    containScroll: 'trimSnaps',
+  });
 
   return (
-    <Section title="따끈따끈, 신규 스토리" onMore={() => {}} bleed="viewport" className='mt-8'>
+    <Section
+      title="따끈따끈, 신규 스토리"
+      onMore={() => {}}
+      bleed="viewport"
+      className="mt-8"
+    >
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4 touch-pan-y">
           {items.map((s, i) => (
             <a
               key={s.id}
               href={`/stories/${s.id}`}
-              className={`min-w-0 flex-[0_0_75%] ${
+              className={`pl-1 min-w-0 flex-[0_0_75%] ${
                 i === items.length - 1 ? 'mr-4' : ''
               }`}
             >
@@ -38,9 +44,7 @@ export default function StoryWideCarousel({
 
                 {/* 이미지 대신 플레이스홀더 */}
                 <div className="relative mx-1 h-[60px] w-[60px] overflow-hidden rounded-md">
-                  <Image
-                  src={s.img}
-                  width={60} height={60} alt=""/>
+                  <Image src={s.img} width={60} height={60} alt="" />
                 </div>
               </article>
             </a>
