@@ -4,7 +4,7 @@ import Header from '@/components/common/monocules/Header';
 import { categories } from '@/data/homeData';
 import { resolveRegionName } from '@/lib/region';
 import {
-  dressProductionLabel,
+  dressOriginLabel,
   dressStyleLabel,
   hallMealLabel,
   hallStyleLabel,
@@ -64,7 +64,7 @@ export default function ResultsScreen({
 
     // 드레스
     sp.getAll('dressStyle').forEach((v) => out.push(dressStyleLabel[v] ?? v));
-    sp.getAll('dressProduction').forEach((v) => out.push(dressProductionLabel[v] ?? v));
+    sp.getAll('dressOrigin').forEach((v) => out.push(dressOriginLabel[v] ?? v));
 
     // 스튜디오
     sp.getAll('studioStyle').forEach((v) => out.push(studioStyleLabel[v] ?? v));

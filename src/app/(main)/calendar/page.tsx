@@ -7,72 +7,49 @@ import MonthSlider from '@/components/calendar/MonthSlider';
 import SummaryCard from '@/components/calendar/SummaryCard';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import Header from '@/components/common/monocules/Header';
-import {
-  MOCK_EVENTS,
-  MOCK_WEDDING_DATE,
-  expandFairsToDays,
-} from '@/data/calendarData';
+import { useCalendarRange } from '@/hooks/useCalendarRange';
 import { dday, toYMD } from '@/lib/calendar';
-import { EventItem } from '@/types/calendar';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
 type Mode = 'schedule' | 'event';
 
+const WEDDING_YMD = '2025-12-31';
+
 export default function CalendarPage() {
   const [base, setBase] = useState<Date>(new Date());
   const [activeYmd, setActiveYmd] = useState<string | null>(null);
-  const [mode, setMode] = useState<Mode>('schedule'); // ✅ 토글 상태
+  const [mode, setMode] = useState<Mode>('schedule');
 
-  const d = dday(MOCK_WEDDING_DATE);
+  const { maps } = useCalendarRange(base, mode === 'schedule' ? 'USER' : 'ADMIN');
+
+  const d = dday(WEDDING_YMD);
   const openDay = (date: Date) => setActiveYmd(toYMD(date));
 
-  // 개인 일정 → 전역에서 그대로 묶기
-  const scheduleMapAll = useMemo(() => {
-    const m = new Map<string, EventItem[]>();
-    for (const ev of MOCK_EVENTS) {
-      const arr = m.get(ev.date) ?? [];
-      arr.push({ id: ev.id, date: ev.date, sticker: ev.sticker });
-      m.set(ev.date, arr);
-    }
-    return m;
-  }, []);
-
-  // ✅ “해당 monthBase 기준”으로 맵을 만들어 주는 팩토리
-  const makeByDate = useCallback(
-    (monthBase: Date) => {
-      if (mode === 'schedule') return scheduleMapAll;
-      // event 모드: 매 달마다 다시 펼쳐서 맵 생성
-      const items = expandFairsToDays(monthBase); // sticker: 'hall'
-      const m = new Map<string, EventItem[]>();
-      for (const it of items) {
-        const arr = m.get(it.date) ?? [];
-        arr.push(it);
-        m.set(it.date, arr);
-      }
-      return m;
-    },
-    [mode, scheduleMapAll],
-  );
-
+  // 현재 달 기준 시트
   const sheetItems = useMemo(() => {
     if (!activeYmd) return [];
-    if (mode === 'schedule') {
-      return MOCK_EVENTS.filter((e) => e.date === activeYmd).map((e) => ({
-        id: e.id,
-        title: e.title,
-        sticker: e.sticker,
-      }));
-    }
-    // 행사 모드
-    return expandFairsToDays(base)
-      .filter((e) => e.date === activeYmd)
-      .map((e) => ({ id: e.id, title: e.title, sticker: e.sticker })); // expandFairsToDays가 title 반환하도록 위에서 수정함
-  }, [activeYmd, mode, base]);
+    const key = `${base.getFullYear()}-${base.getMonth() + 1}`;
+    const sheetMap = maps[key]?.sheet ?? new Map();
+    return (sheetMap.get(activeYmd) ?? []).map((x) => ({
+      id: x.id,
+      title: x.title,
+      sticker: x.sticker,
+    }));
+  }, [activeYmd, base, maps]);
+
+  const makeByDate = useCallback(
+    (monthBase: Date) => {
+      const key = `${monthBase.getFullYear()}-${monthBase.getMonth() + 1}`;
+      return maps[key]?.grid ?? new Map();
+    },
+    [maps],
+  );
+
   const router = useRouter();
 
   return (
-    <main className="mx-auto w-full max-w-[420px]">
+    <main className="mx-auto w-full max-w-[420px] pb-[48px]">
       <Header
         showBack
         onBack={() => router.back()}
@@ -86,7 +63,6 @@ export default function CalendarPage() {
         }
       />
 
-      {/* D-Day + 카드 */}
       <section className="px-[22px] pt-2">
         <div className="flex items-center gap-2">
           <SvgObject src="/icons/MyRing.svg" width={32} height={37} />
@@ -94,25 +70,17 @@ export default function CalendarPage() {
             결혼까지 <span className="text-primary-500">D-{d}</span>
           </p>
         </div>
-        <p className="mt-1 !text-sm text-gray-500">
-          끝까지 웨딧이 함께 할게요 :)
-        </p>
-
+        <p className="mt-1 !text-sm text-gray-500">끝까지 웨딧이 함께 할게요 :)</p>
         <div className="mt-4">
           <SummaryCard />
         </div>
-      </section>
-
-      {/* 월 헤더 + 요일 헤더 */}
-      <section className="mt-8 px-[14px] max-w-[360px] mx-auto">
-        <WeekHeader />
       </section>
 
       <section className="mt-2 pb-8">
         <MonthSlider
           base={base}
           setBase={setBase}
-          makeByDate={makeByDate} // ✅ 변경된 부분
+          makeByDate={makeByDate}
           onPickDay={openDay}
           className="max-w-[360px] mx-auto"
         />
@@ -125,24 +93,5 @@ export default function CalendarPage() {
         onClose={() => setActiveYmd(null)}
       />
     </main>
-  );
-}
-function WeekHeader() {
-  const labels = ['일', '월', '화', '수', '목', '금', '토'];
-  return (
-    <div className="grid grid-cols-7 text-center text-[12px] leading-[14px]">
-      {labels.map((d, i) => (
-        <div
-          key={d}
-          className={
-            i === 0
-              ? 'font-medium text-[#FF6B6B]'
-              : 'font-medium text-text-secondary'
-          }
-        >
-          {d}
-        </div>
-      ))}
-    </div>
   );
 }

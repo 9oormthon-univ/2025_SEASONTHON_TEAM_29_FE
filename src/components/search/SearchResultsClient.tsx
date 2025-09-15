@@ -35,7 +35,7 @@ export function SearchResultsClient() {
             regionCode,
             price,
             dressStyle: sp.getAll('dressStyle'),            // ✅
-            dressProduction: sp.getAll('dressProduction'),  // ✅
+            dressOrigin: sp.getAll('dressOrigin'),  // ✅
           },
         };
       case 'studio':

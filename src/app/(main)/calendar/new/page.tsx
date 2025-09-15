@@ -2,13 +2,14 @@
 'use client';
 
 import { STICKER_SRC } from '@/components/calendar/stickers';
+import Input from '@/components/common/atomic/Input';
+import TextField from '@/components/common/atomic/TextField';
 import Header from '@/components/common/monocules/Header';
+import { createCalendarEvent } from '@/services/calendar.api';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import Input from '@/components/common/atomic/Input';
-import TextField from '@/components/common/atomic/TextField';
 
 type StickerKey = keyof typeof STICKER_SRC;
 
@@ -22,14 +23,33 @@ export default function CalendarNewPage() {
   const disabled = !title.trim() || !sticker;
 
   const stickers: StickerKey[] = useMemo(
-    () => ['letter', 'studio', 'hall', 'dress', 'drink', 'cake', 'makeup'],
+    () => ['INVITATION', 'STUDIO', 'WEDDING_HALL', 'DRESS', 'PARTY', 'BRIDAL_SHOWER', 'MAKEUP'],
     [],
   );
 
-  const onSubmit = (e: React.FormEvent) => {
+  const [loading, setLoading] = useState(false);
+
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (disabled) return;
-    router.back();
+    if (disabled || !sticker) return;
+  
+    try {
+      setLoading(true);
+      await createCalendarEvent({
+        title,
+        description: memo,
+        eventCategory: sticker.toUpperCase(), // 서버 enum이 'LETTER' 같은 UPPERCASE라면 변환 필요
+        startDateTime: new Date().toISOString(), // TODO: 날짜 선택 기능 붙이면 교체
+        endDateTime: new Date().toISOString(),
+        isAllDay: true,
+      });
+      router.back();
+    } catch (err) {
+      console.error('캘린더 등록 실패', err);
+      alert('일정 등록에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -88,15 +108,15 @@ export default function CalendarNewPage() {
         </div>
         <button
           type="submit"
-          disabled={disabled}
+          disabled={disabled || loading}
           className={clsx(
             'mt-8 h-12 w-full rounded-2xl text-[15px] font-semibold transition',
-            disabled
+            disabled || loading
               ? 'bg-primary-200 text-rose-300 cursor-not-allowed'
               : 'bg-primary-500 text-white active:scale-[0.98]',
           )}
         >
-          등록하기
+          {loading ? '등록 중…' : '등록하기'}
         </button>
       </form>
     </main>

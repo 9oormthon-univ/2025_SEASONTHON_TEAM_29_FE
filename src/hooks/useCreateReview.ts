@@ -46,13 +46,17 @@ export function useCreateReview({
     setSubmitting(true);
     setErrorMsg(null);
     setDoneMsg(null);
-
+    
     const payload: CreateReviewPayload = {
       vendorId,
-      rating: rating!, // canSubmit 보장
+      rating: rating!,
       contentBest: good.trim(),
       contentWorst: bad.trim(),
-      imageKeys,
+      mediaList: imageKeys.map((key, i) => ({
+        mediaKey: key,
+        contentType: 'image/jpeg', // 실제 업로드 시점에서 받아온 MIME 타입
+        sortOrder: i,
+      })),
     };
 
     try {

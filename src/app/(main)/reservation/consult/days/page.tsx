@@ -54,7 +54,9 @@ export default function ConsultDaysPage() {
       const set = new Set<number>();
       for (const item of days) {
         const [yy, mm, dd] = item.date.split('-').map(Number);
-        if (yy === year && mm === month1 && item.available) {
+      
+        // available || isBookable 둘 중 하나라도 true면 추가
+        if (yy === year && mm === month1 && (item.available || item.isBookable)) {
           set.add(dd);
         }
       }

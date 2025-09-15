@@ -17,7 +17,7 @@ import {
   neckIdFromOrder,
   neckOrderFromId,
 } from '@/services/mappers/tourMappers';
-import { getTourDetail, saveDress } from '@/services/tours.api';
+import { getTourDetail, updateDress } from '@/services/tours.api';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -26,7 +26,6 @@ export default function DressFittingClient({ id }: { id: string }) {
   const [saving, setSaving] = useState(false);
   const router = useRouter();
 
-  // 상세값으로 초기 세팅
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -35,39 +34,31 @@ export default function DressFittingClient({ id }: { id: string }) {
         const d = res.data;
         if (!alive || !d) return;
 
-        const { materialOrder, neckLineOrder, lineOrder } = d;
-
         // 소재(단일)
-        const targetMaterial = materialNameFromOrder(materialOrder);
-        if (targetMaterial) {
-          // 싹 끄고
-          materials.forEach((m) => {
-            if (m !== targetMaterial) toggleMaterial(m); // ON이면 OFF됨
-          });
-          // 목표 켜기
-          if (!materials.includes(targetMaterial)) toggleMaterial(targetMaterial);
+        const mat = materialNameFromOrder(d.materialOrder);
+        if (mat) {
+          materials.forEach(m => { if (m !== mat) toggleMaterial(m); });
+          if (!materials.includes(mat)) toggleMaterial(mat);
         }
 
         // 넥라인
-        const targetNeckId = neckIdFromOrder(neckLineOrder);
-        if (targetNeckId) {
-          const nk = dressNecklines.find((n) => String(n.id) === targetNeckId) ?? null;
+        const neckId = neckIdFromOrder(d.neckLineOrder);
+        if (neckId) {
+          const nk = dressNecklines.find(n => String(n.id) === neckId) ?? null;
           setNeck(nk);
         }
 
         // 라인
-        const targetLineId = lineIdFromOrder(lineOrder);
-        if (targetLineId) {
-          const ln = dressLines.find((l) => String(l.id) === targetLineId) ?? null;
+        const lineId = lineIdFromOrder(d.lineOrder);
+        if (lineId) {
+          const ln = dressLines.find(l => String(l.id) === lineId) ?? null;
           setLine(ln);
         }
       } catch (e) {
         console.warn('tour detail preload failed', e);
       }
     })();
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -75,8 +66,7 @@ export default function DressFittingClient({ id }: { id: string }) {
     if (!canSave || saving) return;
     setSaving(true);
     try {
-      await saveDress({
-        tourId: Number(id),
+      await updateDress(Number(id), {
         materialOrder: materialOrderFromName(materials[0] ?? null),
         neckLineOrder: neckOrderFromId(neck?.id),
         lineOrder: lineOrderFromId(line?.id),
@@ -107,11 +97,8 @@ export default function DressFittingClient({ id }: { id: string }) {
           options={dressMaterials}
           selected={materials}
           onToggle={(name) => {
-            // 단일 선택
             const target = name;
-            materials.forEach((m) => {
-              if (m !== target) toggleMaterial(m);
-            });
+            materials.forEach(m => { if (m !== target) toggleMaterial(m); });
             if (!materials.includes(target)) toggleMaterial(target);
           }}
         />
@@ -133,11 +120,7 @@ export default function DressFittingClient({ id }: { id: string }) {
         </Section>
 
         <div className="mt-10 mx-5.5">
-          <Button
-            onClick={onSave}                 // ✅ 클릭 핸들러 연결
-            disabled={!canSave || saving}     // ✅ 비활성/로딩 처리
-            ariaLabel="드레스 옵션 저장"
-          >
+          <Button onClick={onSave} disabled={!canSave || saving} ariaLabel="드레스 옵션 저장">
             {saving ? '저장 중…' : '저장하기'}
           </Button>
         </div>

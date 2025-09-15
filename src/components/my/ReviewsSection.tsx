@@ -1,10 +1,20 @@
+// src/components/my/ReviewsSection.tsx
 'use client';
+
 import SvgObject from '@/components/common/atomic/SvgObject';
 import CompanyCard from '@/components/my/CompanyCard';
 import type { ReviewCompany } from '@/types/mypage';
 
 export default function ReviewsSection({
-  items, loading, error, hasMore, onMore, onWriteClick, onCardClick, allowWrite = true,
+  items,
+  loading,
+  error,
+  hasMore,
+  onMore,
+  onWriteClick,
+  onCardClick,
+  allowWrite = true,
+  writeDisabled = false,
 }: {
   items: ReviewCompany[];
   loading?: boolean;
@@ -13,12 +23,11 @@ export default function ReviewsSection({
   onMore: () => void;
   onWriteClick: () => void;
   onCardClick: (id: string) => void;
-  /** 지난 예약이 있을 때만 작성 버튼 노출 */
   allowWrite?: boolean;
+  writeDisabled?: boolean;
 }) {
-  const uniqueItems = items.filter((item, idx, arr) =>
-    arr.findIndex((x) => x.id === item.id) === idx
-  );
+  const uniqueItems = items.filter((item, idx, arr) => arr.findIndex((x) => x.id === item.id) === idx);
+
   return (
     <div className="mt-4">
       <div className="mb-3 flex items-center justify-between px-1">
@@ -33,7 +42,12 @@ export default function ReviewsSection({
           <button
             type="button"
             onClick={onWriteClick}
-            className="flex h-28 w-28 flex-col items-center justify-center gap-2 rounded-lg text-text-secondary outline-1 outline-box-line outline-offset-[-1px]"
+            disabled={writeDisabled}
+            className={[
+              'flex h-28 w-28 flex-col items-center justify-center gap-2 rounded-lg text-text-secondary',
+              'outline-1 outline-box-line outline-offset-[-1px]',
+              writeDisabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
+            ].join(' ')}
           >
             <SvgObject src="/icons/plus.svg" alt="plus" width={26} height={26} className="rounded-full" />
             <span>후기작성</span>
@@ -42,7 +56,7 @@ export default function ReviewsSection({
 
         {uniqueItems.map((c) => (
           <CompanyCard
-            key={c.id}                   // 이제 고유
+            key={c.id}
             variant="review"
             region={c.district ?? '-'}
             name={c.name}
@@ -66,11 +80,7 @@ export default function ReviewsSection({
       )}
       {!loading && hasMore && (
         <div className="mt-4 flex justify-center">
-          <button
-            type="button"
-            className="h-10 rounded-lg px-4 text-sm outline-1 outline-box-line"
-            onClick={onMore}
-          >
+          <button type="button" className="h-10 rounded-lg px-4 text-sm outline-1 outline-box-line" onClick={onMore}>
             더 보기
           </button>
         </div>

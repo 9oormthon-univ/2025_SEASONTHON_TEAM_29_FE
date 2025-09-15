@@ -45,12 +45,12 @@ export default function DynamicProductForm({
   });
   const [studio, setStudio] = useState<Pick<CreateStudioProduct, 'studioStyle' | 'specialShot' | 'iphoneSnap'>>({
     studioStyle: 'PORTRAIT_FOCUSED',
-    specialShot: undefined,
+    specialShot: 'NONE',
     iphoneSnap: false,
   });
-  const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressProduction'>>({
+  const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressOrigin'>>({
     dressStyle: 'ROMANTIC',
-    dressProduction: 'DOMESTIC',
+    dressOrigin: 'DOMESTIC',
   });
   const [makeup, setMakeup] = useState<Pick<CreateMakeupProduct, 'makeupStyle' | 'isStylistDesignationAvailable' | 'hasPrivateRoom'>>({
     makeupStyle: 'NATURAL',
@@ -172,7 +172,7 @@ export default function DynamicProductForm({
                 specialShot: v as CreateStudioProduct['specialShot'],
               }))
             }
-            options={['HANOK', 'UNDERWATER', 'WITH_PET']}
+            options={['NONE', 'HANOK', 'UNDERWATER', 'WITH_PET']}
           />
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -202,11 +202,11 @@ export default function DynamicProductForm({
           />
           <SelectField
             label="제작 방식"
-            value={dress.dressProduction}
+            value={dress.dressOrigin}
             onChange={(v) =>
               setDress((prev) => ({
                 ...prev,
-                dressProduction: v as CreateDressProduct['dressProduction'],
+                dressOrigin: v as CreateDressProduct['dressOrigin'],
               }))
             }
             options={['DOMESTIC', 'IMPORTED']}

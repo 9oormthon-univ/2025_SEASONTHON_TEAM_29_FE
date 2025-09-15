@@ -106,7 +106,7 @@ export type CreateWeddingHallProduct = CreateProductBase & {
 
 /** ---------- 스튜디오 ---------- */
 export type StudioStyle = 'PORTRAIT_FOCUSED' | 'NATURAL' | 'EMOTIONAL' | 'CLASSIC' | 'BLACK_AND_WHITE';
-export type SpecialShot = 'HANOK' | 'UNDERWATER' | 'WITH_PET';
+export type SpecialShot = 'NONE' | 'HANOK' | 'UNDERWATER' | 'WITH_PET';
 
 export type CreateStudioProduct = CreateProductBase & {
   vendorType: 'STUDIO';
@@ -117,12 +117,12 @@ export type CreateStudioProduct = CreateProductBase & {
 
 /** ---------- 드레스 ---------- */
 export type DressStyle = 'MODERN' | 'CLASSIC' | 'ROMANTIC' | 'DANAH' | 'UNIQUE' | 'HIGH_END';
-export type DressProduction = 'DOMESTIC' | 'IMPORTED';
+export type DressOrigin = 'DOMESTIC' | 'IMPORTED';
 
 export type CreateDressProduct = CreateProductBase & {
   vendorType: 'DRESS';
   dressStyle: Extensible<DressStyle>;
-  dressProduction: Extensible<DressProduction>;
+  dressOrigin: Extensible<DressOrigin>;
 };
 
 /** ---------- 메이크업 ---------- */
