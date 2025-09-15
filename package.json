@@ -40,6 +40,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "eslint-plugin-storybook": "^9.1.3",
