@@ -3,11 +3,11 @@ import { mapSearchResponse, type VendorRes } from '@/services/mappers/searchMapp
 import type { SearchResult } from '@/types/search';
 
 export type StudioSearchReq = {
-  regionCode: string[];
-  price: number;
-  studioStyle: string[];
-  specialShots?: string[];
-  iphoneSnap: boolean;
+  regionCode?: string[] | null;
+  price?: number | null;
+  studioStyle?: string[] | null;
+  specialShots?: string[] | null;
+  iphoneSnap?: boolean | null;
   page?: number;
   size?: number;
 };
@@ -22,11 +22,12 @@ export async function searchStudios(
   const size = body.size ?? 12;
 
   const qs = new URLSearchParams();
-  if (body.regionCode.length > 0) qs.set('regionCode', body.regionCode.join(','));
-  qs.set('price', String(body.price));
-  if (body.studioStyle.length > 0) qs.set('studioStyle', body.studioStyle.join(','));
+  if (body.regionCode?.length) qs.set('regionCode', body.regionCode.join(','));
+  if (body.price != null && body.price > 0) qs.set('price', String(body.price));
+  if (body.studioStyle?.length) qs.set('studioStyle', body.studioStyle.join(','));
   if (body.specialShots?.length) qs.set('specialShots', body.specialShots.join(','));
-  qs.set('iphoneSnap', String(body.iphoneSnap));
+  if (body.iphoneSnap != null) qs.set('iphoneSnap', String(body.iphoneSnap));
+
   qs.set('page', String(page));
   qs.set('size', String(size));
 

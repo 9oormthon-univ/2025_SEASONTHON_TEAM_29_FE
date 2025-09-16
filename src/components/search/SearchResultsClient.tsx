@@ -22,10 +22,12 @@ export function SearchResultsClient() {
           body: {
             regionCode,
             price,
-            hallStyle: sp.getAll('hallStyle'),      // ✅
-            hallMeal: sp.getAll('hallMeal'),        // ✅
+            hallStyle: sp.getAll('hallStyle'),   
+            hallMeal: sp.getAll('hallMeal'),     
             capacity: Number(sp.get('guest') ?? 0),
-            hasParking: sp.get('parking') === 'true',
+            hasParking: sp.has('hasParking')
+              ? sp.get('hasParking') === 'true'
+              : null,
           },
         };
       case 'dress':
@@ -34,8 +36,8 @@ export function SearchResultsClient() {
           body: {
             regionCode,
             price,
-            dressStyle: sp.getAll('dressStyle'),            // ✅
-            dressOrigin: sp.getAll('dressOrigin'),  // ✅
+            dressStyle: sp.getAll('dressStyle'),
+            dressOrigin: sp.getAll('dressOrigin'),
           },
         };
       case 'studio':
@@ -44,9 +46,11 @@ export function SearchResultsClient() {
           body: {
             regionCode,
             price,
-            studioStyle: sp.getAll('studioStyle'),    // ✅
-            specialShots: sp.getAll('specialShots'),   // ✅
-            iphoneSnap: sp.get('iphoneSnap') === 'true',
+            studioStyle: sp.getAll('studioStyle'), 
+            specialShots: sp.getAll('specialShots'),
+            iphoneSnap: sp.has('iphoneSnap')
+              ? sp.get('iphoneSnap') === 'true'
+              : null,
           },
         };
       case 'makeup':
@@ -55,9 +59,13 @@ export function SearchResultsClient() {
           body: {
             regionCode,
             price,
-            makeupStyle: sp.getAll('makeupStyle'),                     // ✅
-            isStylistDesignationAvailable: sp.get('stylist') === 'true', // ✅
-            hasPrivateRoom: sp.get('room') === 'true',                   // ✅
+            makeupStyle: sp.getAll('makeupStyle'),                  
+            isStylistDesignationAvailable: sp.has('stylist')
+              ? sp.get('stylist') === 'true'
+              : null,
+            hasPrivateRoom: sp.has('room')
+              ? sp.get('room') === 'true'
+              : null,             
           },
         };
     }

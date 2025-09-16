@@ -3,12 +3,12 @@ import { mapSearchResponse, type VendorRes } from '@/services/mappers/searchMapp
 import type { SearchResult } from '@/types/search';
 
 export type HallSearchReq = {
-  regionCode: string[];
-  price: number;
-  hallStyle: string[];
-  hallMeal: string[];
-  capacity: number;
-  hasParking: boolean;
+  regionCode?: string[] | null;
+  price?: number | null;
+  hallStyle?: string[] | null;
+  hallMeal?: string[] | null;
+  capacity?: number | null;
+  hasParking?: boolean | null;
   page?: number;
   size?: number;
 };
@@ -23,12 +23,14 @@ export async function searchWeddingHalls(
   const size = body.size ?? 12;
 
   const qs = new URLSearchParams();
-  if (body.regionCode.length > 0) qs.set('regionCode', body.regionCode.join(','));
-  qs.set('price', String(body.price));
-  if (body.hallStyle.length > 0) qs.set('hallStyle', body.hallStyle.join(','));
-  if (body.hallMeal.length > 0) qs.set('hallMeal', body.hallMeal.join(','));
-  qs.set('capacity', String(body.capacity));
-  qs.set('hasParking', String(body.hasParking));
+
+  if (body.regionCode?.length) qs.set('regionCode', body.regionCode.join(','));
+  if (body.price != null && body.price > 0) qs.set('price', String(body.price));
+  if (body.hallStyle?.length) qs.set('hallStyle', body.hallStyle.join(','));
+  if (body.hallMeal?.length) qs.set('hallMeal', body.hallMeal.join(','));
+  if (body.capacity != null && body.capacity > 0) qs.set('capacity', String(body.capacity));
+  if (body.hasParking != null) qs.set('hasParking', String(body.hasParking));
+
   qs.set('page', String(page));
   qs.set('size', String(size));
 

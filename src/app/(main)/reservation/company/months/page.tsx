@@ -46,7 +46,7 @@ export default function TypeFlowPage() {
         : [...prev, m].sort((a, b) => a - b),
     );
 
-  const year = new Date().getFullYear() + 1;
+  const year = new Date().getFullYear();
 
   return (
     <ReservationStepLayout

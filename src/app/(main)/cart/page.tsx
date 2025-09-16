@@ -65,7 +65,7 @@ export default function EstimateCartPage() {
 
   const total = useMemo(() => {
     const selectedItems = items.filter(
-      (i) => selectedByType[i.vendorType] === i.cartItemId && i.isActive,
+      (i) => selectedByType[i.vendorType] === i.cartItemId
     );
     return selectedItems.reduce((s, i) => s + i.price, 0);
   }, [items, selectedByType]);

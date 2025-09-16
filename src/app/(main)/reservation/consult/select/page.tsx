@@ -64,7 +64,7 @@ export default function ConsultTimePage() {
 
   // ✅ Lottie 제어용 ref, state
   const lottieRef = React.useRef<LottieRefCurrentProps>(null);
-  const [plays, setPlays] = React.useState(0);
+  const [, setPlays] = React.useState(0);
 
   // 슬롯 로드
   React.useEffect(() => {
