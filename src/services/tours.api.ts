@@ -1,64 +1,91 @@
 // src/services/tours.api.ts
 import { http, type ApiEnvelope } from '@/services/http';
-import type {
-  DressTourItem,
-  PageApi,
-  TourDetailApi,
-  TourListItemApi,
-  ToursBundle,
-  TourStatus,
-  UpdateDressReq,
-} from '@/types/tour';
+import type { DressTourItem, ToursBundle, TourStatus } from '@/types/tour';
 
-const BASE = '/v1/tour'; // http.ts가 '/api' prefix면 최종 '/api/v1/tour'
+/** 서버 응답 타입 */
+export type TourStatusApi = 'WAITING' | 'COMPLETE';
 
-/** 목록(페이지네이션) */
-export async function getToursPage(params?: { page?: number; size?: number; sort?: string }) {
-  const search = new URLSearchParams();
-  if (params?.page !== undefined) search.set('page', String(params.page));
-  if (params?.size !== undefined) search.set('size', String(params.size));
-  if (params?.sort) search.set('sort', params.sort);
+export type TourListItemApi = {
+  id: number;
+  status: TourStatusApi;
+  memberId: number;
+  vendorId: number;
+  vendorName: string;
+  vendorDescription: string;
+  vendorCategory: 'WEDDING_HALL';
+  logoImageUrl: string;          // presigned URL
+};
 
-  const qs = search.toString();
-  const url = qs ? `${BASE}?${qs}` : BASE;
+export type TourDetailApi = TourListItemApi & {
+  materialOrder: number;
+  neckLineOrder: number;
+  lineOrder: number;
+};
 
-  return http<ApiEnvelope<PageApi<TourListItemApi>>>(url, { method: 'GET' });
-}
+export type CreateTourReq = {
+  vendorName: string;
+  reservationDate: string; // YYYY-MM-DD
+};
 
-/** 상세 */
-export async function getTourDetail(tourId: number) {
-  return http<ApiEnvelope<TourDetailApi>>(`${BASE}/${tourId}`, { method: 'GET' });
-}
+export type SaveDressReq = {
+  tourId: number;
+  materialOrder: number;
+  neckLineOrder: number;
+  lineOrder: number;
+};
 
-/** 기록/수정 (PUT) */
-export async function updateDress(tourId: number, body: UpdateDressReq) {
-  return http<ApiEnvelope<string>>(`${BASE}/${tourId}`, {
-    method: 'PUT',
+export async function createTour(body: CreateTourReq) {
+  return http<ApiEnvelope<string>>('/v1/tour', {
+    method: 'POST',
     body: JSON.stringify(body),
   });
 }
 
-/** 삭제(옵션) — 서버가 204면 http 래퍼가 no-content 처리하는지 확인 필요 */
-export async function deleteTour(tourId: number) {
-  return http<ApiEnvelope<unknown>>(`${BASE}/${tourId}`, { method: 'DELETE' });
+export async function saveDress(body: SaveDressReq) {
+  console.log(body);
+  return http<ApiEnvelope<string>>('/v1/tour/save_dress', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
 }
 
-/** ===== 매퍼 ===== */
-function toAppItem(x: TourListItemApi): DressTourItem {
-  const s: TourStatus = x.status === 'COMPLETE' ? 'COMPLETE' : 'WAITING';
+export async function getToursRaw() {
+  return http<ApiEnvelope<TourListItemApi[]>>('/v1/tour', { method: 'GET' });
+}
+
+export async function getTourDetail(tourId: number) {
+  return http<ApiEnvelope<TourDetailApi>>(`/v1/tour/${tourId}/detail`, { method: 'GET' });
+}
+
+/** 상태 매핑: DONE(백) → COMPLETE(프론트) */
+function mapStatus(s: TourStatusApi): TourStatus {
+  return s === 'COMPLETE' ? 'COMPLETE' : 'WAITING';
+}
+
+/** 목록 → 앱 아이템 매핑 */
+function toDressTourItemFromList(x: TourListItemApi): DressTourItem {
   return {
-    id: x.tourId,
-    status: s,
+    id: x.id,
+    status: mapStatus(x.status),
     vendorName: x.vendorName,
-    logoImageUrl: x.vendorLogoUrl,
-    owned: x.owned,
+    vendorDescription: x.vendorDescription,
+    vendorCategory: x.vendorCategory,
+    logoImageUrl: x.logoImageUrl,
   };
 }
 
-/** 기존 컴포넌트 호환을 위한 번들 변환 */
-export async function getTours(params?: { page?: number; size?: number; sort?: string }): Promise<ToursBundle> {
-  const res = await getToursPage(params);
-  const list = res.data?.content ?? [];
-  const dressTour = list.map(toAppItem);
+export function mergeWithDetail(listItem: DressTourItem, detail: TourDetailApi): DressTourItem {
+  return {
+    ...listItem,
+    materialOrder: detail.materialOrder,
+    neckLineOrder: detail.neckLineOrder,
+    lineOrder: detail.lineOrder,
+  };
+}
+
+export async function getTours(): Promise<ToursBundle> {
+  const res = await getToursRaw();
+  const list = res.data ?? [];
+  const dressTour = list.map(toDressTourItemFromList);
   return { dressTour, dressRomance: [] };
 }

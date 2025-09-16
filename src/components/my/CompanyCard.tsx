@@ -21,6 +21,7 @@ type Props = {
   onClick?: () => void;
   selected?: boolean;
   executionDateTime?: string;
+  productName?: string;
   dimImage?: boolean;
 };
 
@@ -38,6 +39,8 @@ export default function CompanyCard({
   region,
   imageSrc,
   priceText,
+  category,
+  productName,
   rating,
   variant = 'category',
   alt,
@@ -51,7 +54,6 @@ export default function CompanyCard({
   const altText = alt ?? name;
   const textDimCls = dimImage ? 'opacity-40' : '';
 
-  /** CART */
   /** CART */
   if (variant === 'cart') {
     return (
@@ -79,7 +81,6 @@ export default function CompanyCard({
             <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
           )}
         </div>
-
         {/* 왼쪽 뱃지: 카테고리 */}
         {category && (
           <div className="px-1.5 py-0.5 left-0 top-[125px] absolute bg-primary-200 rounded-lg inline-flex justify-center items-center gap-3 overflow-hidden">

@@ -155,7 +155,7 @@ export default function ResultsScreen({
                           onClick={() => {
                             const cat = sp.get('cat');
                             const params = new URLSearchParams();
-                            if (cat) params.set('cat', cat); // ✅ 카테고리만 유지
+                            if (cat) params.set('cat', cat);
                             router.push(`/search/filters?${params.toString()}`);
                           }}
                           className="text-xs text-gray-400 hover:text-gray-600"
@@ -164,7 +164,7 @@ export default function ResultsScreen({
                         </button>
                       )}
                     </div>
-                    <div className="grid grid-cols-3">
+                    <div className="grid grid-cols-3 gap-3">
                       {list.map((it) => (
                         <VendorCard
                           key={it.id}
@@ -175,7 +175,7 @@ export default function ResultsScreen({
                             regionName: it.region,
                             averageRating: it.rating,
                             reviewCount: it.count,
-                            minPrice: grouped[key]?.minPrice, // ✅ 추가
+                            minPrice: grouped[key]?.minPrice,
                           }}
                           href={`/vendor/${it.id}`}
                         />

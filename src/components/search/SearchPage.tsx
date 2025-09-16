@@ -44,28 +44,10 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
   const [stylist, setStylist] = useState<string | null>(null);
   const [room, setRoom] = useState<string | null>(null);
 
-  /** ✅ 카테고리별 필수 조건 검사 */
   const canSearch = useMemo(() => {
-    if (!cat || areas.length === 0 || price === null) return false;
-
-    switch (cat) {
-      case 'hall':
-        return (
-          hallStyle.length > 0 &&
-          hallMeal.length > 0 &&
-          guest !== null &&
-          parking !== null
-        );
-      case 'dress':
-        return dressStyle.length > 0 && dressOrigin.length > 0;
-      case 'studio':
-        return studioStyle.length > 0 && iphoneSnap !== null;
-      case 'makeup':
-        return makeupStyle.length > 0 && stylist !== null && room !== null;
-      default:
-        return false;
-    }
-  }, [cat, areas, price, hallStyle, hallMeal, guest, parking, dressStyle, dressOrigin, studioStyle, iphoneSnap, makeupStyle, stylist, room]);
+    if (!cat) return false; // 카테고리만 있어도 가능
+    return true;
+  }, [cat]);
 
   const toggle = (list: string[], v: string, set: (v: string[]) => void) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -88,7 +70,11 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
     hallStyle.forEach((v) => p.append('hallStyle', hallStyleMap[v]));
     hallMeal.forEach((v) => p.append('hallMeal', hallMealMap[v]));
     if (guest) p.set('guest', guest.replace(/명$/, ''));
-    if (parking) p.set('parking', parking === '있음' ? 'true' : 'false');
+    if (parking === '있음') {
+      p.set('hasParking', 'true');
+    } else if (parking === '없음') {
+      p.set('hasParking', 'false');
+    }
 
     // 드레스
     dressStyle.forEach((v) => p.append('dressStyle', dressStyleMap[v]));
@@ -96,11 +82,13 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
     // 스튜디오
     studioStyle.forEach((v) => p.append('studioStyle', studioStyleMap[v]));
-    if (studioShot.length === 0) {
-      p.append('specialShots', 'NONE'); // ✅ 기본값
-    } else {
+
+    // 선택된 특수촬영만 추가
+    if (studioShot.length > 0) {
       studioShot.forEach((v) => p.append('specialShots', studioShotMap[v]));
     }
+    
+    // 아이폰 스냅
     if (iphoneSnap) p.set('iphoneSnap', iphoneSnap === '있음' ? 'true' : 'false');
 
     // 메이크업
@@ -113,7 +101,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   return (
     <main className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
-      <Header showBack onBack={() => router.back()} value="검색" />
+      <Header showBack onBack={() => router.push('/search')} value="검색" />
       <div className="px-[22px] flex-1 overflow-y-auto">
 
         <section className="px-0">

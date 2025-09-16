@@ -54,7 +54,7 @@ export default function CalendarNewPage() {
 
   return (
     <main className="mx-auto w-full max-w-[420px]">
-      <Header showBack onBack={() => router.back()} value="일정 등록하기" />
+      <Header showBack onBack={() => router.push('/calendar')} value="일정 등록하기" />
 
       <form onSubmit={onSubmit} className="px-[22px] pb-8">
         <Input

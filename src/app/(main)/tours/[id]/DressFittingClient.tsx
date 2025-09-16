@@ -1,4 +1,3 @@
-// src/app/(main)/tours/[id]/DressFittingClient.tsx
 'use client';
 
 import Button from '@/components/common/atomic/Button';
@@ -17,7 +16,7 @@ import {
   neckIdFromOrder,
   neckOrderFromId,
 } from '@/services/mappers/tourMappers';
-import { getTourDetail, updateDress } from '@/services/tours.api';
+import { getTourDetail, saveDress } from '@/services/tours.api';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -34,21 +33,18 @@ export default function DressFittingClient({ id }: { id: string }) {
         const d = res.data;
         if (!alive || !d) return;
 
-        // 소재(단일)
         const mat = materialNameFromOrder(d.materialOrder);
         if (mat) {
           materials.forEach(m => { if (m !== mat) toggleMaterial(m); });
           if (!materials.includes(mat)) toggleMaterial(mat);
         }
 
-        // 넥라인
         const neckId = neckIdFromOrder(d.neckLineOrder);
         if (neckId) {
           const nk = dressNecklines.find(n => String(n.id) === neckId) ?? null;
           setNeck(nk);
         }
 
-        // 라인
         const lineId = lineIdFromOrder(d.lineOrder);
         if (lineId) {
           const ln = dressLines.find(l => String(l.id) === lineId) ?? null;
@@ -66,7 +62,8 @@ export default function DressFittingClient({ id }: { id: string }) {
     if (!canSave || saving) return;
     setSaving(true);
     try {
-      await updateDress(Number(id), {
+      await saveDress({
+        tourId: Number(id),
         materialOrder: materialOrderFromName(materials[0] ?? null),
         neckLineOrder: neckOrderFromId(neck?.id),
         lineOrder: lineOrderFromId(line?.id),
@@ -81,7 +78,7 @@ export default function DressFittingClient({ id }: { id: string }) {
 
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[calc(env(safe-area-inset-bottom)+96px)]">
-      <Header showBack onBack={() => router.back()} value="투어일지" />
+      <Header showBack onBack={() => router.push('/tours')} value="투어일지" />
 
       <Preview
         neckOverlay={neck?.overlay ?? null}

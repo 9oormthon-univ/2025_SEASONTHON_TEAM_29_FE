@@ -1,12 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import Header from '@/components/common/monocules/Header';
 import LineStepProgress from '@/components/invitation/LineStepProgress';
 import Step1 from '@/components/invitation/ThemaStep/Step1';
 import Step2 from '@/components/invitation/ThemaStep/Step2';
 import Step3 from '@/components/invitation/ThemaStep/Step3';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
 export default function ThemaEditorPage() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export default function ThemaEditorPage() {
 
   const handleBack = () => {
     if (step > 1) pushStep(step - 1);
-    else router.back();
+    else router.push('/mypage/invite/editor');
   };
 
   return (

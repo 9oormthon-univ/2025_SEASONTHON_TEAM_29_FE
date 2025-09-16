@@ -50,7 +50,7 @@ export default function CalendarListPage() {
     <main className="mx-auto w-full max-w-[420px] pb-[24px]">
       <Header
         showBack
-        onBack={() => router.back()}
+        onBack={() => router.push('/calendar')}
         value={title}
         rightSlot={
           <CalendarToggle

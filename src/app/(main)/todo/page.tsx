@@ -10,7 +10,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const TABBAR_H = 75;
 const HANDLE_H = 15;
-const SHEET_OPEN = 280;
+const SHEET_OPEN = 340;
 const CLOSED_OFFSET = SHEET_OPEN - HANDLE_H;
 
 export default function TodoPage() {
@@ -100,7 +100,7 @@ export default function TodoPage() {
         ref={headerRef}
         value="TO-DO"
         showBack
-        onBack={() => router.back()}
+        onBack={() => router.push('/home')}
         bgClassName="bg-[#191919]"
         textClassName="text-white"
       />
@@ -161,16 +161,16 @@ export default function TodoPage() {
           </button>
 
           <div className="px-4 pt-3 pb-6 overflow-y-auto" style={{ height: SHEET_OPEN - HANDLE_H }}>
-            <p className="font-semibold text-neutral-700 mb-3">수행한 항목을 선택해 주세요.</p>
+            <p className="font-bold text-[18px] text-neutral-700 mb-6 mt-2">수행한 항목을 선택해 주세요.</p>
             {!loaded ? (
               <p className="text-sm text-neutral-500">불러오는 중…</p>
             ) : (
-              <ul className="flex flex-wrap gap-2">
+              <ul className="flex flex-wrap gap-x-[8px] gap-y-[12px]">
                 {todos.map((t) => (
                   <li key={t.templateId}>
                     <label
                       className={[
-                        'inline-flex items-center rounded-full border px-3 py-1.5 cursor-pointer select-none',
+                        'inline-flex items-center rounded-full border px-[14px] py-[8px] cursor-pointer select-none',
                         t.isCompleted
                           ? 'border-rose-300 bg-rose-50 text-rose-600'
                           : 'border-neutral-200 bg-neutral-50 text-neutral-800',
@@ -182,7 +182,7 @@ export default function TodoPage() {
                         checked={t.isCompleted}
                         onChange={() => onToggleChip(t.templateId)}
                       />
-                      <span className="text-[11px]">{t.content}</span>
+                      <span className="text-[12px]">{t.content}</span>
                     </label>
                   </li>
                 ))}

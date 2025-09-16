@@ -38,6 +38,10 @@ export type VendorProductSummary = {
   description?: string;
   basePrice: number;
   imageUrls: string[];
+  details?: {
+    weddingHallSeat?: number;
+    banquetHallSeat?: number;
+  };
 };
 
 export type VendorDetail = {
@@ -106,12 +110,12 @@ export type CreateWeddingHallProduct = CreateProductBase & {
 
 /** ---------- 스튜디오 ---------- */
 export type StudioStyle = 'PORTRAIT_FOCUSED' | 'NATURAL' | 'EMOTIONAL' | 'CLASSIC' | 'BLACK_AND_WHITE';
-export type SpecialShot = 'NONE' | 'HANOK' | 'UNDERWATER' | 'WITH_PET';
+export type SpecialShots = 'NONE' | 'HANOK' | 'UNDERWATER' | 'WITH_PET';
 
 export type CreateStudioProduct = CreateProductBase & {
   vendorType: 'STUDIO';
   studioStyle: Extensible<StudioStyle>;
-  specialShot?: Extensible<SpecialShot>;
+  specialShots?: Extensible<SpecialShots>;
   iphoneSnap?: boolean;
 };
 

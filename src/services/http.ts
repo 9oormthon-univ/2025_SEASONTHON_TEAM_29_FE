@@ -2,6 +2,8 @@ import { refreshStore } from '@/lib/refreshStore';
 import { tokenStore } from '@/lib/tokenStore';
 
 const BASE = '/api';
+const REISSUE_PATH = '/v1/member/token-reissue';
+const REFRESH_HEADER = 'X-Refresh-Token';
 
 type HttpInit = RequestInit & { skipAuth?: boolean };
 export type ApiEnvelope<T> = {
@@ -28,15 +30,19 @@ function toHeaderRecord(h?: HeadersInit): Record<string, string> {
 let refreshPromise: Promise<boolean> | null = null;
 
 export async function reissueOnce(): Promise<boolean> {
-  if (refreshPromise) return refreshPromise; // 이미 진행 중이면 공유
+  if (refreshPromise) return refreshPromise;
 
   refreshPromise = (async () => {
     const rt = refreshStore.get();
     if (!rt) return false;
 
-    const res = await fetch(absoluteUrl(`${BASE}/v1/member/reissue`), {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${rt}` },
+    // 변경점: GET + X-Refresh-Token 헤더 사용
+    const res = await fetch(absoluteUrl(`${BASE}${REISSUE_PATH}`), {
+      method: 'GET',
+      headers: {
+        // 스웨거 주석대로 Bearer 프리픽스 포함
+        [REFRESH_HEADER]: `Bearer ${rt}`,
+      },
       cache: 'no-store',
     }).catch(() => null);
 
@@ -59,18 +65,15 @@ export async function reissueOnce(): Promise<boolean> {
   try {
     return await refreshPromise;
   } finally {
-    refreshPromise = null; // 끝나면 초기화
+    refreshPromise = null;
   }
 }
 
 function redirectToLogin() {
   if (typeof window === 'undefined') return;
   const next = encodeURIComponent(window.location.pathname || '/');
-
-  // 저장된 토큰 제거
   tokenStore.clear?.();
   refreshStore.clear?.();
-
   window.location.replace(`/login?next=${next}`);
 }
 
@@ -79,7 +82,7 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
     ...toHeaderRecord(init.headers),
   };
 
-  // JSON 바디가 있으면 Content-Type 기본값 채우기
+  // JSON 바디가 있으면 Content-Type 기본값
   if (init.body && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
@@ -92,7 +95,6 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
 
   const url = absoluteUrl(`${BASE}${path}`);
 
-  // 첫 요청
   let res: Response | null = null;
   try {
     res = await fetch(url, {

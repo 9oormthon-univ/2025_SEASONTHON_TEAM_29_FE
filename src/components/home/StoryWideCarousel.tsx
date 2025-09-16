@@ -25,6 +25,7 @@ export default function StoryWideCarousel({ items }: { items: StoryItem[] }) {
               key={s.id}
               href={`/stories/${s.id}`}
               className={`pl-1 min-w-0 flex-[0_0_75%] ${
+
                 i === items.length - 1 ? 'mr-4' : ''
               }`}
             >

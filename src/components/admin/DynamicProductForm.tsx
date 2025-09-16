@@ -43,9 +43,9 @@ export default function DynamicProductForm({
     capacity: 0,
     hasParking: false,
   });
-  const [studio, setStudio] = useState<Pick<CreateStudioProduct, 'studioStyle' | 'specialShot' | 'iphoneSnap'>>({
+  const [studio, setStudio] = useState<Pick<CreateStudioProduct, 'studioStyle' | 'specialShots' | 'iphoneSnap'>>({
     studioStyle: 'PORTRAIT_FOCUSED',
-    specialShot: 'NONE',
+    specialShots: 'NONE',
     iphoneSnap: false,
   });
   const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressOrigin'>>({
@@ -165,11 +165,11 @@ export default function DynamicProductForm({
           />
           <SelectField
             label="특수 촬영"
-            value={studio.specialShot ?? ''}
+            value={studio.specialShots ?? ''}
             onChange={(v) =>
               setStudio((prev) => ({
                 ...prev,
-                specialShot: v as CreateStudioProduct['specialShot'],
+                specialShots: v as CreateStudioProduct['specialShots'],
               }))
             }
             options={['NONE', 'HANOK', 'UNDERWATER', 'WITH_PET']}
