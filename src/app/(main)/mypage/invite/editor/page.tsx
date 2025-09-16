@@ -80,7 +80,7 @@ export default function InviteEditorPage() {
         showBack
         onBack={() => history.back()}
         rightSlot={
-          <a href="view" className="text-xs text-primary-500 underline">
+          <a href="editor/view" className="text-xs text-primary-500 underline">
             미리보기
           </a>
         }
