@@ -1,11 +1,12 @@
 'use client';
 
+import congrats from '@/assets/animations/congrats.json';
 import ReservationLayout from '@/components/reservation/layout/ReservationLayout';
 import { createReservation, getDailySlots } from '@/services/reservation.api';
 import { ReservationSlot } from '@/types/reservation';
 import { formatTimeHM } from '@/utills/time';
 import clsx from 'clsx';
-import Image from 'next/image';
+import Lottie from 'lottie-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
@@ -142,13 +143,12 @@ export default function ConsultTimePage() {
           <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[420px] h-96 bg-white rounded-t-xl overflow-hidden">
             <div className="w-11 h-0.5 mx-auto mt-3 rounded-full bg-neutral-300" />
             <div className="h-full flex flex-col items-center justify-center gap-6">
-              <Image
-                src="/congratu.png"
-                alt="예약 완료"
-                width={160}
-                height={160}
-                priority
-                className="w-[160px] h-[160px] select-none pointer-events-none"
+              <Lottie
+                animationData={congrats}
+                loop={false}           // 필요하면 true
+                autoplay
+                style={{ width: 157, height: 181 }}
+                className="w-[157px] h-[181px] select-none pointer-events-none"
               />
               <p className="text-[16px] font-semibold text-text--default">
                 예약이 완료 되었어요!
