@@ -1,22 +1,22 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState, type ComponentProps } from 'react';
-import { defaultInviteForm, type InviteForm } from '@/types/invite';
-import Header from '@/components/common/monocules/Header';
-import ThemaSection from '@/components/invitation/section/ThemaSection';
-import BasicInfoSection from '@/components/invitation/section/BasicInfoSection';
-import MessageSection from '@/components/invitation/section/MessageSection';
-import DateSection from '@/components/invitation/section/DateSection';
-import PlaceSection, {
-  type PlaceSectionValue,
-} from '@/components/invitation/section/PlaceSection';
 import Button from '@/components/common/atomic/Button';
 import SvgObject from '@/components/common/atomic/SvgObject';
-import clsx from 'clsx';
+import Header from '@/components/common/monocules/Header';
+import BasicInfoSection from '@/components/invitation/section/BasicInfoSection';
+import DateSection from '@/components/invitation/section/DateSection';
 import GallerySection, {
   type GallerySectionValue,
 } from '@/components/invitation/section/GallerySection';
+import MessageSection from '@/components/invitation/section/MessageSection';
+import PlaceSection, {
+  type PlaceSectionValue,
+} from '@/components/invitation/section/PlaceSection';
+import ThemaSection from '@/components/invitation/section/ThemaSection';
+import { defaultInviteForm, type InviteForm } from '@/types/invite';
+import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
+import { useState, type ComponentProps } from 'react';
 const DEFAULT_PLACE: PlaceSectionValue = {
   venueName: '',
   hallInfo: '',
@@ -75,7 +75,7 @@ export default function InviteEditorPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-96 bg-background">
-      <Header value="청첩장 제작" onBack={() => router.back()} showBack />
+      <Header value="청첩장 제작" onBack={() => router.push('/mypage')} showBack />
       <section className="mx-auto max-w-100 px-2 pt-2 flex flex-col items-center gap-3">
         <ThemaSection
           value={form.theme as unknown as ThemaValue}

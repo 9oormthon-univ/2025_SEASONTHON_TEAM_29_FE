@@ -49,7 +49,7 @@ export default function ReviewForm({
       <div className="w-96 px-6 pb-36">
         <Header 
         showBack
-        onBack={()=>router.back()}
+        onBack={()=>router.push('/mypage')}
         value="후기" />
 
         {/* 헤더 & 평점 */}

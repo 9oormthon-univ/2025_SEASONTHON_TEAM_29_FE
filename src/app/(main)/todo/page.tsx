@@ -100,7 +100,7 @@ export default function TodoPage() {
         ref={headerRef}
         value="TO-DO"
         showBack
-        onBack={() => router.back()}
+        onBack={() => router.push('/home')}
         bgClassName="bg-[#191919]"
         textClassName="text-white"
       />

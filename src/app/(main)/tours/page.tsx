@@ -74,7 +74,7 @@ export default function ToursPage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[96px]">
-      <Header showBack onBack={() => router.back()} value="투어일지" rightSlot={<PlusButton />} />
+      <Header showBack onBack={() => router.push('/home')} value="투어일지" rightSlot={<PlusButton />} />
       <TourTabs />
       <section className="flex-1 overflow-y-auto">
         {loading && <ToursSkeleton />}

@@ -7,6 +7,7 @@ import VendorReviewCard from '@/components/reviews/VendorReviewCard';
 import VendorReviewStats from '@/components/reviews/VendorReviewStats';
 import { useVendorReviews } from '@/hooks/useVendorReviews';
 import { getVendorReviewStats, type VendorReviewStatsType } from '@/services/vendor-review.api';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 export default function VendorReviewsScreen({ vendorId }: { vendorId: number }) {
@@ -43,10 +44,11 @@ export default function VendorReviewsScreen({ vendorId }: { vendorId: number }) 
     io.observe(sentinelRef.current);
     return () => io.disconnect();
   }, [load]);
+  const router = useRouter();
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-[420px] bg-white pb-16">
-      <Header showBack value="전체리뷰" />
+      <Header showBack value="전체리뷰" onBack={() => router.back()}/>
 
       {/* 상단: 총 개수 텍스트 */}
       <section className="px-5 pt-3">

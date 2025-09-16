@@ -73,7 +73,7 @@ export default function EstimateCartPage() {
 
   return (
     <div className="w-full max-w-[420px] mx-auto">
-      <Header showBack onBack={() => router.back()} value="견적서" />
+      <Header showBack onBack={() => router.push('/home')} value="견적서" />
 
       <section className="px-5 mt-3">
         <div className="w-full h-20 inline-flex flex-col items-center justify-center rounded-2xl border border-zinc-300/50 bg-white px-7">
