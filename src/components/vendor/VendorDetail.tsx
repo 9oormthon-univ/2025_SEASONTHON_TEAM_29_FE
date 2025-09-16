@@ -33,14 +33,14 @@ export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail })
 
       {!!vendor.description && (
         <section className="px-4">
-          <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed text-gray-700">
+          <p className="mt-1 text-[13px] leading-relaxed text-gray-700">
             {vendor.description}
           </p>
         </section>
       )}
       <VendorActions vendorId={vendor.vendorId} />
       {/* 상품 섹션들 */}
-      <div className="px-4 pb-10 mt-6">
+      <div className="px-4 pb-10 mt-10">
         {vendor.products.map((p) => (
           <ProductSectionBlock key={p.id} product={p} vendorId={vendor.vendorId} />
         ))}

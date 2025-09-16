@@ -38,6 +38,10 @@ export type VendorProductSummary = {
   description?: string;
   basePrice: number;
   imageUrls: string[];
+  details?: {
+    weddingHallSeat?: number;
+    banquetHallSeat?: number;
+  };
 };
 
 export type VendorDetail = {
