@@ -16,12 +16,13 @@ import {
   neckIdFromOrder,
   neckOrderFromId,
 } from '@/services/mappers/tourMappers';
-import { getTourDetail, saveDress } from '@/services/tours.api';
+import { getTourRomanceDetail, updateTourRomance } from '@/services/tourRomance.api';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function DressFittingClient({ id }: { id: string }) {
-  const { materials, toggleMaterial, neck, setNeck, line, setLine, canSave } = useDressFitting();
+export default function RomanceFittingClient({ id }: { id: string }) {
+  const { materials, toggleMaterial, neck, setNeck, line, setLine, canSave } =
+    useDressFitting();
   const [saving, setSaving] = useState(false);
   const router = useRouter();
 
@@ -29,32 +30,39 @@ export default function DressFittingClient({ id }: { id: string }) {
     let alive = true;
     (async () => {
       try {
-        const res = await getTourDetail(Number(id));
-        const d = res.data;
-        if (!alive || !d) return;
+        const detail = await getTourRomanceDetail(Number(id));
+        if (!alive || !detail) return;
 
-        const mat = materialNameFromOrder(d.materialOrder);
+        // 소재
+        const mat = materialNameFromOrder(detail.materialOrder ?? 0);
         if (mat) {
-          materials.forEach(m => { if (m !== mat) toggleMaterial(m); });
+          materials.forEach((m) => {
+            if (m !== mat) toggleMaterial(m);
+          });
           if (!materials.includes(mat)) toggleMaterial(mat);
         }
 
-        const neckId = neckIdFromOrder(d.neckLineOrder);
+        // 넥라인
+        const neckId = neckIdFromOrder(detail.neckLineOrder ?? 0);
         if (neckId) {
-          const nk = dressNecklines.find(n => String(n.id) === neckId) ?? null;
+          const nk =
+            dressNecklines.find((n) => String(n.id) === neckId) ?? null;
           setNeck(nk);
         }
 
-        const lineId = lineIdFromOrder(d.lineOrder);
+        // 라인
+        const lineId = lineIdFromOrder(detail.lineOrder ?? 0);
         if (lineId) {
-          const ln = dressLines.find(l => String(l.id) === lineId) ?? null;
+          const ln = dressLines.find((l) => String(l.id) === lineId) ?? null;
           setLine(ln);
         }
       } catch (e) {
-        console.warn('tour detail preload failed', e);
+        console.warn('romance detail preload failed', e);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -62,8 +70,7 @@ export default function DressFittingClient({ id }: { id: string }) {
     if (!canSave || saving) return;
     setSaving(true);
     try {
-      await saveDress({
-        tourId: Number(id),
+      await updateTourRomance(Number(id), {
         materialOrder: materialOrderFromName(materials[0] ?? null),
         neckLineOrder: neckOrderFromId(neck?.id),
         lineOrder: lineOrderFromId(line?.id),
@@ -78,7 +85,7 @@ export default function DressFittingClient({ id }: { id: string }) {
 
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[calc(env(safe-area-inset-bottom)+96px)]">
-      <Header showBack onBack={() => router.push('/tours')} value="투어일지" />
+      <Header showBack onBack={() => router.push('/tours')} value="드레스 로망" />
 
       <Preview
         neckOverlay={neck?.overlay ?? null}
@@ -95,7 +102,9 @@ export default function DressFittingClient({ id }: { id: string }) {
           selected={materials}
           onToggle={(name) => {
             const target = name;
-            materials.forEach(m => { if (m !== target) toggleMaterial(m); });
+            materials.forEach((m) => {
+              if (m !== target) toggleMaterial(m);
+            });
             if (!materials.includes(target)) toggleMaterial(target);
           }}
         />
@@ -117,7 +126,11 @@ export default function DressFittingClient({ id }: { id: string }) {
         </Section>
 
         <div className="mt-10 mx-5.5">
-          <Button onClick={onSave} disabled={!canSave || saving} ariaLabel="드레스 옵션 저장">
+          <Button
+            onClick={onSave}
+            disabled={!canSave || saving}
+            ariaLabel="드레스 로망 옵션 저장"
+          >
             {saving ? '저장 중…' : '저장하기'}
           </Button>
         </div>
