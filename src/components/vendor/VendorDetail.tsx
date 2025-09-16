@@ -25,8 +25,10 @@ export default function VendorDetailScreen({ vendor }: { vendor: VendorDetail })
         vendorName={vendor.vendorName}
         vendorType={vendor.vendorType}
         fullAddress={vendor.fullAddress}
+        addressDetail={vendor.addressDetail}
         phoneNumber={vendor.phoneNumber}
         kakaoMapUrl={vendor.kakaoMapUrl}
+        products={vendor.products}
       />
 
       {!!vendor.description && (

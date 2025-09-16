@@ -17,7 +17,7 @@ export default function StoryWideCarousel({
           {items.map((s, i) => (
             <a
               key={s.id}
-              href={`/stories/${s.id}`}
+              href={`/editorials/${s.id}`}
               className={`min-w-0 flex-[0_0_75%] ${
                 i === items.length - 1 ? 'mr-4' : ''
               }`}

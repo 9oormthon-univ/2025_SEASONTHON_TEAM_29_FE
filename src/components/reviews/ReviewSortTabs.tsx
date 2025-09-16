@@ -3,8 +3,8 @@
 
 type Key = 'high' | 'low';
 const TABS: { key: Key; label: string }[] = [
-  { key: 'high', label: '링 많은순' },
-  { key: 'low', label: '링 적은순' },
+  { key: 'high', label: '링 높은순' },
+  { key: 'low', label: '링 낮은순' },
 ];
 
 export const toSortParam = (k: Key) => (k === 'high' ? 'rating,desc' : 'rating,asc');
@@ -23,7 +23,7 @@ export default function ReviewSortTabs({
             type="button"
             onClick={() => onChange(t.key)}
             className={[
-              'h-9 rounded-full px-4 text-sm border transition',
+              'py-[7px] rounded-full px-[16px] !text-[14px] border transition',
               active
                 ? 'border-primary-300 bg-primary-50 text-primary-600'
                 : 'border-gray-200 text-text-default',

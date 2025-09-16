@@ -110,19 +110,8 @@ export default function ConsultTimePage() {
     }
   };
 
-  // ✅ Lottie 완료 이벤트 핸들러
   const handleLottieComplete = () => {
-    setPlays((prev) => {
-      const next = prev + 1;
-      if (next < 2) {
-        // 2회 전이면 다시 재생
-        lottieRef.current?.goToAndPlay(0, true);
-      } else {
-        // 2회 끝나면 홈으로 이동
-        router.push('/home');
-      }
-      return next;
-    });
+    router.push('/home');
   };
 
   return (
@@ -165,7 +154,7 @@ export default function ConsultTimePage() {
               <Lottie
                 lottieRef={lottieRef}
                 animationData={congrats}
-                loop={false}      // 무한 반복 ❌
+                loop={2}
                 autoplay
                 onComplete={handleLottieComplete}
                 style={{ width: 157, height: 181 }}

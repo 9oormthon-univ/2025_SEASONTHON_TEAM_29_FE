@@ -29,7 +29,7 @@ export default function VendorReviewStats({
       </div>
 
       {/* 오른쪽: 세로 막대 그래프 (라벨 하단 고정) */}
-      <div className="ml-auto flex items-end gap-4">
+      <div className="ml-auto flex items-end gap-4 mr-5">
         {rows.map((score) => {
           const count = dist[String(score) as keyof RatingDist] ?? 0;
           const ratio = count / safeTotal;

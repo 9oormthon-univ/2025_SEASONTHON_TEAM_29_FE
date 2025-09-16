@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
 import SvgObject from '@/components/common/atomic/SvgObject';
+import * as React from 'react';
 
 type SectionProps = {
   title?: string;
@@ -39,35 +39,25 @@ export default function Section({
         <div className="mx-auto w-full" style={{ maxWidth: CONTAINER_MAX }}>
           {/* 타이틀: 컨테이너 안에 그대로 */}
           <div
-            className="relative mb-2"
-            style={{ paddingLeft: CONTAINER_PX, paddingRight: CONTAINER_PX }}
+            className="relative mb-2 flex items-center justify-between"
+            style={{ paddingLeft: 0, paddingRight: 0 }}
           >
-            <h2 className={`${titleCls} pr-8 truncate -ml-5`}>{title}</h2>
+            <h2 className={`${titleCls} truncate`}>{title}</h2>
 
-            {/* 버튼만 화면 전폭(w-screen) 래퍼로 빼서 오른쪽 끝 정렬 */}
             {onMore && (
-              <div className="pointer-events-none absolute inset-0">
-                <div className="pointer-events-auto relative left-1/2 -ml-[50vw] w-screen">
-                  <div
-                    className="flex justify-end"
-                    style={{ paddingRight: CONTAINER_PX }}
-                  >
-                    <button
-                      type="button"
-                      onClick={onMore}
-                      className="shrink-0 active:scale-95"
-                      aria-label="더 보기"
-                    >
-                      <SvgObject
-                        src="/icons/arrowRight.svg"
-                        alt="더보기"
-                        width={20}
-                        height={20}
-                      />
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <button
+                type="button"
+                onClick={onMore}
+                className="shrink-0 active:scale-95 ml-2"
+                aria-label="더 보기"
+              >
+                <SvgObject
+                  src="/icons/arrowRight.svg"
+                  alt="더보기"
+                  width={20}
+                  height={20}
+                />
+              </button>
             )}
           </div>
         </div>

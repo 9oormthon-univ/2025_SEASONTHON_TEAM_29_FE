@@ -21,6 +21,7 @@ type Props = {
   onClick?: () => void;
   selected?: boolean;
   executionDateTime?: string;
+  productName?: string;
   dimImage?: boolean;
 };
 
@@ -38,6 +39,8 @@ export default function CompanyCard({
   region,
   imageSrc,
   priceText,
+  category,
+  productName,
   rating,
   variant = 'category',
   alt,
@@ -51,7 +54,6 @@ export default function CompanyCard({
   const textDimCls = dimImage ? 'opacity-40' : '';
 
   /** CART */
-  /** CART */
   if (variant === 'cart') {
     return (
       <button
@@ -62,8 +64,8 @@ export default function CompanyCard({
         {/* 이미지 박스 */}
         <div
           className={clsx(
-            'relative w-28 h-28 rounded-lg bg-white overflow-hidden outline outline-1 outline-offset-[-1px]',
-            selected ? 'outline-primary-500' : 'outline-box-line',
+            'relative w-28 h-28 rounded-lg bg-white overflow-hidden border',
+            selected ? 'border-primary-500' : 'border-box-line',
           )}
         >
           <Image
@@ -80,12 +82,19 @@ export default function CompanyCard({
           )}
         </div>
 
-        {/* 🔑 날짜 뱃지 */}
-        {executionDateTime && (
-          <span className="mb-1 rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-500">
-            {formatDate(executionDateTime)}
-          </span>
-        )}
+        {/* 🔑 뱃지 영역 */}
+        <div className="mb-1 flex gap-1">
+          {category === '웨딩홀' && productName && (
+            <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-500">
+              {productName === 'Details' ? '단독홀' : productName}
+            </span>
+          )}
+          {executionDateTime && (
+            <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-500">
+              {formatDate(executionDateTime)}
+            </span>
+          )}
+        </div>
 
         {/* 이름 */}
         {(region || name) && (
@@ -103,7 +112,6 @@ export default function CompanyCard({
       </button>
     );
   }
-
   /** REVIEW */
   if (variant === 'review') {
     return (

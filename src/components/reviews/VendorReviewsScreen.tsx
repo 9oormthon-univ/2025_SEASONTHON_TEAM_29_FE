@@ -71,7 +71,7 @@ export default function VendorReviewsScreen({ vendorId }: { vendorId: number }) 
       )}
 
       {/* 정렬 탭 */}
-      <section className="px-5">
+      <section className="px-5 pt-[10px]">
         <ReviewSortTabs value={sortKey} onChange={setSortKey} />
       </section>
 

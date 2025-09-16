@@ -7,6 +7,14 @@ import type { CartDetail, CartItem } from '@/types/cart';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
+type Category = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
+const vendorTypeToCategory: Record<CartItem['vendorType'], Category> = {
+  WEDDING_HALL: '웨딩홀',
+  DRESS: '드레스',
+  MAKEUP: '메이크업',
+  STUDIO: '스튜디오',
+};
+
 const KR = (n: number) =>
   new Intl.NumberFormat('ko-KR', {
     style: 'currency',
@@ -119,6 +127,8 @@ export default function EstimateCartPage() {
                         imageSrc={item.logoImageUrl}
                         priceText={`${Math.floor(item.price / 10000)}만원`} // 🔑 "93만원"
                         executionDateTime={item.executionDateTime}         // 🔑 날짜 표시
+                        productName={item.productName}  // 🔑 추가 (웨딩홀일 경우 상품명 뱃지에 사용)
+                        category={vendorTypeToCategory[item.vendorType]}
                         selected={selectedByType[item.vendorType] === item.cartItemId}
                         onClick={() => toggleOne(item)}
                         className="shrink-0 snap-start"

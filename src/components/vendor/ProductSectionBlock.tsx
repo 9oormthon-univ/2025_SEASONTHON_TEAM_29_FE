@@ -51,7 +51,7 @@ export default function ProductSectionBlock({
         <div className="flex touch-pan-y">
           {product.imageUrls.map((src, i) => (
             <div key={i} className="min-w-0 flex-[0_0_100%]">
-              <div className="relative aspect-[4/3] w-full bg-gray-50">
+              <div className="relative aspect-[346/237] w-full bg-gray-50">
                 <Image
                   src={src}
                   alt={`${product.name}-${i}`}
