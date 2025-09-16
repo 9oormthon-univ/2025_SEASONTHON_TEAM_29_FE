@@ -44,8 +44,8 @@ export type MyContractsRes = {
 
 export type ContractDetail = {
   contractId: number;
-  vendorName: string;
+  executionDateTime: string; // ISO string
+  repImageUrl?: string;
   vendorAddress: string;
-  repImageUrl: string;
-  executionDateTime: string;
+  vendorName: string;
 };
