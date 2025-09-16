@@ -6,7 +6,7 @@ import { createReservation, getDailySlots } from '@/services/reservation.api';
 import { ReservationSlot } from '@/types/reservation';
 import { formatTimeHM } from '@/utills/time';
 import clsx from 'clsx';
-import Lottie from 'lottie-react';
+import Lottie, { type LottieRefCurrentProps } from 'lottie-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 
@@ -39,6 +39,7 @@ function TimeChip({
     </button>
   );
 }
+
 export default function ConsultTimePage() {
   const router = useRouter();
   const sp = useSearchParams();
@@ -60,6 +61,10 @@ export default function ConsultTimePage() {
   const [posting, setPosting] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [done, setDone] = React.useState(false);
+
+  // ✅ Lottie 제어용 ref, state
+  const lottieRef = React.useRef<LottieRefCurrentProps>(null);
+  const [plays, setPlays] = React.useState(0);
 
   // 슬롯 로드
   React.useEffect(() => {
@@ -86,12 +91,10 @@ export default function ConsultTimePage() {
     })();
   }, [vendorId, yy, mm, dd]);
 
-  // 완료 시 자동 이동
+  // 완료 시 → done true → plays 초기화
   React.useEffect(() => {
-    if (!done) return;
-    const t = setTimeout(() => router.push('/home'), 1500);
-    return () => clearTimeout(t);
-  }, [done, router]);
+    if (done) setPlays(0);
+  }, [done]);
 
   const handleReserve = async () => {
     if (!selectedSlotId) return;
@@ -106,6 +109,22 @@ export default function ConsultTimePage() {
       setPosting(false);
     }
   };
+
+  // ✅ Lottie 완료 이벤트 핸들러
+  const handleLottieComplete = () => {
+    setPlays((prev) => {
+      const next = prev + 1;
+      if (next < 2) {
+        // 2회 전이면 다시 재생
+        lottieRef.current?.goToAndPlay(0, true);
+      } else {
+        // 2회 끝나면 홈으로 이동
+        router.push('/home');
+      }
+      return next;
+    });
+  };
+
   return (
     <ReservationLayout
       title="예약하기"
@@ -144,9 +163,11 @@ export default function ConsultTimePage() {
             <div className="w-11 h-0.5 mx-auto mt-3 rounded-full bg-neutral-300" />
             <div className="h-full flex flex-col items-center justify-center gap-6">
               <Lottie
+                lottieRef={lottieRef}
                 animationData={congrats}
-                loop={false}           // 필요하면 true
+                loop={false}      // 무한 반복 ❌
                 autoplay
+                onComplete={handleLottieComplete}
                 style={{ width: 157, height: 181 }}
                 className="w-[157px] h-[181px] select-none pointer-events-none"
               />

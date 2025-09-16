@@ -4,16 +4,12 @@ import ReservationStepLayout from '@/components/reservation/layout/ReservationLa
 import ReservationCard from '@/components/reservation/ReservationCard';
 import { useContractSlots } from '@/hooks/useContractSlots';
 import { formatMoney, formatSlot } from '@/lib/format';
-import { addCartItem } from '@/services/cart.api';
+import { addCartItem } from '@/services/cart.api'; // ✅ 새 cart API
 import { createContract } from '@/services/contract.api';
 import type { ContractSlot } from '@/types/contract';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
-
-// ✅ Lottie 추가
-import cartAnim from '@/assets/lottie/cart.json';
-import contractAnim from '@/assets/lottie/contract.json';
-import Lottie from 'lottie-react';
+import { useEffect, useMemo, useState } from 'react';
 
 function toReservationCardPropsFromContract(s: ContractSlot) {
   return {
@@ -36,7 +32,7 @@ export default function SlotSelectPage() {
     const m = now.getMonth() + 1;
     return [m, m + 1, m + 2].map((x) => ((x - 1) % 12) + 1);
   }, []);
-
+  
   const { slots, loading, error, refetch } = useContractSlots(productId, months);
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -78,9 +74,12 @@ export default function SlotSelectPage() {
     }
   };
 
-  const handleLottieComplete = () => {
-    router.push('/home');
-  };
+  // 완료 후 홈으로 이동
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const t = setTimeout(() => router.push('/home'), 2000);
+    return () => clearTimeout(t);
+  }, [sheetOpen, router]);
 
   return (
     <ReservationStepLayout
@@ -149,13 +148,12 @@ export default function SlotSelectPage() {
           <div className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[420px] h-96 bg-white rounded-t-xl overflow-hidden">
             <div className="w-11 h-0.5 mx-auto mt-3 rounded-full bg-neutral-300" />
             <div className="h-full flex flex-col items-center justify-center gap-6">
-              {/* ✅ 이미지 대신 Lottie */}
-              <Lottie
-                animationData={sheetOpen === 'contract' ? contractAnim : cartAnim}
-                loop={false}
-                autoplay
-                onComplete={handleLottieComplete}
-                style={{ width: 160, height: 160 }}
+              <Image
+                src={sheetOpen === 'contract' ? '/congratu.png' : '/cartCheck.png'}
+                alt={sheetOpen === 'contract' ? '계약 완료' : '견적 담기 완료'}
+                width={160}
+                height={160}
+                priority
                 className="w-[160px] h-[160px] select-none pointer-events-none"
               />
               <p className="text-[16px] font-semibold text-text--default">
