@@ -42,10 +42,19 @@ export default function InviteEditorPage() {
   });
 
   const { staged, clear } = useStagedInvitationMedia(draftId);
-  useRestoreInviteDraft({ draftId, setForm, setPlaceLocal, setGalleryLocal });
-  useInviteDraftAutosave(draftId, form, placeLocal, galleryLocal);
+  const [hydrated, setHydrated] = useState(false);
 
-  type ThemaValue = ComponentProps<typeof ThemaSection>['value'];
+  useRestoreInviteDraft({
+    draftId,
+    setForm,
+    setPlaceLocal,
+    setGalleryLocal,
+    onDone: () => setHydrated(true),
+  });
+
+  useInviteDraftAutosave(draftId, form, placeLocal, galleryLocal, {
+    enabled: hydrated,
+  });
   type ThemaOnChange = ComponentProps<typeof ThemaSection>['onChange'];
   type BasicValue = ComponentProps<typeof BasicInfoSection>['value'];
   type BasicOnChange = ComponentProps<typeof BasicInfoSection>['onChange'];
@@ -62,6 +71,16 @@ export default function InviteEditorPage() {
     >;
     setForm((f) => ({ ...f, bride, groom, order }));
   };
+  const msgValue = {
+    title: form.greeting?.title ?? '',
+    body: form.greeting?.body ?? '',
+    ordered:
+      typeof (form as any).greeting?.ordered === 'boolean'
+        ? (form as any).greeting.ordered
+        : ['순서대로', 'ORDERED', 'ASC', 'TRUE'].includes(
+            String((form as any).greeting?.sort || '').toUpperCase(),
+          ),
+  } as const;
   const setMessage: MessageOnChange = (v) =>
     setForm((f) => ({
       ...f,
@@ -126,13 +145,17 @@ export default function InviteEditorPage() {
         />
         <MessageSection
           defaultOpen={false}
-          value={
-            (form.greeting ?? {
-              title: '',
-              body: '',
-            }) as unknown as MessageValue
+          value={msgValue}
+          onChange={(next) =>
+            setForm((f) => ({
+              ...f,
+              greeting: {
+                title: next.title,
+                body: next.body,
+                ordered: next.ordered,
+              } as any,
+            }))
           }
-          onChange={setMessage}
         />
         <DateSection
           defaultOpen={false}

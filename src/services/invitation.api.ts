@@ -2,25 +2,27 @@ import type {
   InvitationRequestBody,
   InvitationResponse,
 } from '@/types/invitation';
+import { tokenStore } from '@/lib/tokenStore';
 
 export async function createInvitation(
   body: InvitationRequestBody,
   options?: { signal?: AbortSignal },
 ): Promise<InvitationResponse> {
-  const res = await fetch('/api/vi/invitation', {
+  const token = tokenStore.get();
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
+  const base = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+  const res = await fetch(`${base}/v1/invitation`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    headers,
     signal: options?.signal,
-    credentials: 'include',
+    body: JSON.stringify(body),
   });
+
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(text || `Failed to create invitation (${res.status})`);
   }
-  try {
-    return (await res.json()) as InvitationResponse;
-  } catch {
-    return {} as InvitationResponse;
-  }
+  return res.json().catch(() => ({}) as InvitationResponse);
 }
