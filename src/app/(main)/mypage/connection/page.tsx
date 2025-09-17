@@ -104,7 +104,7 @@ function CoupleLinkingView({ onComplete }: Props) {
       </div>
 
       <div className="fixed bottom-6 left-0 right-0 flex justify-center">
-        <div className="w-96 px-6">
+        <div className="w-96 px-6 pb-8">
           <Button
             size="lg"
             state={bottomDisabled ? 'inactive' : 'default'}
