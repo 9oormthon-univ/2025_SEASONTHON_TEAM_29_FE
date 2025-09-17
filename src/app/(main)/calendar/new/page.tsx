@@ -101,7 +101,7 @@ export default function CalendarNewPage() {
           onChange={setMemo}
           placeholder="기억하고 싶은 내용을 적어주세요."
           className="mt-3 w-full"
-          textareaClassName="text-[14px]"
+          textareaClassName="!text-[14px]"
           showCount
         />
         <div className="mt-5 grid grid-cols-4 gap-2">
