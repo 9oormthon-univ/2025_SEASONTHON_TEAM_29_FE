@@ -34,8 +34,8 @@ export default function InvitationCast({
         <SvgObject
           src="/Cast.svg"
           alt="Cast"
-          width={70}
-          height={72}
+          width={160}
+          height={80}
           className="block h-auto w-[120px] select-none"
         />
       </div>
