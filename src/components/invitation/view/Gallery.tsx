@@ -20,22 +20,23 @@ export default function Gallery({
   className,
   showHint = true,
 }: Props) {
-  const pagesCount = Math.ceil(total / perPage);
+  const filled = Math.min(images.length, total);
+  const pagesCount = useMemo(
+    () => Math.ceil(filled / perPage),
+    [filled, perPage],
+  );
   const pageIndexes = useMemo(
     () => Array.from({ length: pagesCount }, (_, i) => i),
     [pagesCount],
   );
-  const urls = useMemo(
-    () => Array.from({ length: total }, (_, i) => images[i] ?? null),
-    [images, total],
-  );
+  const urls = useMemo(() => images.slice(0, filled), [images, filled]);
+
   const staggeredIndices = (start: number, count = 9, pageIndex: number) => {
     const ids = Array.from({ length: count }, (_, idx) => start + idx);
     const [a, b, c, d, e, f, g, h, i] = ids as number[];
 
-    // 왼-오-왼
+    // 왼-오-왼 / 오-왼-오 패턴
     const patternA = [a, b, c, null, null, d, e, f, g, h, i, null];
-    // 오-왼-오
     const patternB = [null, a, b, c, d, e, f, null, null, g, h, i];
 
     return (pageIndex % 2 === 0 ? patternA : patternB).slice(0, 12) as Array<
@@ -43,6 +44,7 @@ export default function Gallery({
     >;
   };
 
+  if (filled === 0) return null;
   return (
     <section className={clsx('mx-auto w-full max-w-[420px]', className)}>
       <div className="flex items-center justify-center">
@@ -54,11 +56,12 @@ export default function Gallery({
           className="h-auto w-[140px] select-none"
         />
       </div>
+
       <div className="mt-6">
         <div className="flex snap-x snap-mandatory overflow-x-auto scroll-pl-6 gap-6 px-6 pb-2">
           {pageIndexes.map((p) => {
             const start = p * perPage;
-            const end = Math.min(start + perPage, total);
+            const end = Math.min(start + perPage, filled); // ← 핵심: filled 기준
             const indices = staggeredIndices(start, end - start, p);
 
             return (
@@ -80,12 +83,7 @@ export default function Gallery({
                             'aspect-[3/4]',
                           )}
                         >
-                          {!urls[idx] && (
-                            <span className="absolute inset-0 grid place-items-center text-xl font-bold text-text--secondary">
-                              {idx + 1}
-                            </span>
-                          )}
-                          {urls[idx] && (
+                          {urls[idx] ? (
                             <Image
                               src={urls[idx]!}
                               alt={`${idx + 1}번 이미지`}
@@ -95,7 +93,7 @@ export default function Gallery({
                               priority={p === 0}
                               unoptimized
                             />
-                          )}
+                          ) : null}
                         </div>
                       </div>
                     ),
@@ -106,15 +104,12 @@ export default function Gallery({
           })}
         </div>
       </div>
-
-      {showHint && (
-        <p
-          className="mt-4 text-center text-xs leading-normal text-text--tertiary"
-          style={{ fontFamily: 'DI, serif' }}
-        >
-          좌우로 넘기시면 더 많은 사진을 볼 수 있어요.
-        </p>
-      )}
+      <p
+        className="mt-4 text-center text-xs leading-normal text-text--tertiary"
+        style={{ fontFamily: 'DI, serif' }}
+      >
+        좌우로 넘기시면 더 많은 사진을 볼 수 있어요.
+      </p>
     </section>
   );
 }
