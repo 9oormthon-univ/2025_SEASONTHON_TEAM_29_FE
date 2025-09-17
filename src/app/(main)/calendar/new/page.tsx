@@ -19,8 +19,6 @@ const ICON_CFG: Record<
   INVITATION: {
     w: 60,
     h: 62,
-    className:
-      'origin-top-left rotate-[-30.22deg] -translate-x-4 translate-y-7',
   },
   STUDIO: { w: 50, h: 46 },
   WEDDING_HALL: { w: 46, h: 46, className: 'translate-y-0.5' },
