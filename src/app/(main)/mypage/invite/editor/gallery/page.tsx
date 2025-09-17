@@ -56,11 +56,8 @@ export default function Page() {
   function staggeredIndices(start: number, count = 9, pageIndex: number) {
     const ids = Array.from({ length: count }, (_, i) => start + i);
     const [a, b, c, d, e, f, g, h, i] = ids;
-
-    // 오-왼-오
     const patternA = [a, b, c, null, null, d, e, f, g, h, i, null];
     const patternB = [null, a, b, c, d, e, f, null, null, g, h, i];
-
     return (pageIndex % 2 === 0 ? patternA : patternB).slice(0, 12) as Array<
       number | null
     >;
@@ -82,7 +79,6 @@ export default function Page() {
     try {
       const files = selectedPairs.map((p) => p.file);
       const issued = await uploadAll('INVITATION', draftId, files);
-
       const mediaList = issued
         .map((u, idx) => ({
           mediaKey: u.s3Key,
@@ -90,10 +86,7 @@ export default function Page() {
           sortOrder: selectedPairs[idx].i,
         }))
         .sort((a, b) => a.sortOrder - b.sortOrder);
-
       qc.setQueryData(['invitation', 'mediaList', String(draftId)], mediaList);
-
-      console.log('[GALLERY mediaList]', mediaList);
       alert(`${mediaList.length}장의 사진이 업로드되었습니다.`);
       router.push(`/mypage/invite/editor?draft=${draftId}`);
     } catch (e) {
@@ -201,6 +194,23 @@ export default function Page() {
         className="hidden"
         onChange={handleFileChange}
       />
+
+      {uploading && (
+        <div className="fixed inset-0 z-[100] grid place-items-center bg-black/40">
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-80 h-56 relative rounded-lg bg-white shadow-xl"
+          >
+            <div className="absolute left-1/2 -translate-x-1/2 top-6 text-center text-text--default text-base font-semibold">
+              두 분의 소중한 추억을
+              <br />
+              예쁘게 담는 중이에요
+            </div>
+            <div className="absolute left-1/2 -translate-x-1/2 top-[80px] w-36 h-32 bg-zinc-300 rounded-md" />
+          </div>
+        </div>
+      )}
     </main>
   );
 }
