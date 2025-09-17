@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
 import clsx from 'clsx';
 import SvgObject from '@/components/common/atomic/SvgObject';
 
@@ -87,16 +86,6 @@ export default function Location({
     document.head.appendChild(s);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JS_KEY, address, pos?.lat, pos?.lng]);
-
-  const openKakao = () => {
-    const url = pos
-      ? `https://map.kakao.com/link/to/${encodeURIComponent(
-          placeTitle,
-        )},${pos.lat},${pos.lng}`
-      : `https://map.kakao.com/link/search/${encodeURIComponent(address)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
   return (
     <section
       className={clsx(
