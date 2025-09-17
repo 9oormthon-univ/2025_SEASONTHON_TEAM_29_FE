@@ -17,7 +17,12 @@ export type ThemaSectionValue = {
   preventZoom: boolean;
   revealOnScroll: boolean;
 };
-
+type MediaItem = { mediaKey: string; contentType: string; sortOrder: number };
+type MediaProps = {
+  films: MediaItem[];
+  main?: MediaItem | null;
+  ticket?: MediaItem | null;
+};
 type Props = {
   className?: string;
   title?: string;
@@ -25,6 +30,8 @@ type Props = {
   value: ThemaSectionValue;
   onChange: (next: ThemaSectionValue) => void;
   accents?: string[];
+  linkTo?: string;
+  media?: MediaProps;
 };
 
 const DEFAULT_ACCENTS = ['#F7C7C7', '#C8B7F0', '#FBEFCF'];
@@ -37,6 +44,8 @@ export default function ThemaSection({
   title = '테마',
   defaultOpen = false,
   value,
+  media,
+  linkTo,
   onChange,
   accents = DEFAULT_ACCENTS,
 }: Props) {
@@ -144,7 +153,11 @@ export default function ThemaSection({
             </FieldRow>
             <div className="mt-3 pl-20">
               <PhotoCard
-                files={[]}
+                count={
+                  (media?.films?.length ?? 0) +
+                  (media?.main ? 1 : 0) +
+                  (media?.ticket ? 1 : 0)
+                }
                 total={5}
                 linkTo="/mypage/invite/editor/thema/1"
               />

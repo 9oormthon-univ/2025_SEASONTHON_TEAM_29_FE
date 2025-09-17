@@ -20,6 +20,7 @@ import { useState, type ComponentProps } from 'react';
 import { useStagedInvitationMedia } from '@/hooks/useStagedInvitationMedia';
 import { useSubmitInvitation } from '@/hooks/useSubmitInvitation';
 import { useInviteDraftAutosave } from '@/hooks/useInviteDraftAutosave';
+import { useRestoreInviteDraft } from '@/hooks/useRestoreInviteDraft';
 
 const DEFAULT_PLACE: PlaceSectionValue = {
   venueName: '',
@@ -41,6 +42,7 @@ export default function InviteEditorPage() {
   });
 
   const { staged, clear } = useStagedInvitationMedia(draftId);
+  useRestoreInviteDraft({ draftId, setForm, setPlaceLocal, setGalleryLocal });
   useInviteDraftAutosave(draftId, form, placeLocal, galleryLocal);
 
   type ThemaValue = ComponentProps<typeof ThemaSection>['value'];
@@ -51,7 +53,6 @@ export default function InviteEditorPage() {
   type MessageOnChange = ComponentProps<typeof MessageSection>['onChange'];
   type CeremonyValue = ComponentProps<typeof DateSection>['value'];
   type CeremonyOnChange = ComponentProps<typeof DateSection>['onChange'];
-
   const setTheme: ThemaOnChange = (v) =>
     setForm((f) => ({ ...f, theme: v as unknown as InviteForm['theme'] }));
   const setBasic: BasicOnChange = (v) => {
@@ -103,8 +104,14 @@ export default function InviteEditorPage() {
       />
       <section className="mx-auto max-w-100 px-2 pt-2 flex flex-col items-center gap-3">
         <ThemaSection
-          value={form.theme as unknown as ThemaValue}
+          value={form.theme as any}
           onChange={setTheme}
+          media={{
+            films: staged.filmMedia,
+            main: staged.mainMedia,
+            ticket: staged.ticketMedia,
+          }}
+          linkTo={`/mypage/invite/editor/thema/1?draft=${draftId}`}
         />
         <BasicInfoSection
           defaultOpen={false}
@@ -147,6 +154,7 @@ export default function InviteEditorPage() {
           uploadDomain="REVIEW"
           uploadDomainId={123}
           maxTotal={27}
+          linkTo={`/mypage/invite/editor/gallery?draft=${draftId}`}
         />
         <PlainCollapsible title="엔딩사진/문구" />
         <PlainCollapsible title="계좌번호" />
@@ -208,23 +216,6 @@ function PlainCollapsible({
           )}
         />
       </button>
-      {open && (
-        <div id={panelId} role="region" aria-labelledby={headerId}>
-          <Hr />
-          <div className="px-4 pt-3 pb-4">{children}</div>
-        </div>
-      )}
     </section>
-  );
-}
-
-function Hr({ className }: { className?: string }) {
-  return (
-    <div
-      className={clsx(
-        'w-full h-0 outline-[0.5px] outline-offset-[-0.25px] outline-box-line',
-        className,
-      )}
-    />
   );
 }

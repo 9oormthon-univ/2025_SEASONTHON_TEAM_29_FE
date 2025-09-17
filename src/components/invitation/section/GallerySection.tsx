@@ -25,6 +25,7 @@ type Props = {
   uploadDomainId: number;
   maxTotal?: number;
   concurrency?: number;
+  linkTo?: string;
 };
 
 export default function GallerySection({
@@ -34,16 +35,17 @@ export default function GallerySection({
   value,
   onChange,
   maxTotal = 27,
+  linkTo,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen);
   const sectionId = useId();
   const headerId = `${sectionId}-header`;
   const panelId = `${sectionId}-panel`;
-  const [files] = useState<File[]>([]);
   const patch = <K extends keyof GallerySectionValue>(
     key: K,
     v: GallerySectionValue[K],
   ) => onChange({ ...value, [key]: v });
+  console.log('[GALLERY] photos length =', value.photos.length);
 
   return (
     <section
@@ -100,9 +102,9 @@ export default function GallerySection({
             </FieldRow>
             <div className="mt-3 pl-20">
               <PhotoCard
-                files={files}
+                count={value.photos.length}
                 total={maxTotal}
-                linkTo="/mypage/invite/editor/gallery"
+                linkTo={linkTo}
               />
             </div>
 
