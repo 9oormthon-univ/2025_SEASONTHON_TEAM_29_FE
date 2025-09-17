@@ -1,7 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import clsx from 'clsx';
+import Image from 'next/image';
 
 type CheckIconProps = {
   selected: boolean;
@@ -15,7 +15,7 @@ export default function CheckComponent({
   selected,
   className,
   srcChecked = '/icons/Check.svg',
-  srcUnchecked = '/icons/CheckGrey.svg',
+  srcUnchecked = '/icons/CheckGray.svg',
   alt,
 }: CheckIconProps) {
   const src = selected ? srcChecked : srcUnchecked;

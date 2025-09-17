@@ -4,6 +4,7 @@ import { cn } from '@/utills/cn';
 import clsx from 'clsx';
 import Image from 'next/image';
 import SvgObject from '../common/atomic/SvgObject';
+import CheckComponent from '../invitation/CheckComponent';
 
 type Category = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
 type Variant = 'review' | 'category' | 'cart';
@@ -23,6 +24,7 @@ type Props = {
   executionDateTime?: string;
   productName?: string;
   dimImage?: boolean;
+  selecting? : boolean;
 };
 
 const formatDate = (iso?: string) => {
@@ -50,6 +52,7 @@ export default function CompanyCard({
   selected = false,
   dimImage = false,
   executionDateTime,
+  selecting = false,
 }: Props) {
   const altText = alt ?? name;
   const textDimCls = dimImage ? 'opacity-40' : '';
@@ -77,6 +80,11 @@ export default function CompanyCard({
             alt={alt ?? name}
             className="object-contain"
           />
+          {selecting && (
+            <div className="absolute top-1 left-1">
+              <CheckComponent selected={selected} />
+            </div>
+          )}
           {dimImage && (
             <div className="absolute inset-0 rounded-lg bg-gray-200/60 pointer-events-none" />
           )}

@@ -2,7 +2,7 @@
 
 import Header from '@/components/common/monocules/Header';
 import CompanyCard from '@/components/my/CompanyCard';
-import { getCartDetail } from '@/services/cart.api';
+import { getCartDetail, removeCartItem } from '@/services/cart.api';
 import type { CartDetail, CartItem } from '@/types/cart';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -79,9 +79,44 @@ export default function EstimateCartPage() {
 
   const router = useRouter();
 
+  const [selecting, setSelecting] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const deleteSelected = async () => {
+    try {
+      await Promise.all(selectedIds.map((id) => removeCartItem(id)));
+      setItems((prev) => prev.filter((i) => !selectedIds.includes(i.cartItemId)));
+      setSelectedIds([]);
+      setSelecting(false);
+    } catch (e) {
+      alert('삭제 실패');
+    }
+  };
+
   return (
     <div className="w-full max-w-[420px] mx-auto">
-      <Header showBack onBack={() => router.push('/home')} value="견적서" />
+      <Header
+        showBack
+        onBack={() => router.push('/home')}
+        value="견적서"
+        rightSlot={
+          <button
+            onClick={() => {
+              setSelecting((prev) => !prev);
+              setSelectedIds([]); // 선택 모드 토글 시 초기화
+            }}
+            className="text-sm font-medium text-primary-500"
+          >
+            {selecting ? '취소' : '선택'}
+          </button>
+        }
+      />
 
       <section className="px-5 mt-3">
         <div className="w-full h-20 inline-flex flex-col items-center justify-center rounded-2xl border border-zinc-300/50 bg-white px-7">
@@ -125,13 +160,17 @@ export default function EstimateCartPage() {
                         name={item.vendorName}
                         region={item.regionName}
                         imageSrc={item.logoImageUrl}
-                        priceText={`${Math.floor(item.price / 10000)}만원`} // 🔑 "93만원"
-                        executionDateTime={item.executionDateTime}         // 🔑 날짜 표시
-                        productName={item.productName}  // 🔑 추가 (웨딩홀일 경우 상품명 뱃지에 사용)
+                        priceText={`${Math.floor(item.price / 10000)}만원`}
+                        executionDateTime={item.executionDateTime}
+                        productName={item.productName}
                         category={vendorTypeToCategory[item.vendorType]}
-                        selected={selectedByType[item.vendorType] === item.cartItemId}
-                        onClick={() => toggleOne(item)}
-                        className="shrink-0 snap-start"
+                        selecting={selecting}
+                        selected={selectedIds.includes(item.cartItemId)}
+                        onClick={
+                          selecting
+                            ? () => toggleSelect(item.cartItemId)
+                            : () => toggleOne(item)
+                        }
                       />
                     ))
                   )}
@@ -141,6 +180,16 @@ export default function EstimateCartPage() {
           </div>
         ))}
       </section>
+      {selecting && selectedIds.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 max-w-[420px] mx-auto p-4 bg-white border-t border-gray-200">
+          <button
+            onClick={deleteSelected}
+            className="w-full h-12 bg-red-500 text-white font-semibold rounded-lg"
+          >
+            선택 항목 삭제
+          </button>
+        </div>
+      )}
 
       <div className="h-20" />
     </div>

@@ -101,7 +101,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   return (
     <main className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
-      <Header showBack onBack={() => router.push('/search')} value="검색" />
+      <Header showBack onBack={() => router.push('/home')} value="검색" />
       <div className="px-[22px] flex-1 overflow-y-auto">
 
         <section className="px-0">

@@ -18,7 +18,7 @@ export default function ReviewSquareCarousel({ items }: { items: HomeReviewItem[
     <Section title="웨딧 유저가 말해주는 솔직 리뷰" onMore={() => {}} bleed="viewport" className="mt-8">
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4 touch-pan-y">
-          {items.map((it, i) => (
+          {items.slice(0, 5).map((it, i) => (
             <a
               key={it.id}
               href={it.href}
