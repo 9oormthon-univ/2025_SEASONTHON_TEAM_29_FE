@@ -7,7 +7,7 @@ import Header from '@/components/common/monocules/Header';
 import { createCalendarEvent } from '@/services/calendar.api';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 type StickerKey = keyof typeof STICKER_SRC;
@@ -32,6 +32,7 @@ const ICON_CFG: Record<
 
 export default function CalendarNewPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [title, setTitle] = useState('');
   const [titleStarted, setTitleStarted] = useState(false);
   const [memo, setMemo] = useState('');
@@ -39,6 +40,26 @@ export default function CalendarNewPage() {
   const [loading, setLoading] = useState(false);
 
   const disabled = !title.trim() || !sticker;
+
+    // ?date=2025-09-18 이런 형태로 들어온 값 읽기
+    const dateParam = searchParams.get('date');
+    // 없으면 오늘 날짜
+    const targetDate = dateParam ? new Date(dateParam) : new Date();
+  
+    // ISO string (자정 기준 allDay 이벤트)
+    const startDateTime = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      23, 0, 0, 0,
+    ).toISOString();
+  
+    const endDateTime = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      23, 59, 59, 999,
+    ).toISOString();
 
   const stickers: StickerKey[] = useMemo(
     () => [
@@ -62,8 +83,8 @@ export default function CalendarNewPage() {
         title,
         description: memo,
         eventCategory: sticker.toUpperCase(),
-        startDateTime: new Date().toISOString(),
-        endDateTime: new Date().toISOString(),
+        startDateTime,
+        endDateTime,
         isAllDay: true,
       });
       router.back();
