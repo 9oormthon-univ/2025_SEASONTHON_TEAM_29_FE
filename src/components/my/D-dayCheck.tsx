@@ -34,7 +34,7 @@ export default function DdayCard({
   return (
     <div
       className={cn(
-        'relative w-80 h-[138px] rounded-lg overflow-hidden',
+        'relative w-87 h-[138px] rounded-lg overflow-hidden',
         'bg-gradient-to-l from-red-100 to-neutral-50/40',
         className,
       )}
