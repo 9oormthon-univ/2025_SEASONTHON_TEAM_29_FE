@@ -5,8 +5,8 @@ import Image from 'next/image';
 
 export type PickCompany = {
   id: number;                 // contractId
-  vendorId: number;
-  vendorName?: string;
+  contractId: number;
+  vendorName: string;
   vendorLogoUrl?: string;
   mainImageUrl?: string;
   reservationDate?: string;   // 표기용(없어도 됨)
@@ -23,7 +23,7 @@ export default function ReviewCompanyPicker({
   loading?: boolean;
   error?: string;
   onPick: (query: {
-    vendorId: string;
+    contractId: string;
     vendorName: string;
     reservationId: string;
     date: string;
@@ -46,7 +46,7 @@ export default function ReviewCompanyPicker({
   return (
     <ul className="mt-3 max-h-[60vh] overflow-y-auto rounded-md border border-gray-100">
       {items.map((r) => {
-        const vendorName = r.vendorName ?? `업체 #${r.vendorId}`;
+        const vendorName = r.vendorName;
         const logo = r.vendorLogoUrl || r.mainImageUrl || '/logos/placeholder.png';
         const when = r.reservationDate
           ? `${r.reservationDate}${r.reservationTime ? ` ${r.reservationTime}` : ''}`
@@ -59,7 +59,7 @@ export default function ReviewCompanyPicker({
               className="flex w-full items-center justify-between px-3 py-2 text-left hover:bg-gray-50"
               onClick={() =>
                 onPick({
-                  vendorId: String(r.vendorId),
+                  contractId: String(r.contractId),
                   vendorName,
                   reservationId: String(r.id),
                   date: r.reservationDate ?? '',

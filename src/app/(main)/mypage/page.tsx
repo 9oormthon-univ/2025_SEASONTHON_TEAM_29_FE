@@ -1,4 +1,3 @@
-// src/app/mypage/page.tsx
 'use client';
 
 import BottomNav from '@/components/common/atomic/BottomNav';
@@ -38,7 +37,7 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-background pb-24">
-      <Header showBack onBack={() => router.back()} value="마이" />
+      <Header showBack onBack={() => router.push('/home')} value="마이" />
 
       <section className="mx-auto max-w-96 px-5 pt-2">
         <ProfileHeader
@@ -80,26 +79,22 @@ export default function Page() {
 
       <BottomNav innerMax="max-w-96" />
 
-      {/* 후기 작성 업체 선택 바텀시트 (reviewable 목록 활용) */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <h3 className="px-1 text-base font-semibold text-foreground">업체 선택</h3>
         <ReviewCompanyPicker
           items={reviewables.map((r) => ({
-            id: r.contractId,
-            vendorId: r.vendorId,
+            id: r.vendorId,
+            contractId: r.contractId,
             vendorName: r.vendorName,
             vendorLogoUrl: r.logoImageUrl,
           }))}
           loading={rvLoading}
           error={rvErr ?? undefined}
-          onPick={({ vendorId, vendorName, reservationId }) => {
+          onPick={({ contractId, vendorName }) => {
             setSheetOpen(false);
             const q = new URLSearchParams({
-              vendorId,
+              contractId: String(contractId),
               vendorName,
-              reservationId, // contractId
-              date: '',
-              time: '',
             }).toString();
             router.push(`/mypage/review?${q}`);
           }}

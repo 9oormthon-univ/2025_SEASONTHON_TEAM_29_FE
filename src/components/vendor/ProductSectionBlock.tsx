@@ -40,18 +40,24 @@ export default function ProductSectionBlock({
 
   return (
     <section className="mb-8">
-      <h2 className="text-[15px] font-extrabold text-gray-900">
+      <h2 className="text-lg font-semibold text-gray-900">
         {product.name}
       </h2>
 
+      {product.details?.weddingHallSeat && product.details?.banquetHallSeat && (
+        <p className="text-xs text-text-secondary">
+          웨딩홀 {product.details.weddingHallSeat}석, 피로연장 {product.details.banquetHallSeat}석 보유
+        </p>
+      )}
+
       <div
         ref={ref}
-        className="relative mt-2 overflow-hidden border border-gray-200 rounded-md"
+        className="relative mt-5 overflow-hidden border border-gray-200 rounded-md"
       >
         <div className="flex touch-pan-y">
           {product.imageUrls.map((src, i) => (
             <div key={i} className="min-w-0 flex-[0_0_100%]">
-              <div className="relative aspect-[4/3] w-full bg-gray-50">
+              <div className="relative aspect-[346/237] w-full bg-gray-50">
                 <Image
                   src={src}
                   alt={`${product.name}-${i}`}

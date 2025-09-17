@@ -1,6 +1,6 @@
 import { CategoryItem } from '@/types/category';
-import SvgObject from '../common/atomic/SvgObject';
 import { cn } from '@/utills/cn';
+import SvgObject from '../common/atomic/SvgObject';
 
 const DEFAULT_BOX = 40;
 
@@ -35,7 +35,7 @@ export default function CategoryQuick({
         return (
           <a
             key={c.key}
-            href={`/category/detail?cat=${c.key}`}
+            href={`search/results?cat=${c.key}`}
             className="relative flex h-20 items-center justify-center text-center text-xs text-gray-700"
           >
             <div

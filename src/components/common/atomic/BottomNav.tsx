@@ -36,7 +36,7 @@ function iconSize(icon: NavItem['iconBase']) {
     case 'People':
       return { w: 22, h: 28 };
     case 'Todo':
-      return { w: 28, h: 28 };
+      return { w: 29, h: 29 };
   }
 }
 const FRAME_CLS = 'size-8';
@@ -53,7 +53,7 @@ export default function BottomNav({
     <nav
       aria-label="하단 내비게이션"
       className={clsx(
-        'h-[75px] fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-full',
+        'h-[80px] fixed bottom-0 left-1/2 -translate-x-1/2 z-40 w-full',
         'border-t border-gray-200/70 dark:border-white/10',
         'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75',
         'pb-[env(safe-area-inset-bottom)]',
@@ -68,10 +68,12 @@ export default function BottomNav({
       >
         {items.map(({ href, iconBase, label }) => {
           const active = isActive(href);
+          const { w, h } = iconSize(iconBase);
           const src = active
             ? `/icons/FullNav/Full${iconBase}.svg`
             : `/icons/LineNav/Line${iconBase}.svg`;
-          const { w, h } = iconSize(iconBase);
+
+          const raised = href === '/tours';
 
           return (
             <li key={href}>
@@ -80,8 +82,9 @@ export default function BottomNav({
                 aria-label={label}
                 aria-current={active ? 'page' : undefined}
                 className={clsx(
-                  'group flex items-center justify-center rounded-lg',
+                  'group flex items-center justify-center rounded-lg transition-transform',
                   'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60',
+                  raised && '-translate-y-[4px] translate-x-1 ',
                 )}
               >
                 <div

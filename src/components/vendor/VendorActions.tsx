@@ -14,7 +14,7 @@ export default function VendorActions({ vendorId }: { vendorId: number }) {
       <div className="mt-4 grid grid-cols-1 gap-2">
         <button
           className={baseBtn}
-          onClick={() => router.push(`/coming-soon`)}
+          onClick={() => router.push(`/vendor/${vendorId}/reviews`)}
         >
           <SvgObject src="/icons/Chat.svg" className="h-6 w-6" />
           리뷰 보러가기

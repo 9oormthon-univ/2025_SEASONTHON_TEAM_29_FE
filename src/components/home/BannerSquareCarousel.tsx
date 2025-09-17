@@ -39,17 +39,18 @@ export default function BannerSquareCarousel({
                 style={{ aspectRatio: '1/1' }}
                 aria-label={`배너 ${i + 1}`}
               >
-                <Image
-                  src={b.src}
-                  alt={b.alt}
-                  fill
-                  sizes="(max-width: 768px) 92vw, 420px"
-                  className="object-cover"
-                  loading="lazy"
-                  unoptimized
-                />
-
-                {/* 텍스트 오버레이 */}
+                <div className="absolute -inset-px">
+                  <Image
+                    src={b.src}
+                    alt={b.alt}
+                    fill
+                    sizes="(max-width: 768px) 92vw, 420px"
+                    className="object-cover [transform:translateZ(0)] will-change-transform"
+                    loading="lazy"
+                    unoptimized
+                    draggable={false}
+                  />
+                </div>
                 <div
                   className={`absolute bottom-6 left-6 drop-shadow-md ${
                     b.color === 'black' ? 'text-black' : 'text-white'

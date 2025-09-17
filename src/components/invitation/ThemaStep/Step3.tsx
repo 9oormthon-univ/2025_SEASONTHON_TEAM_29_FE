@@ -2,9 +2,11 @@
 
 import Button from '@/components/common/atomic/Button';
 import Image from 'next/image';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 export default function Step3({
+  files,
+  onChangeFile,
   onNext,
 }: {
   files: File | null;
@@ -12,9 +14,11 @@ export default function Step3({
   onNext: () => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
 
-  const url = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
+  const url = useMemo(
+    () => (files ? URL.createObjectURL(files) : null),
+    [files],
+  );
   useEffect(
     () => () => {
       if (url) URL.revokeObjectURL(url);
@@ -28,7 +32,7 @@ export default function Step3({
         영화같은 순간을 담아주세요
       </p>
       <h2 className="mt-1 text-xl font-bold text-text--default pb-12">
-        메인사진을 담아주세요.
+        티켓 사진을 담아주세요.
       </h2>
 
       <button
@@ -85,7 +89,7 @@ export default function Step3({
           type="file"
           accept="image/*"
           className="hidden"
-          onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+          onChange={(e) => onChangeFile(e.target.files?.[0] ?? null)}
         />
       </button>
 
@@ -93,7 +97,7 @@ export default function Step3({
         프레임을 클릭하면 사진을 넣을 수 있어요.
       </p>
       <div className="fixed inset-x-0 bottom-0 px-6 pb-20 pt-4 bg-white/80 backdrop-blur">
-        <Button fullWidth onClick={onNext}>
+        <Button fullWidth onClick={onNext} disabled={!files}>
           등록하기
         </Button>
       </div>

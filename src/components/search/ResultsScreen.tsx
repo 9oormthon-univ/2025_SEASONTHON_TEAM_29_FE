@@ -101,11 +101,7 @@ export default function ResultsScreen({
       <Header
         showBack
         onBack={() => {
-          if (cat) {
-            router.push(`/search/filters?cat=${cat}`);
-          } else {
-            router.push('/search/filters');
-          }
+          router.back();
         }}
         value="검색결과"
       />
@@ -154,9 +150,7 @@ export default function ResultsScreen({
                         <button
                           onClick={() => {
                             const cat = sp.get('cat');
-                            const params = new URLSearchParams();
-                            if (cat) params.set('cat', cat); // ✅ 카테고리만 유지
-                            router.push(`/search/filters?${params.toString()}`);
+                            router.push(`/search/filters?cat=${cat}`);
                           }}
                           className="text-xs text-gray-400 hover:text-gray-600"
                         >
@@ -164,7 +158,7 @@ export default function ResultsScreen({
                         </button>
                       )}
                     </div>
-                    <div className="grid grid-cols-3">
+                    <div className="grid grid-cols-3 gap-3">
                       {list.map((it) => (
                         <VendorCard
                           key={it.id}
@@ -175,7 +169,7 @@ export default function ResultsScreen({
                             regionName: it.region,
                             averageRating: it.rating,
                             reviewCount: it.count,
-                            minPrice: grouped[key]?.minPrice, // ✅ 추가
+                            minPrice: grouped[key]?.minPrice,
                           }}
                           href={`/vendor/${it.id}`}
                         />

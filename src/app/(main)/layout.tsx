@@ -11,7 +11,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? '';
 
   const HIDE_EXACT = ['/search', '/search/filters'];
-  const HIDE_PREFIX = ['/tours/', '/mypage/connection', '/mypage/review', '/editorials', '/reservation', '/cart', '/review', '/calendar/new', '/mypage/invite/editor'];
+  const HIDE_PREFIX = ['/tours/', '/mypage/connection', '/mypage/review', '/editorials', '/reservation', '/cart', '/review', '/calendar/new', '/mypage/invite/editor' , '/mypage/contracts/'];
   const hideBottomNav = HIDE_EXACT.includes(pathname) || HIDE_PREFIX.some((p) => pathname.startsWith(p));
 
   return (

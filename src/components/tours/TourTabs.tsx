@@ -1,14 +1,14 @@
-// src/components/tours/TourTabs.tsx
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import type { TourTab } from '@/types/tour';
 
-export default function TourTabs() {
-  const pathname = usePathname() ?? '';
-  const router = useRouter();
-
-  // 현재 경로로 활성 탭 판단
-  const isRomance = pathname.startsWith('/coming-soon');
+export default function TourTabs({
+  value,
+  onChange,
+}: {
+  value: TourTab;
+  onChange: (tab: TourTab) => void;
+}) {
   const base = 'flex-1 py-3 text-sm font-medium';
   const active = 'text-black border-b-3 border-primary-500';
   const inactive = 'text-gray-400';
@@ -17,17 +17,17 @@ export default function TourTabs() {
     <div className="flex">
       <button
         type="button"
-        onClick={() => router.push('/tours')}
-        className={`${base} ${!isRomance ? active : inactive}`}
-        aria-current={!isRomance ? 'page' : undefined}
+        onClick={() => onChange('dressTour')}
+        className={`${base} ${value === 'dressTour' ? active : inactive}`}
+        aria-current={value === 'dressTour' ? 'page' : undefined}
       >
         드레스 투어
       </button>
       <button
         type="button"
-        onClick={() => router.push('/coming-soon')}
-        className={`${base} ${isRomance ? active : inactive}`}
-        aria-current={isRomance ? 'page' : undefined}
+        onClick={() => onChange('dressRomance')}
+        className={`${base} ${value === 'dressRomance' ? active : inactive}`}
+        aria-current={value === 'dressRomance' ? 'page' : undefined}
       >
         드레스 로망
       </button>

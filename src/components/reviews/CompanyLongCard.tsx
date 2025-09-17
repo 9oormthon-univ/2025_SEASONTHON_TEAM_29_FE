@@ -2,32 +2,35 @@
 
 import clsx from 'clsx';
 import Image from 'next/image';
+import Link from 'next/link';
 import SvgObject from '../common/atomic/SvgObject';
 
 type CompanyType = '스튜디오' | '웨딩홀' | '드레스' | '메이크업';
 
 type Props = {
+  vendorId: number;               // ✅ 추가
   title: string;
   logoUrl?: string;
   date?: string;
   type: CompanyType;
-  onReport?: () => void;
   className?: string;
 };
 
 export default function CompanyLongCard({
+  vendorId,
   title,
   logoUrl,
   date,
   type,
-  onReport,
   className,
 }: Props) {
   return (
-    <div
+    <Link
+      href={`/vendor/${vendorId}`}  // ✅ 클릭 시 이동
       className={clsx(
         'relative w-80 h-22',
         'border-y border-box-line',
+        'block cursor-pointer active:bg-gray-50', // ✅ 버튼 느낌
         className,
       )}
     >
@@ -64,19 +67,7 @@ export default function CompanyLongCard({
       </div>
       <div className="absolute left-0 bottom-1 text-text--secondary text-xs leading-loose">
         <span>{date}</span>
-        <span className="px-2">|</span>
-        {onReport ? (
-          <button
-            type="button"
-            onClick={onReport}
-            className="underline-offset-2 hover:underline"
-          >
-            신고하기
-          </button>
-        ) : (
-          <span>신고하기</span>
-        )}
       </div>
-    </div>
+    </Link>
   );
 }

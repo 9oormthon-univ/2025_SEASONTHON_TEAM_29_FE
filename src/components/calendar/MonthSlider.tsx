@@ -16,8 +16,17 @@ type Props = {
   className?: string;
 };
 
-export default function MonthSlider({ base, setBase, makeByDate, onPickDay, className }: Props) {
-  const slides = useMemo(() => [addMonths(base, -1), base, addMonths(base, 1)], [base]);
+export default function MonthSlider({
+  base,
+  setBase,
+  makeByDate,
+  onPickDay,
+  className,
+}: Props) {
+  const slides = useMemo(
+    () => [addMonths(base, -1), base, addMonths(base, 1)],
+    [base],
+  );
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'center',
@@ -58,14 +67,21 @@ export default function MonthSlider({ base, setBase, makeByDate, onPickDay, clas
   }, [slides, emblaApi, recenter]);
 
   // ✅ 각 슬라이드(monthBase)별로 “그 달 전용” 맵을 만든다
-  const maps = useMemo(() => slides.map((d) => makeByDate(d)), [slides, makeByDate]);
+  const maps = useMemo(
+    () => slides.map((d) => makeByDate(d)),
+    [slides, makeByDate],
+  );
 
   return (
     <div className={clsx('overflow-hidden', className)} ref={emblaRef}>
       <div className="flex">
         {slides.map((monthBase, i) => (
-          <div key={i} className="min-w-0 shrink-0 grow-0 basis-full px-[14px]">
-            <MonthGrid monthBase={monthBase} byDate={maps[i]} onPickDay={onPickDay} />
+          <div key={i} className="min-w-0 shrink-0 grow-0 basis-full">
+            <MonthGrid
+              monthBase={monthBase}
+              byDate={maps[i]}
+              onPickDay={onPickDay}
+            />
           </div>
         ))}
       </div>

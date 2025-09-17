@@ -21,7 +21,10 @@ export default function CalendarPage() {
   const [activeYmd, setActiveYmd] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>('schedule');
 
-  const { maps } = useCalendarRange(base, mode === 'schedule' ? 'USER' : 'ADMIN');
+  const { maps } = useCalendarRange(
+    base,
+    mode === 'schedule' ? 'USER' : 'ADMIN',
+  );
 
   const d = dday(WEDDING_YMD);
   const openDay = (date: Date) => setActiveYmd(toYMD(date));
@@ -52,7 +55,7 @@ export default function CalendarPage() {
     <main className="mx-auto w-full max-w-[420px] pb-[48px]">
       <Header
         showBack
-        onBack={() => router.back()}
+        onBack={() => router.push('/home')}
         value={`${base.getMonth() + 1}월`}
         rightSlot={
           <CalendarToggle
@@ -70,13 +73,15 @@ export default function CalendarPage() {
             결혼까지 <span className="text-primary-500">D-{d}</span>
           </p>
         </div>
-        <p className="mt-1 !text-sm text-gray-500">끝까지 웨딧이 함께 할게요 :)</p>
+        <p className="mt-1 !text-sm text-gray-500">
+          끝까지 웨딧이 함께 할게요 :)
+        </p>
         <div className="mt-4">
           <SummaryCard />
         </div>
       </section>
 
-      <section className="mt-2 pb-8">
+      <section className="mt-8 pb-8">
         <MonthSlider
           base={base}
           setBase={setBase}

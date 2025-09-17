@@ -66,6 +66,7 @@ function ContractCarousel({
       api?.off('reInit', update);
     };
   }, [api]);
+  console.log(contracts);
 
   return (
     <div ref={ref} className="overflow-hidden">
@@ -82,7 +83,7 @@ function ContractCarousel({
                 reviewCount: undefined,
                 minPrice: undefined,
               }}
-              href={`/vendor/${c.vendorId}`}
+              href={`/mypage/contracts/${c.contractId}`}
             />
           </div>
         ))}

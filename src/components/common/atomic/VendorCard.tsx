@@ -29,7 +29,7 @@ export default function VendorCard({ item, href }: Props) {
       aria-label={`${vendorName} 상세보기`}
     >
       {/* 로고 */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-50">
+      <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-gray-200">
         <Image
           src={logoImageUrl || '/logos/placeholder.png'}
           alt={vendorName}

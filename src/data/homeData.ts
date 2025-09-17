@@ -90,7 +90,7 @@ export const stories: StoryItem[] = [
     img: '/icons/story1.png',
   },
   {
-    id: 2,
+    id: 3,
     category: ['야외', '로맨틱', '단독홀'],
     title: '신부 취향저격 가든웨딩',
     img: '/icons/story2.png',

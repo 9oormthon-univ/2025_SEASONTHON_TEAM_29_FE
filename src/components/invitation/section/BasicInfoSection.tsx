@@ -39,6 +39,7 @@ export default function BasicInfoSection({
   const sectionId = useId();
   const headerId = `${sectionId}-header`;
   const panelId = `${sectionId}-panel`;
+
   function patch(path: 'groom', v: BasicInfoPerson): void;
   function patch(path: 'bride', v: BasicInfoPerson): void;
   function patch(path: 'order', v: BasicInfoValue['order']): void;
@@ -308,18 +309,18 @@ function FieldRow({
     </div>
   );
 }
-
 function BoxInput({
   value,
   onChange,
   placeholder,
   className,
 }: {
-  value: string;
+  value?: string | null;
   onChange: (v: string) => void;
   placeholder?: string;
   className?: string;
 }) {
+  const controlled = value ?? '';
   return (
     <div
       className={clsx(
@@ -329,7 +330,7 @@ function BoxInput({
       )}
     >
       <input
-        value={value}
+        value={controlled}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={clsx(

@@ -1,7 +1,7 @@
 import { http, type ApiEnvelope } from '@/services/http';
 
 export type CreateReviewPayload = {
-  vendorId: number;
+  contractId: number;
   rating: number;
   contentBest: string;
   contentWorst: string;

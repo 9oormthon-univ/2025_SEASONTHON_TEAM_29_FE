@@ -3,11 +3,11 @@ import { mapSearchResponse, type VendorRes } from '@/services/mappers/searchMapp
 import type { SearchResult } from '@/types/search';
 
 export type MakeupSearchReq = {
-  regionCode: string[];
-  price: number; // 원 단위
-  makeupStyle: string[];
-  isStylistDesignationAvailable: boolean;
-  hasPrivateRoom: boolean;
+  regionCode?: string[] | null;
+  price?: number | null;
+  makeupStyle?: string[] | null;
+  isStylistDesignationAvailable?: boolean | null;
+  hasPrivateRoom?: boolean | null;
   page?: number;
   size?: number;
 };
@@ -22,11 +22,14 @@ export async function searchMakeups(
   const size = body.size ?? 12;
 
   const qs = new URLSearchParams();
-  if (body.regionCode.length > 0) qs.set('regionCode', body.regionCode.join(','));
-  qs.set('price', String(body.price));
-  if (body.makeupStyle.length > 0) qs.set('makeupStyle', body.makeupStyle.join(','));
-  qs.set('isStylistDesignationAvailable', String(body.isStylistDesignationAvailable));
-  qs.set('hasPrivateRoom', String(body.hasPrivateRoom));
+  if (body.regionCode?.length) qs.set('regionCode', body.regionCode.join(','));
+  if (body.price != null && body.price > 0) qs.set('price', String(body.price));
+  if (body.makeupStyle?.length) qs.set('makeupStyle', body.makeupStyle.join(','));
+  if (body.isStylistDesignationAvailable != null)
+    qs.set('isStylistDesignationAvailable', String(body.isStylistDesignationAvailable));
+  if (body.hasPrivateRoom != null)
+    qs.set('hasPrivateRoom', String(body.hasPrivateRoom));
+
   qs.set('page', String(page));
   qs.set('size', String(size));
 
