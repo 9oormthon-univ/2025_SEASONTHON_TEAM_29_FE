@@ -125,7 +125,7 @@ function CoupleLinkingView({ onComplete }: Props) {
           </Button>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
