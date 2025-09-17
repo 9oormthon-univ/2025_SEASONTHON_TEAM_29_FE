@@ -147,10 +147,10 @@ export default function CalendarNewPage() {
                   <Image
                     src={STICKER_SRC[key]}
                     alt={key}
-                    width={w}
-                    height={h}
+                    width={40}
+                    height={40}
                     draggable={false}
-                    className={clsx('pointer-events-none', className)}
+                    className="block w-15 h-15 object-contain"
                   />
                 </span>
               </button>
