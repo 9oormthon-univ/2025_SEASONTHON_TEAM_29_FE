@@ -54,8 +54,17 @@ function CoupleLinkingView({ onComplete }: Props) {
   };
 
   return (
-    <main className="min-h-screen bg-background pb-24">
-      <Header showBack onBack={() => router.push('/mypage')} value="계정연동" />
+    <div className="min-h-screen bg-background flex flex-col items-center">
+      <Header
+        value="계정연동"
+        showBack
+        onBack={() => router.push('/mypage')}
+        sticky={false}
+        className="w-full"
+        maxWidthClassName="max-w-96 w-full"
+        bgClassName="bg-background"
+        textClassName="text-text--default"
+      />
       <div className="w-96 px-6 py-5 space-y-8 pb-28">
         <section className="space-y-2">
           <h2 className="text-sm font-medium text-text--default">
