@@ -140,7 +140,7 @@ export default function CalendarNewPage() {
           type="submit"
           disabled={disabled || loading}
           className={clsx(
-            'mt-8 h-12 w-full rounded-2xl text-[15px] font-semibold transition',
+            'mt-50 h-12 w-full rounded-2xl text-[15px] font-semibold transition',
             disabled || loading
               ? 'bg-primary-200/40 text-rose-300 cursor-not-allowed'
               : 'bg-primary-500 text-white active:scale-[0.98]',
