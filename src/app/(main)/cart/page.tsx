@@ -95,6 +95,7 @@ export default function EstimateCartPage() {
       setSelectedIds([]);
       setSelecting(false);
     } catch (e) {
+      console.log(e);
       alert('삭제 실패');
     }
   };
