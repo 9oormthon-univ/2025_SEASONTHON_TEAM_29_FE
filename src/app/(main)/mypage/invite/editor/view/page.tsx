@@ -20,6 +20,20 @@ import {
 
 import { useStagedInvitationMedia } from '@/hooks/useStagedInvitationMedia';
 
+type PreviewData = InvitationApi['data'];
+type PreviewPlace = PreviewData['marriagePlace'];
+
+type PersistedDraft = Partial<{
+  theme: ThemeDraft;
+  basicInformation: BasicInformationDraft;
+  greetings: GreetingsDraft;
+  marriageDate: MarriageDateDraft;
+  marriagePlace: MarriagePlaceDraft &
+    Partial<Pick<PreviewPlace, 'address' | 'lat' | 'lng'>>;
+  gallery: GalleryMetaDraft;
+  mediaList: { mediaKey: string; sortOrder: number }[];
+}>;
+
 const toMediaUrl = (key?: string | null) => {
   if (!key) return null;
   const CDN = process.env.NEXT_PUBLIC_CDN_URL?.replace(/\/$/, '');
@@ -35,47 +49,51 @@ export default function Page() {
   const qc = useQueryClient();
   const { staged } = useStagedInvitationMedia(draftId);
 
-  const [payload, setPayload] = useState<InvitationApi['data'] | null>(null);
+  const [payload, setPayload] = useState<PreviewData | null>(null);
 
   useEffect(() => {
     if (!Number.isFinite(draftId) || draftId <= 0) return;
-    const theme = qc.getQueryData<ThemeDraft>(draftFieldKey(draftId, 'theme'));
-    const basic = qc.getQueryData<BasicInformationDraft>(
+    let theme = qc.getQueryData<ThemeDraft>(draftFieldKey(draftId, 'theme'));
+    let basic = qc.getQueryData<BasicInformationDraft>(
       draftFieldKey(draftId, 'basicInformation'),
     );
-    const greet = qc.getQueryData<GreetingsDraft>(
+    let greet = qc.getQueryData<GreetingsDraft>(
       draftFieldKey(draftId, 'greetings'),
     );
-    const mdate = qc.getQueryData<MarriageDateDraft>(
+    let mdate = qc.getQueryData<MarriageDateDraft>(
       draftFieldKey(draftId, 'marriageDate'),
     );
-    const mplace = qc.getQueryData<MarriagePlaceDraft>(
+    let mplaceDraft = qc.getQueryData<MarriagePlaceDraft>(
       draftFieldKey(draftId, 'marriagePlace'),
     );
-    const gmeta = qc.getQueryData<GalleryMetaDraft>(
+    let gmetaDraft = qc.getQueryData<GalleryMetaDraft>(
       draftFieldKey(draftId, 'gallery'),
     );
-    const mediaList =
+    let mediaList =
       qc.getQueryData<{ mediaKey: string; sortOrder: number }[]>(
         galleryKey(draftId),
       ) ?? [];
-    if (!basic || !greet || !mdate || !mplace) {
-      try {
-        const raw = localStorage.getItem(`inviteDraft:${draftId}`);
-        if (raw) {
-          const json = JSON.parse(raw);
-          if (!theme && json.theme) json.theme satisfies ThemeDraft;
-          if (!basic && json.basicInformation)
-            json.basicInformation satisfies BasicInformationDraft;
-          if (!greet && json.greetings) json.greetings satisfies GreetingsDraft;
-          if (!mdate && json.marriageDate)
-            json.marriageDate satisfies MarriageDateDraft;
-          if (!mplace && json.marriagePlace)
-            json.marriagePlace satisfies MarriagePlaceDraft;
+    try {
+      const raw = localStorage.getItem(`inviteDraft:${draftId}`);
+      if (raw) {
+        const json = JSON.parse(raw) as PersistedDraft;
+        if (!theme && json.theme) theme = json.theme;
+        if (!basic && json.basicInformation) basic = json.basicInformation;
+        if (!greet && json.greetings) greet = json.greetings;
+        if (!mdate && json.marriageDate) mdate = json.marriageDate;
+        if (!mplaceDraft && json.marriagePlace)
+          mplaceDraft = json.marriagePlace;
+        if (mediaList.length === 0 && Array.isArray(json.mediaList)) {
+          mediaList = json.mediaList;
         }
-      } catch {}
+        if (!gmetaDraft && json.gallery) gmetaDraft = json.gallery;
+      }
+    } catch {
+      // ignore
     }
-    const b = basic ?? {
+
+    // 3) 미리보기에 맞는 형태로 안전하게 기본값 채우기
+    const b: BasicInformationDraft = basic ?? {
       groomFirstName: '',
       groomLastName: '',
       groomFatherName: '',
@@ -91,60 +109,78 @@ export default function Page() {
       brideFirst: false,
     };
 
-    const g = greet ?? {
+    const g: GreetingsDraft = greet ?? {
       greetingsTitle: '',
       greetingsContent: '',
       greetingsSortInOrder: true,
     };
 
-    const md = mdate ?? {
+    const md: MarriageDateDraft = mdate ?? {
       marriageDate: new Date().toISOString().slice(0, 10),
       marriageTime: '12:00',
       representDDay: true,
     };
-
-    const mp = mplace ?? {
-      vendorName: '',
-      floorAndHall: '',
-      drawSketchMap: true,
-      address: '',
-      lat: 0,
-      lng: 0,
+    const mp: PreviewPlace = {
+      vendorName: mplaceDraft?.vendorName ?? '',
+      floorAndHall: mplaceDraft?.floorAndHall ?? '',
+      drawSketchMap: mplaceDraft?.drawSketchMap ?? true,
+      address:
+        (mplaceDraft as Partial<PreviewPlace> | undefined)?.address ?? '',
+      lat: (mplaceDraft as Partial<PreviewPlace> | undefined)?.lat ?? 0,
+      lng: (mplaceDraft as Partial<PreviewPlace> | undefined)?.lng ?? 0,
     };
-    const galleryUrls = [...mediaList]
+
+    const galleryUrls: string[] = [...mediaList]
       .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map((m) => toMediaUrl(m.mediaKey)!)
-      .filter(Boolean);
-    const mainMediaUrl = toMediaUrl(staged.mainMedia?.mediaKey ?? null);
-    const filmMediaUrl = [
+      .map((m) => toMediaUrl(m.mediaKey))
+      .filter((u): u is string => !!u);
+
+    const mainMediaUrl: string =
+      toMediaUrl(staged.mainMedia?.mediaKey ?? null) ?? '/mock/main-sample.jpg';
+
+    const filmMediaUrl: string[] = [
       toMediaUrl(staged.filmMedia?.[0]?.mediaKey ?? null),
       toMediaUrl(staged.filmMedia?.[1]?.mediaKey ?? null),
       toMediaUrl(staged.filmMedia?.[2]?.mediaKey ?? null),
     ].filter((u): u is string => !!u);
-    const ticketMediaUrl = toMediaUrl(staged.ticketMedia?.mediaKey ?? null);
-    const assembled: InvitationApi['data'] = {
-      basicInformation: b,
-      greetings: g,
-      marriageDate: md,
-      marriagePlace: mp,
-      mainMediaUrl: mainMediaUrl || null,
-      filmMediaUrl,
-      ticketMediaUrl: ticketMediaUrl || null,
-      mediaUrls: galleryUrls,
-      theme: theme ?? {
+
+    const ticketMediaUrl: string =
+      toMediaUrl(staged.ticketMedia?.mediaKey ?? null) ?? '';
+
+    const themeValue: PreviewData['theme'] =
+      (theme as PreviewData['theme']) ?? {
         font: 'Pretendard',
         fontSize: '보통',
         accentColor: '#000000',
         template: 'FILM',
         canEnlarge: false,
         appearanceEffect: false,
-      },
-      gallery: gmeta ?? {
+      };
+
+    const galleryValue: PreviewData['gallery'] =
+      (gmetaDraft as PreviewData['gallery']) ?? {
         galleryTitle: '갤러리',
         arrangement: 'GRID',
         popUpViewer: true,
-      },
-    } as any;
+      };
+
+    const assembled: PreviewData = {
+      id: 0,
+      memberId: 0,
+      ending: '',
+      account: '',
+      background: '',
+      theme: themeValue,
+      basicInformation: b,
+      greetings: g,
+      marriageDate: md,
+      marriagePlace: mp,
+      mainMediaUrl,
+      filmMediaUrl,
+      ticketMediaUrl,
+      mediaUrls: galleryUrls,
+      gallery: galleryValue,
+    };
 
     setPayload(assembled);
   }, [draftId, qc, staged.mainMedia, staged.filmMedia, staged.ticketMedia]);

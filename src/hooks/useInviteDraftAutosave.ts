@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import type { InviteForm } from '@/types/invite';
 import type { ComponentProps } from 'react';
@@ -22,12 +22,75 @@ type GallerySectionValue = ComponentProps<typeof GallerySection>['value'];
 
 const str = (v: unknown, d = ''): string =>
   v == null ? d : typeof v === 'string' ? v : String(v);
+
 const bool = (v: unknown, d = false): boolean =>
   v == null ? d : typeof v === 'boolean' ? v : !!v;
+
 const num = (v: unknown, d = 0): number =>
   v == null ? d : typeof v === 'number' ? v : Number(v);
 
 type Options = { enabled?: boolean };
+
+type MaybeTheme = Partial<{
+  font: string;
+  fontFamily: string;
+  fontSize: string;
+  fontWeight: string;
+  accentColor: string;
+  accent: string;
+  canEnlarge: boolean;
+  appearanceEffect: boolean;
+}>;
+
+type MaybePerson = Partial<{
+  firstName: string;
+  lastName: string;
+  fatherName: string;
+  motherName: string;
+  fatherDeceased: boolean;
+  motherDeceased: boolean;
+  fatherDead: boolean;
+  motherDead: boolean;
+  isFatherDead: boolean;
+  isMotherDead: boolean;
+}>;
+
+type MaybeGreeting = Partial<{
+  title: string;
+  body: string;
+  ordered: boolean;
+  sort: string;
+}>;
+
+type MaybeCeremony = Partial<{
+  date: string;
+  time: string;
+  hour: number;
+  minute: number;
+  representDDay: boolean;
+  showDDay: boolean;
+  showDday: boolean;
+}>;
+
+type MaybePlace = Partial<{
+  venueName: string;
+  hallInfo: string;
+  showMap: boolean;
+}>;
+
+type PhotoItem =
+  | string
+  | {
+      key?: string;
+      contentType?: string;
+    };
+
+type MaybeGalleryLocal = Partial<{
+  title: string;
+  layout: string;
+  enablePopup: boolean;
+  photos: PhotoItem[];
+}>;
 
 export function useInviteDraftAutosave(
   draftId: number,
@@ -38,141 +101,33 @@ export function useInviteDraftAutosave(
 ) {
   const { enabled = true } = opts;
   const qc = useQueryClient();
+
   const canSave = enabled && Number.isFinite(draftId) && draftId > 0;
-  const latestRef = useRef({ form, place, gallery });
+  const fTheme = form.theme;
+  const fGroom = form.groom;
+  const fBride = form.bride;
+  const fOrder = form.order;
+  const fGreeting = form.greeting;
+  const fCeremony = form.ceremony;
+  const fBrideFirst =
+    (form as unknown as { brideFirst?: boolean }).brideFirst ?? undefined;
+
+  const latestRef = useRef<{
+    form: InviteForm;
+    place: PlaceSectionValue;
+    gallery: GallerySectionValue;
+  }>({
+    form,
+    place,
+    gallery,
+  });
   useEffect(() => {
     latestRef.current = { form, place, gallery };
   }, [form, place, gallery]);
-  const flush = useMemo(() => {
-    const saveTheme = (t: any): ThemeDraft => ({
-      font: str(t.font ?? t.fontFamily),
-      fontSize: str(t.fontSize ?? t.fontWeight),
-      accentColor: str(t.accentColor ?? t.accent),
-      template: 'FILM',
-      canEnlarge: bool(t.canEnlarge),
-      appearanceEffect: bool(t.appearanceEffect),
-    });
 
-    const saveBasic = (g: any, b: any, order: any): BasicInformationDraft => ({
-      groomFirstName: str(g.firstName ?? g.first),
-      groomLastName: str(g.lastName ?? g.last),
-      groomFatherName: str(g.fatherName ?? g.father),
-      groomMotherName: str(g.motherName ?? g.mother),
-      brideFirstName: str(b.firstName ?? b.first),
-      brideLastName: str(b.lastName ?? b.last),
-      brideFatherName: str(b.fatherName ?? b.father),
-      brideMotherName: str(b.motherName ?? b.mother),
-      groomFatherDead: bool(g.fatherDeceased ?? g.fatherDead ?? g.isFatherDead),
-      groomMotherDead: bool(g.motherDeceased ?? g.motherDead ?? g.isMotherDead),
-      brideFatherDead: bool(b.fatherDeceased ?? b.fatherDead ?? b.isFatherDead),
-      brideMotherDead: bool(b.motherDeceased ?? b.motherDead ?? b.isMotherDead),
-      brideFirst:
-        str(order) === 'BRIDE_FIRST' ||
-        str(order) === 'BRIDE' ||
-        str(order) === 'BRIDE_FIRST_ORDER' ||
-        bool((latestRef.current.form as any).brideFirst),
-    });
-
-    const saveDate = (c: any): MarriageDateDraft => {
-      const hour = num(c.hour, NaN);
-      const minute = num(c.minute, NaN);
-      const time =
-        str(c.time) ||
-        (Number.isFinite(hour) && Number.isFinite(minute)
-          ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
-          : '');
-      return {
-        marriageDate: str(c.date),
-        marriageTime: time,
-        representDDay: bool(c.representDDay ?? c.showDDay ?? c.showDday, true),
-      };
-    };
-
-    const savePlace = (p: any): MarriagePlaceDraft => ({
-      vendorName: str(p?.venueName),
-      floorAndHall: str(p?.hallInfo),
-      drawSketchMap: bool(p?.showMap),
-    });
-
-    const saveGalleryMeta = (g: any): GalleryMetaDraft => ({
-      galleryTitle: str(g?.title, '갤러리'),
-      arrangement: str(g?.layout) === 'GRID' ? 'GRID' : 'SWIPE',
-      popUpViewer: bool(g?.enablePopup, true),
-    });
-
-    const toMediaList = (photos: any[]) =>
-      photos.map((p, i) =>
-        typeof p === 'string'
-          ? { mediaKey: p, contentType: '', sortOrder: i }
-          : {
-              mediaKey: str(p?.key),
-              contentType: str(p?.contentType),
-              sortOrder: i,
-            },
-      );
-
-    return () => {
-      const { form, place, gallery } = latestRef.current;
-      if (!canSave) return;
-      qc.setQueryData(
-        draftFieldKey(draftId, 'theme'),
-        saveTheme((form as any).theme ?? {}),
-      );
-      qc.setQueryData(
-        draftFieldKey(draftId, 'basicInformation'),
-        saveBasic(
-          (form as any).groom ?? {},
-          (form as any).bride ?? {},
-          (form as any).order,
-        ),
-      );
-      qc.setQueryData(draftFieldKey(draftId, 'greetings'), {
-        greetingsTitle: str((form as any).greeting?.title),
-        greetingsContent: str((form as any).greeting?.body),
-        greetingsSortInOrder: true,
-      } as GreetingsDraft);
-      qc.setQueryData(
-        draftFieldKey(draftId, 'marriageDate'),
-        saveDate((form as any).ceremony ?? {}),
-      );
-      qc.setQueryData(
-        draftFieldKey(draftId, 'marriagePlace'),
-        savePlace(place),
-      );
-      qc.setQueryData(
-        draftFieldKey(draftId, 'gallery'),
-        saveGalleryMeta(gallery),
-      );
-
-      const photos = Array.isArray((gallery as any)?.photos)
-        ? (gallery as any).photos
-        : [];
-      const list = toMediaList(photos);
-      qc.setQueryData(galleryKey(draftId), list);
-      try {
-        const payload = {
-          theme: qc.getQueryData(draftFieldKey(draftId, 'theme')),
-          basicInformation: qc.getQueryData(
-            draftFieldKey(draftId, 'basicInformation'),
-          ),
-          greetings: qc.getQueryData(draftFieldKey(draftId, 'greetings')),
-          marriageDate: qc.getQueryData(draftFieldKey(draftId, 'marriageDate')),
-          marriagePlace: qc.getQueryData(
-            draftFieldKey(draftId, 'marriagePlace'),
-          ),
-          gallery: qc.getQueryData(draftFieldKey(draftId, 'gallery')),
-          mediaList: qc.getQueryData(galleryKey(draftId)),
-          updatedAt: Date.now(),
-        };
-        localStorage.setItem(`inviteDraft:${draftId}`, JSON.stringify(payload));
-      } catch {}
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canSave, draftId, qc]);
-  useEffect(() => {
-    if (!canSave) return;
-    const t: any = (form as any).theme ?? {};
-    const v: ThemeDraft = {
+  const toThemeDraft = (src: unknown): ThemeDraft => {
+    const t = (src ?? {}) as MaybeTheme;
+    return {
       font: str(t.font ?? t.fontFamily),
       fontSize: str(t.fontSize ?? t.fontWeight),
       accentColor: str(t.accentColor ?? t.accent),
@@ -180,78 +135,43 @@ export function useInviteDraftAutosave(
       canEnlarge: bool(t.canEnlarge),
       appearanceEffect: bool(t.appearanceEffect),
     };
-    qc.setQueryData(draftFieldKey(draftId, 'theme'), v);
-  }, [qc, draftId, canSave, (form as any).theme]);
+  };
 
-  useEffect(() => {
-    if (!canSave) return;
-    const g: any = (form as any).groom ?? {};
-    const b: any = (form as any).bride ?? {};
-    const order: any = (form as any).order;
-    const v: BasicInformationDraft = {
-      groomFirstName: str(g.firstName ?? g.first),
-      groomLastName: str(g.lastName ?? g.last),
-      groomFatherName: str(g.fatherName ?? g.father),
-      groomMotherName: str(g.motherName ?? g.mother),
-      brideFirstName: str(b.firstName ?? b.first),
-      brideLastName: str(b.lastName ?? b.last),
-      brideFatherName: str(b.fatherName ?? b.father),
-      brideMotherName: str(b.motherName ?? b.mother),
+  const toBasicDraft = (
+    groomSrc: unknown,
+    brideSrc: unknown,
+    orderSrc: unknown,
+    brideFirstFallback?: boolean,
+  ): BasicInformationDraft => {
+    const g = (groomSrc ?? {}) as MaybePerson;
+    const b = (brideSrc ?? {}) as MaybePerson;
+    const order = str(orderSrc);
+
+    const brideFirst =
+      order === 'BRIDE_FIRST' ||
+      order === 'BRIDE' ||
+      order === 'BRIDE_FIRST_ORDER' ||
+      !!brideFirstFallback;
+
+    return {
+      groomFirstName: str(g.firstName),
+      groomLastName: str(g.lastName),
+      groomFatherName: str(g.fatherName ?? ''),
+      groomMotherName: str(g.motherName ?? ''),
+      brideFirstName: str(b.firstName),
+      brideLastName: str(b.lastName),
+      brideFatherName: str(b.fatherName ?? ''),
+      brideMotherName: str(b.motherName ?? ''),
       groomFatherDead: bool(g.fatherDeceased ?? g.fatherDead ?? g.isFatherDead),
       groomMotherDead: bool(g.motherDeceased ?? g.motherDead ?? g.isMotherDead),
       brideFatherDead: bool(b.fatherDeceased ?? b.fatherDead ?? b.isFatherDead),
       brideMotherDead: bool(b.motherDeceased ?? b.motherDead ?? b.isMotherDead),
-      brideFirst:
-        str(order) === 'BRIDE_FIRST' ||
-        str(order) === 'BRIDE' ||
-        str(order) === 'BRIDE_FIRST_ORDER' ||
-        bool((form as any).brideFirst),
+      brideFirst,
     };
-    qc.setQueryData(draftFieldKey(draftId, 'basicInformation'), v);
-  }, [
-    qc,
-    draftId,
-    canSave,
-    (form as any).groom,
-    (form as any).bride,
-    (form as any).order,
-  ]);
+  };
 
-  useEffect(() => {
-    if (!canSave) return;
-    const g: any = (form as any).greeting ?? {};
-
-    const ordered =
-      typeof g.ordered === 'boolean'
-        ? g.ordered
-        : ['순서대로', 'ORDERED', 'ASC', 'TRUE'].includes(
-            String(g.sort || '').toUpperCase(),
-          );
-
-    const v: GreetingsDraft = {
-      greetingsTitle: str(g.title),
-      greetingsContent: str(g.body),
-      greetingsSortInOrder: ordered,
-    };
-
-    qc.setQueryData(draftFieldKey(draftId, 'greetings'), v);
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[AUTOSAVE:greetings]', v, '(from form.greeting =', g, ')');
-    }
-  }, [
-    qc,
-    draftId,
-    canSave,
-    (form as any).greeting?.title,
-    (form as any).greeting?.body,
-    (form as any).greeting?.ordered,
-    (form as any).greeting?.sort,
-  ]);
-
-  useEffect(() => {
-    if (!canSave) return;
-    const c: any = (form as any).ceremony ?? {};
+  const toDateDraft = (src: unknown): MarriageDateDraft => {
+    const c = (src ?? {}) as MaybeCeremony;
     const hour = num(c.hour, NaN);
     const minute = num(c.minute, NaN);
     const time =
@@ -259,67 +179,191 @@ export function useInviteDraftAutosave(
       (Number.isFinite(hour) && Number.isFinite(minute)
         ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
         : '');
-    const v: MarriageDateDraft = {
+    return {
       marriageDate: str(c.date),
       marriageTime: time,
       representDDay: bool(c.representDDay ?? c.showDDay ?? c.showDday, true),
     };
-    qc.setQueryData(draftFieldKey(draftId, 'marriageDate'), v);
-  }, [qc, draftId, canSave, (form as any).ceremony]);
+  };
 
+  const toPlaceDraft = (src: unknown): MarriagePlaceDraft => {
+    const p = (src ?? {}) as MaybePlace;
+    return {
+      vendorName: str(p.venueName),
+      floorAndHall: str(p.hallInfo),
+      drawSketchMap: bool(p.showMap),
+    };
+  };
+
+  const toGalleryMetaDraft = (src: unknown): GalleryMetaDraft => {
+    const g = (src ?? {}) as MaybeGalleryLocal;
+    return {
+      galleryTitle: str(g.title, '갤러리'),
+      arrangement: str(g.layout) === 'GRID' ? 'GRID' : 'SWIPE',
+      popUpViewer: bool(g.enablePopup, true),
+    };
+  };
+
+  const toMediaList = (
+    photos: PhotoItem[],
+  ): { mediaKey: string; contentType: string; sortOrder: number }[] =>
+    photos.map((p, i) =>
+      typeof p === 'string'
+        ? { mediaKey: p, contentType: '', sortOrder: i }
+        : {
+            mediaKey: str(p.key),
+            contentType: str(p.contentType),
+            sortOrder: i,
+          },
+    );
+
+  const flush = useMemo<() => void>(() => {
+    return () => {
+      if (!canSave) return;
+
+      const { form: f, place: pl, gallery: gal } = latestRef.current;
+
+      const themeDraft = toThemeDraft(
+        (f as unknown as { theme?: unknown }).theme,
+      );
+      const basicDraft = toBasicDraft(
+        (f as unknown as { groom?: unknown }).groom,
+        (f as unknown as { bride?: unknown }).bride,
+        (f as unknown as { order?: unknown }).order,
+        (f as unknown as { brideFirst?: boolean }).brideFirst,
+      );
+      const greetSrc =
+        (f as unknown as { greeting?: MaybeGreeting }).greeting ?? {};
+      const greetingsDraft: GreetingsDraft = {
+        greetingsTitle: str(greetSrc.title),
+        greetingsContent: str(greetSrc.body),
+        greetingsSortInOrder:
+          typeof greetSrc.ordered === 'boolean'
+            ? greetSrc.ordered
+            : ['순서대로', 'ORDERED', 'ASC', 'TRUE'].includes(
+                str(greetSrc.sort).toUpperCase(),
+              ),
+      };
+      const dateDraft = toDateDraft(
+        (f as unknown as { ceremony?: unknown }).ceremony,
+      );
+      const placeDraft = toPlaceDraft(pl as unknown);
+      const galleryDraft = toGalleryMetaDraft(gal as unknown);
+      const photos = Array.isArray(
+        (gal as unknown as MaybeGalleryLocal)?.photos,
+      )
+        ? ((gal as unknown as MaybeGalleryLocal).photos as PhotoItem[])
+        : [];
+      const mediaList = toMediaList(photos);
+
+      qc.setQueryData(draftFieldKey(draftId, 'theme'), themeDraft);
+      qc.setQueryData(draftFieldKey(draftId, 'basicInformation'), basicDraft);
+      qc.setQueryData(draftFieldKey(draftId, 'greetings'), greetingsDraft);
+      qc.setQueryData(draftFieldKey(draftId, 'marriageDate'), dateDraft);
+      qc.setQueryData(draftFieldKey(draftId, 'marriagePlace'), placeDraft);
+      qc.setQueryData(draftFieldKey(draftId, 'gallery'), galleryDraft);
+      qc.setQueryData(galleryKey(draftId), mediaList);
+
+      try {
+        const payload = {
+          theme: themeDraft,
+          basicInformation: basicDraft,
+          greetings: greetingsDraft,
+          marriageDate: dateDraft,
+          marriagePlace: placeDraft,
+          gallery: galleryDraft,
+          mediaList,
+          updatedAt: Date.now(),
+        };
+        localStorage.setItem(`inviteDraft:${draftId}`, JSON.stringify(payload));
+      } catch {
+        // ignore
+      }
+    };
+  }, [canSave, draftId, qc]);
+
+  // theme
   useEffect(() => {
     if (!canSave) return;
-    const v: MarriagePlaceDraft = {
-      vendorName: str((place as any)?.venueName),
-      floorAndHall: str((place as any)?.hallInfo),
-      drawSketchMap: bool((place as any)?.showMap),
+    qc.setQueryData(
+      draftFieldKey(draftId, 'theme'),
+      toThemeDraft((fTheme as unknown) ?? {}),
+    );
+  }, [qc, draftId, canSave, fTheme]);
+
+  // basicInformation
+  useEffect(() => {
+    if (!canSave) return;
+    qc.setQueryData(
+      draftFieldKey(draftId, 'basicInformation'),
+      toBasicDraft(fGroom, fBride, fOrder, fBrideFirst),
+    );
+  }, [qc, draftId, canSave, fGroom, fBride, fOrder, fBrideFirst]);
+
+  // greetings
+  useEffect(() => {
+    if (!canSave) return;
+    const g = (fGreeting ?? {}) as MaybeGreeting;
+    const v: GreetingsDraft = {
+      greetingsTitle: str(g.title),
+      greetingsContent: str(g.body),
+      greetingsSortInOrder:
+        typeof g.ordered === 'boolean'
+          ? g.ordered
+          : ['순서대로', 'ORDERED', 'ASC', 'TRUE'].includes(
+              str(g.sort).toUpperCase(),
+            ),
     };
-    qc.setQueryData(draftFieldKey(draftId, 'marriagePlace'), v);
+    qc.setQueryData(draftFieldKey(draftId, 'greetings'), v);
+  }, [qc, draftId, canSave, fGreeting]);
+
+  // marriageDate
+  useEffect(() => {
+    if (!canSave) return;
+    qc.setQueryData(
+      draftFieldKey(draftId, 'marriageDate'),
+      toDateDraft(fCeremony),
+    );
+  }, [qc, draftId, canSave, fCeremony]);
+
+  // marriagePlace
+  useEffect(() => {
+    if (!canSave) return;
+    qc.setQueryData(
+      draftFieldKey(draftId, 'marriagePlace'),
+      toPlaceDraft(place as unknown),
+    );
   }, [qc, draftId, canSave, place]);
 
+  // gallery meta
   useEffect(() => {
     if (!canSave) return;
-    const v: GalleryMetaDraft = {
-      galleryTitle: str((gallery as any)?.title, '갤러리'),
-      arrangement: str((gallery as any)?.layout) === 'GRID' ? 'GRID' : 'SWIPE',
-      popUpViewer: bool((gallery as any)?.enablePopup, true),
-    };
-    qc.setQueryData(draftFieldKey(draftId, 'gallery'), v);
-  }, [
-    qc,
-    draftId,
-    canSave,
-    (gallery as any)?.title,
-    (gallery as any)?.layout,
-    (gallery as any)?.enablePopup,
-  ]);
+    qc.setQueryData(
+      draftFieldKey(draftId, 'gallery'),
+      toGalleryMetaDraft(gallery as unknown),
+    );
+  }, [qc, draftId, canSave, gallery]);
 
+  // media list
   useEffect(() => {
     if (!canSave) return;
 
-    const photos: any[] = Array.isArray((gallery as any)?.photos)
-      ? (gallery as any).photos
-      : [];
-
+    const g = gallery as unknown as MaybeGalleryLocal;
+    const photos = Array.isArray(g.photos) ? (g.photos as PhotoItem[]) : [];
     const existed =
       qc.getQueryData<
         { mediaKey: string; contentType?: string; sortOrder: number }[]
       >(galleryKey(draftId)) ?? [];
-    const existedMap = new Map(existed.map((m) => [m.mediaKey, m]));
-    const list = photos.map((p, i) => {
-      const key = typeof p === 'string' ? p : str(p?.key);
-      const prev = existedMap.get(key);
-      return {
-        mediaKey: key,
-        contentType:
-          typeof p === 'string'
-            ? (prev?.contentType ?? '')
-            : str(p?.contentType) || prev?.contentType || '',
-        sortOrder: i,
-      };
-    });
+    const existedMap = new Map(
+      existed.map((m) => [m.mediaKey, m.contentType ?? '']),
+    );
+    const list = toMediaList(photos).map((m) => ({
+      ...m,
+      contentType: m.contentType || existedMap.get(m.mediaKey) || '',
+    }));
+
     qc.setQueryData(galleryKey(draftId), list);
-  }, [qc, draftId, canSave, (gallery as any)?.photos]);
+  }, [qc, draftId, canSave, gallery]);
 
   useEffect(() => {
     if (!canSave) return;

@@ -45,7 +45,6 @@ export default function ThemaSection({
   defaultOpen = false,
   value,
   media,
-  linkTo,
   onChange,
   accents = DEFAULT_ACCENTS,
 }: Props) {

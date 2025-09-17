@@ -68,43 +68,51 @@ export function useLocalDraftAutosave(opts: {
   const { enabled, draftId, form, place, gallery } = opts;
   const timerRef = useRef<number | null>(null);
   const [lastSavedAt, setLastSavedAt] = useState<number | null>(null);
+
   const payload: LocalDraftSnapshot | null = useMemo(() => {
     if (!Number.isFinite(draftId) || draftId <= 0) return null;
     return {
       v: 1,
       updatedAt: Date.now(),
       form: {
-        theme: (form as any).theme,
-        groom: (form as any).groom,
-        bride: (form as any).bride,
-        order: (form as any).order,
-        greeting: (form as any).greeting,
-        ceremony: (form as any).ceremony,
-        gallery: (form as any).gallery,
-      } as Partial<InviteForm>,
+        theme: form.theme,
+        groom: form.groom,
+        bride: form.bride,
+        order: form.order,
+        greeting: form.greeting,
+        ceremony: form.ceremony,
+        gallery: form.gallery,
+      },
       place,
       gallery,
     };
-  }, [draftId, form, place, gallery]);
+  }, [
+    draftId,
+    form.theme,
+    form.groom,
+    form.bride,
+    form.order,
+    form.greeting,
+    form.ceremony,
+    form.gallery,
+    place,
+    gallery,
+  ]);
 
   useEffect(() => {
     if (!enabled || !payload) return;
-    if (timerRef.current) window.clearTimeout(timerRef.current);
+
+    if (timerRef.current !== null) window.clearTimeout(timerRef.current);
+
     timerRef.current = window.setTimeout(() => {
       try {
         localStorage.setItem(lsKey(draftId), JSON.stringify(payload));
         setLastSavedAt(payload.updatedAt);
-        console.log(
-          '[LOCAL-AUTOSAVE] saved at',
-          new Date(payload.updatedAt).toISOString(),
-        );
-      } catch (e) {
-        console.warn('[LOCAL-AUTOSAVE] failed:', e);
-      }
-    }, 500) as unknown as number;
+      } catch {}
+    }, 500);
 
     return () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current);
     };
   }, [enabled, draftId, payload]);
 

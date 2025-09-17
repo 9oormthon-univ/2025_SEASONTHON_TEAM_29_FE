@@ -18,7 +18,6 @@ export default function Gallery({
   perPage = 9,
   total = 27,
   className,
-  showHint = true,
 }: Props) {
   const filled = Math.min(images.length, total);
   const pagesCount = useMemo(

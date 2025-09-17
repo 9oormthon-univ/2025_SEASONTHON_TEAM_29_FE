@@ -29,6 +29,7 @@ type Args = {
   onDone?: () => void;
   onHydrated?: () => void;
 };
+
 const tpl = (t?: string) =>
   (({ FILM: 'Film', LETTER: 'Letter', ALBUM: 'Album' }) as const)[
     String(t || '').toUpperCase()
@@ -59,6 +60,7 @@ export function useRestoreInviteDraft({
     if (!draftId) return;
     if (restoredRef.current === draftId) return;
     restoredRef.current = draftId;
+
     const theme = qc.getQueryData<ThemeDraft>(draftFieldKey(draftId, 'theme'));
     const basic = qc.getQueryData<BasicInformationDraft>(
       draftFieldKey(draftId, 'basicInformation'),
@@ -79,64 +81,74 @@ export function useRestoreInviteDraft({
       qc.getQueryData<{ mediaKey: string; sortOrder: number }[]>(
         galleryKey(draftId),
       ) ?? [];
+
     const nextPatch: Partial<InviteForm> = {};
 
     if (theme) {
-      (nextPatch as any).theme = {
+      const themePatch = {
         fontFamily: theme.font,
         fontWeight: theme.fontSize,
         accent: theme.accentColor,
         template: tpl(theme.template),
         preventZoom: !theme.canEnlarge,
         revealOnScroll: !!theme.appearanceEffect,
-      };
+      } as unknown as InviteForm['theme'];
+      nextPatch.theme = themePatch;
     }
 
     if (basic) {
-      (nextPatch as any).groom = {
+      const groomPatch = {
         firstName: basic.groomFirstName,
         lastName: basic.groomLastName,
         fatherName: basic.groomFatherName,
         motherName: basic.groomMotherName,
         fatherDeceased: basic.groomFatherDead,
         motherDeceased: basic.groomMotherDead,
-      };
-      (nextPatch as any).bride = {
+      } as unknown as InviteForm['groom'];
+
+      const bridePatch = {
         firstName: basic.brideFirstName,
         lastName: basic.brideLastName,
         fatherName: basic.brideFatherName,
         motherName: basic.brideMotherName,
         fatherDeceased: basic.brideFatherDead,
         motherDeceased: basic.brideMotherDead,
-      };
-      (nextPatch as any).order = (
+      } as unknown as InviteForm['bride'];
+
+      nextPatch.groom = groomPatch;
+      nextPatch.bride = bridePatch;
+      nextPatch.order = (
         basic.brideFirst ? 'BRIDE_FIRST' : 'GROOM_FIRST'
       ) as InviteForm['order'];
     }
+
     if (greet) {
-      (nextPatch as any).greeting = {
+      const greetingPatch = {
         title: greet.greetingsTitle,
         body: greet.greetingsContent,
         ordered: !!greet.greetingsSortInOrder,
-      };
+      } as unknown as InviteForm['greeting'];
+      nextPatch.greeting = greetingPatch;
     }
 
     if (md) {
       const { hour, minute } = toHM(md.marriageTime);
-      (nextPatch as any).ceremony = {
+      const ceremonyPatch = {
         date: md.marriageDate,
         hour,
         minute,
         showCountdown: !!md.representDDay,
-      };
+      } as unknown as InviteForm['ceremony'];
+      nextPatch.ceremony = ceremonyPatch;
     }
 
     if (media.length) {
       const photos = [...media]
         .sort((a, b) => a.sortOrder - b.sortOrder)
         .map((m) => m.mediaKey);
-      (nextPatch as any).gallery = photos;
+      nextPatch.gallery = photos as unknown as InviteForm['gallery'];
     }
+
     setForm((prev) => ({ ...prev, ...nextPatch }));
 
     if (mp) {
@@ -165,7 +177,6 @@ export function useRestoreInviteDraft({
 
     onHydrated?.();
     onDone?.();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [draftId]);
 }

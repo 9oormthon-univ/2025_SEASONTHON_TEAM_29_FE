@@ -8,7 +8,9 @@ import DateSection from '@/components/invitation/section/DateSection';
 import GallerySection, {
   type GallerySectionValue,
 } from '@/components/invitation/section/GallerySection';
-import MessageSection from '@/components/invitation/section/MessageSection';
+import MessageSection, {
+  type MessageSectionValue as MessageValue,
+} from '@/components/invitation/section/MessageSection';
 import PlaceSection, {
   type PlaceSectionValue,
 } from '@/components/invitation/section/PlaceSection';
@@ -27,6 +29,20 @@ const DEFAULT_PLACE: PlaceSectionValue = {
   hallInfo: '',
   showMap: true,
 };
+
+type ThemeValue = ComponentProps<typeof ThemaSection>['value'];
+type ThemaOnChange = ComponentProps<typeof ThemaSection>['onChange'];
+type BasicValue = ComponentProps<typeof BasicInfoSection>['value'];
+type BasicOnChange = ComponentProps<typeof BasicInfoSection>['onChange'];
+type CeremonyValue = ComponentProps<typeof DateSection>['value'];
+type CeremonyOnChange = ComponentProps<typeof DateSection>['onChange'];
+
+interface GreetingLoose {
+  title?: string;
+  body?: string;
+  ordered?: boolean;
+  sort?: string;
+}
 
 export default function InviteEditorPage() {
   const sp = useSearchParams();
@@ -52,18 +68,20 @@ export default function InviteEditorPage() {
     onDone: () => setHydrated(true),
   });
 
-  useInviteDraftAutosave(draftId, form, placeLocal, galleryLocal, {
-    enabled: hydrated,
-  });
-  type ThemaOnChange = ComponentProps<typeof ThemaSection>['onChange'];
-  type BasicValue = ComponentProps<typeof BasicInfoSection>['value'];
-  type BasicOnChange = ComponentProps<typeof BasicInfoSection>['onChange'];
-  type MessageValue = ComponentProps<typeof MessageSection>['value'];
-  type MessageOnChange = ComponentProps<typeof MessageSection>['onChange'];
-  type CeremonyValue = ComponentProps<typeof DateSection>['value'];
-  type CeremonyOnChange = ComponentProps<typeof DateSection>['onChange'];
+  const { saveNow } = useInviteDraftAutosave(
+    draftId,
+    form,
+    placeLocal,
+    galleryLocal,
+    { enabled: hydrated },
+  );
+
   const setTheme: ThemaOnChange = (v) =>
-    setForm((f) => ({ ...f, theme: v as unknown as InviteForm['theme'] }));
+    setForm((f) => ({
+      ...f,
+      theme: v as unknown as InviteForm['theme'],
+    }));
+
   const setBasic: BasicOnChange = (v) => {
     const { bride, groom, order } = v as unknown as Pick<
       InviteForm,
@@ -71,21 +89,19 @@ export default function InviteEditorPage() {
     >;
     setForm((f) => ({ ...f, bride, groom, order }));
   };
-  const msgValue = {
-    title: form.greeting?.title ?? '',
-    body: form.greeting?.body ?? '',
+
+  const g = form.greeting as unknown as GreetingLoose | undefined;
+  const msgValue: MessageValue = {
+    title: g?.title ?? '',
+    body: g?.body ?? '',
     ordered:
-      typeof (form as any).greeting?.ordered === 'boolean'
-        ? (form as any).greeting.ordered
+      typeof g?.ordered === 'boolean'
+        ? !!g.ordered
         : ['순서대로', 'ORDERED', 'ASC', 'TRUE'].includes(
-            String((form as any).greeting?.sort || '').toUpperCase(),
+            String(g?.sort || '').toUpperCase(),
           ),
-  } as const;
-  const setMessage: MessageOnChange = (v) =>
-    setForm((f) => ({
-      ...f,
-      greeting: v as unknown as InviteForm['greeting'],
-    }));
+  };
+
   const setCeremony: CeremonyOnChange = (v) =>
     setForm((f) => ({
       ...f,
@@ -108,13 +124,7 @@ export default function InviteEditorPage() {
       alert('청첩장 저장에 실패했어요. 잠시 후 다시 시도해 주세요.');
     },
   });
-  const { saveNow } = useInviteDraftAutosave(
-    draftId,
-    form,
-    placeLocal,
-    galleryLocal,
-    { enabled: hydrated },
-  );
+
   const router = useRouter();
 
   return (
@@ -137,7 +147,7 @@ export default function InviteEditorPage() {
       />
       <section className="mx-auto max-w-100 px-2 pt-2 flex flex-col items-center gap-3">
         <ThemaSection
-          value={form.theme as any}
+          value={form.theme as unknown as ThemeValue}
           onChange={setTheme}
           media={{
             films: staged.filmMedia,
@@ -167,7 +177,7 @@ export default function InviteEditorPage() {
                 title: next.title,
                 body: next.body,
                 ordered: next.ordered,
-              } as any,
+              } as unknown as InviteForm['greeting'],
             }))
           }
         />
@@ -214,11 +224,9 @@ export default function InviteEditorPage() {
 
 function PlainCollapsible({
   title,
-  children,
   defaultOpen = false,
 }: {
   title: string;
-  children?: React.ReactNode;
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
