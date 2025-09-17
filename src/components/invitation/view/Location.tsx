@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
+import SvgObject from '@/components/common/atomic/SvgObject';
 
 type Props = {
   vendorTitle?: string;
@@ -105,13 +106,12 @@ export default function Location({
       aria-label="Location"
     >
       <div className="flex items-center justify-center">
-        <Image
+        <SvgObject
           src="/Location.svg"
           alt="Location"
           width={160}
           height={80}
-          className="h-auto w-40 select-none"
-          priority
+          className="select-none"
         />
       </div>
 
@@ -131,13 +131,6 @@ export default function Location({
       />
 
       <div className="mt-3 flex items-center justify-center gap-3">
-        <button
-          type="button"
-          onClick={openKakao}
-          className="rounded-md border border-white/30 px-3 py-1 text-xs text-white"
-        >
-          카카오맵 열기
-        </button>
         {error && <span className="text-xs text-primary-500/80">{error}</span>}
       </div>
     </section>
