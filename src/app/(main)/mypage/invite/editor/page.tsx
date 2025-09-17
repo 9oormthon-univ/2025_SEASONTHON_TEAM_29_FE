@@ -20,13 +20,11 @@ import { useState, type ComponentProps } from 'react';
 import { useCreateInvitation } from '@/hooks/useCreateInvitation';
 import { useSearchParams } from 'next/navigation';
 import { useStagedInvitationMedia } from '@/hooks/useStagedInvitationMedia';
-import { toInvitationPayload } from '@/lib/invitationAdapter';
 import { useQueryClient } from '@tanstack/react-query';
 import {
   buildInvitationPayload,
   clearDraftCache,
 } from '@/lib/buildInvitationPayload';
-import type { MediaItem } from '@/types/invitation';
 
 const DEFAULT_PLACE: PlaceSectionValue = {
   venueName: '',
