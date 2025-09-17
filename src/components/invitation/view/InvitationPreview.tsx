@@ -77,7 +77,7 @@ export default function InvitationFromData({
 
         <Reveal delay={120}>
           <FilmImage
-            className="mt-6"
+            className="mt-6 -ml-35"
             photos={[
               filmMediaUrl[0] ?? null,
               filmMediaUrl[1] ?? null,
@@ -88,7 +88,7 @@ export default function InvitationFromData({
 
         <Reveal delay={180}>
           <InvitationMessage
-            className="mt-10 px-6"
+            className="mt-10"
             title={g.greetingsTitle}
             message={g.greetingsContent}
           />
@@ -106,15 +106,9 @@ export default function InvitationFromData({
           />
         </Reveal>
 
-        <Reveal delay={300}>
+        <Reveal delay={320} effect="fade">
           <div className="mt-14 flex items-center justify-center">
-            <SvgObject
-              src="/Date.svg"
-              alt="Date"
-              width={80}
-              height={60}
-              className="h-auto w-20 select-none"
-            />
+            <SvgObject src="/Date.svg" alt="Date" width={160} height={80} />
           </div>
           <div className="mt-4 flex items-center justify-center">
             <TicketImage
@@ -130,7 +124,7 @@ export default function InvitationFromData({
 
         <Reveal delay={360}>
           <Location
-            className="mt-14 px-6"
+            className="mt-14"
             vendorTitle={mp.vendorName}
             floor={mp.floorAndHall}
             address={address}

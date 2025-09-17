@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
+import SvgObject from '@/components/common/atomic/SvgObject';
 
 type Mode = 'color' | 'photo';
 
@@ -30,14 +31,18 @@ export default function TicketImage({
   className,
 }: Props) {
   const hasPhoto = useMemo(() => Boolean(imageUrl), [imageUrl]);
+  const isExternal = useMemo(
+    () => !!imageUrl && /^https?:\/\//i.test(imageUrl),
+    [imageUrl],
+  );
   const [mode, setMode] = useState<Mode>(
     defaultMode ?? (hasPhoto ? 'photo' : 'color'),
   );
 
   useEffect(() => {
-    if (!hasPhoto && mode === 'photo') setMode('color');
-    if (hasPhoto && !defaultMode) setMode('photo');
-  }, [hasPhoto, mode, defaultMode]);
+    if (!hasPhoto) setMode('color');
+    else if (defaultMode) setMode(defaultMode);
+  }, [hasPhoto, defaultMode]);
 
   const toggleMode = () => {
     if (disableToggle || !hasPhoto) return;
@@ -161,15 +166,29 @@ export default function TicketImage({
 
               <g clipPath="url(#ticketClip)">
                 {hasPhoto ? (
-                  <image
-                    href={imageUrl as string}
-                    x="0"
-                    y="0"
-                    width="185"
-                    height="370"
-                    preserveAspectRatio="xMidYMid slice"
-                    crossOrigin="anonymous"
-                  />
+                  isExternal ? (
+                    <foreignObject x="0" y="0" width="185" height="370">
+                      <div
+                        style={{
+                          width: '185px',
+                          height: '370px',
+                          backgroundImage: `url(${imageUrl})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          backgroundRepeat: 'no-repeat',
+                        }}
+                      />
+                    </foreignObject>
+                  ) : (
+                    <image
+                      href={imageUrl as string}
+                      x="0"
+                      y="0"
+                      width="185"
+                      height="370"
+                      preserveAspectRatio="xMidYMid slice"
+                    />
+                  )
                 ) : (
                   <rect
                     x="0"
