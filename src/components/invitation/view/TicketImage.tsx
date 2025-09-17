@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
-import SvgObject from '@/components/common/atomic/SvgObject';
 
 type Mode = 'color' | 'photo';
 

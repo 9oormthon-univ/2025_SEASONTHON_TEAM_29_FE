@@ -89,11 +89,18 @@ type BuildArgs = {
 };
 export function buildInvitationPayload(args: BuildArgs): InvitationRequestBody {
   const { form, placeLocal, galleryLocal, staged, draftId, qc } = args;
-  const base = toInvitationPayload(form, placeLocal, galleryLocal, {
-    mainMedia: staged.mainMedia ?? undefined,
-    filmMedia: staged.filmMedia ?? undefined,
-    ticketMedia: staged.ticketMedia ?? undefined,
-  }) as any;
+
+  const base: InvitationRequestBody = toInvitationPayload(
+    form,
+    placeLocal,
+    galleryLocal,
+    {
+      mainMedia: staged.mainMedia ?? undefined,
+      filmMedia: staged.filmMedia ?? undefined,
+      ticketMedia: staged.ticketMedia ?? undefined,
+    },
+  );
+
   const theme = qc.getQueryData<ThemeDraft>(draftFieldKey(draftId, 'theme'));
   const basic = qc.getQueryData<BasicInformationDraft>(
     draftFieldKey(draftId, 'basicInformation'),
@@ -111,16 +118,44 @@ export function buildInvitationPayload(args: BuildArgs): InvitationRequestBody {
     draftFieldKey(draftId, 'gallery'),
   );
 
-  if (theme) base.theme = theme;
-  if (basic) base.basicInformation = basic;
-  if (greetings) base.greetings = greetings;
-  if (marriageDate) base.marriageDate = marriageDate;
-  if (marriagePlace) base.marriagePlace = marriagePlace;
-  if (galleryMeta) base.gallery = galleryMeta;
+  if (theme) {
+    base.theme = { ...base.theme, ...theme } as InvitationRequestBody['theme'];
+  }
+  if (basic) {
+    base.basicInformation = {
+      ...base.basicInformation,
+      ...basic,
+    } as InvitationRequestBody['basicInformation'];
+  }
+  if (greetings) {
+    base.greetings = {
+      ...base.greetings,
+      ...greetings,
+    } as InvitationRequestBody['greetings'];
+  }
+  if (marriageDate) {
+    base.marriageDate = {
+      ...base.marriageDate,
+      ...marriageDate,
+    } as InvitationRequestBody['marriageDate'];
+  }
+  if (marriagePlace) {
+    base.marriagePlace = {
+      ...base.marriagePlace,
+      ...marriagePlace,
+    } as InvitationRequestBody['marriagePlace'];
+  }
+  if (galleryMeta) {
+    base.gallery = {
+      ...base.gallery,
+      ...galleryMeta,
+    } as InvitationRequestBody['gallery'];
+  }
+
   const mediaList = qc.getQueryData<MediaItem[]>(galleryKey(draftId)) ?? [];
   if (mediaList.length > 0) {
     base.mediaList = [...mediaList].sort((a, b) => a.sortOrder - b.sortOrder);
   }
 
-  return base as InvitationRequestBody;
+  return base;
 }

@@ -39,10 +39,13 @@ export default function Location({
 
     const init = () => {
       if (!mapRef.current) return;
-      const kakao = (window as any).kakao;
+      const kakao = window.kakao;
 
-      const draw = (center: any) => {
-        const map = new kakao.maps.Map(mapRef.current!, { center, level: 4 });
+      const draw = (center: KakaoLatLng) => {
+        const map = new kakao.maps.Map(mapRef.current as HTMLElement, {
+          center,
+          level: 4,
+        });
         new kakao.maps.Marker({ map, position: center });
       };
 
@@ -52,25 +55,29 @@ export default function Location({
       }
 
       const geocoder = new kakao.maps.services.Geocoder();
-      geocoder.addressSearch(address, (result: any[], status: string) => {
+      geocoder.addressSearch(address, (result, status) => {
         if (status === kakao.maps.services.Status.OK && result[0]) {
           const { x, y } = result[0];
-          const c = new kakao.maps.LatLng(Number(y), Number(x));
-          setPos({ lat: Number(y), lng: Number(x) });
+          const latNum = Number(y);
+          const lngNum = Number(x);
+          const c = new kakao.maps.LatLng(latNum, lngNum);
+          setPos({ lat: latNum, lng: lngNum });
           draw(c);
         } else {
           setError('주소를 좌표로 변환하지 못했습니다.');
         }
       });
     };
-    if ((window as any).kakao?.maps) {
+
+    if (window.kakao?.maps) {
       init();
       return;
     }
+
     if (document.getElementById('kakao-map-sdk')) {
-      const t = setInterval(() => {
-        if ((window as any).kakao?.maps) {
-          clearInterval(t);
+      const t = window.setInterval(() => {
+        if (window.kakao?.maps) {
+          window.clearInterval(t);
           init();
         }
       }, 100);
@@ -81,11 +88,12 @@ export default function Location({
     s.id = 'kakao-map-sdk';
     s.async = true;
     s.src = `//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${JS_KEY}&libraries=services`;
-    s.onload = () => (window as any).kakao.maps.load(init);
+    s.onload = () => window.kakao.maps.load(init);
     s.onerror = () => setError('카카오 지도 스크립트를 불러오지 못했습니다.');
     document.head.appendChild(s);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JS_KEY, address, pos?.lat, pos?.lng]);
+
   return (
     <section
       className={clsx(

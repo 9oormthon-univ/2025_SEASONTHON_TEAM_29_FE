@@ -16,7 +16,6 @@ export default function MyTabs({
     <div className="mt-6 flex gap-6 font-medium">
       <button
         type="button"
-        aria-selected={value === 'reserve'}
         onClick={() => onChange('reserve')}
         className={`${base} ${value === 'reserve' ? active : ''}`}
       >
@@ -24,7 +23,6 @@ export default function MyTabs({
       </button>
       <button
         type="button"
-        aria-selected={value === 'review'}
         onClick={() => onChange('review')}
         className={`${base} ${value === 'review' ? active : ''}`}
       >
@@ -32,7 +30,6 @@ export default function MyTabs({
       </button>
       <button
         type="button"
-        aria-selected={value === 'invite'}
         onClick={() => onChange('invite')}
         className={`${base} ${value === 'invite' ? active : ''}`}
       >

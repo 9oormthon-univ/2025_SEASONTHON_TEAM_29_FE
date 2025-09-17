@@ -9,6 +9,19 @@ type MediaArg = {
   ticketMedia?: MediaItem | null;
 };
 
+type Dict = Record<string, unknown>;
+type GalleryItem = string | { key?: string; contentType?: string };
+
+function asDict(v: unknown): Dict {
+  return v && typeof v === 'object' ? (v as Dict) : {};
+}
+function asGalleryArr(v: unknown): GalleryItem[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter(
+    (x): x is GalleryItem =>
+      typeof x === 'string' || (x && typeof x === 'object'),
+  );
+}
 export function toInvitationPayload(
   form: InviteForm,
   place: PlaceSectionValue,
@@ -26,38 +39,44 @@ export function toInvitationPayload(
   gallery: GallerySectionValue,
   media?: MediaArg,
 ): InvitationRequestBody {
-  const anyForm = form as any;
-  const theme = anyForm.theme ?? {};
-  const groom = anyForm.groom ?? {};
-  const bride = anyForm.bride ?? {};
-  const ceremony = anyForm.ceremony ?? {};
-  const gallerySrc =
-    (anyForm.gallery as Array<
-      string | { key?: string; contentType?: string }
-    >) ??
-    (gallery?.photos as Array<
-      string | { key?: string; contentType?: string }
-    >) ??
-    [];
+  const f = asDict(form);
+  const theme = asDict(f.theme);
+  const groom = asDict(f.groom);
+  const bride = asDict(f.bride);
+  const ceremony = asDict(f.ceremony);
+
+  const galleryFromForm = asGalleryArr(f.gallery);
+  const galleryFromSection = asGalleryArr(gallery?.photos);
+  const gallerySrc: GalleryItem[] =
+    galleryFromForm.length > 0 ? galleryFromForm : galleryFromSection;
+
+  const orderVal = f.order;
+  const brideFirst =
+    orderVal === 'BRIDE_FIRST' ||
+    orderVal === 'BRIDE' ||
+    orderVal === 'BRIDE_FIRST_ORDER' ||
+    Boolean(f.brideFirst);
+
+  const greeting = asDict(f.greeting);
 
   const payload: InvitationRequestBody = {
     theme: {
-      font: theme.font ?? theme.fontFamily ?? '',
-      fontSize: theme.fontSize ?? theme.fontWeight ?? '',
-      accentColor: theme.accentColor ?? theme.accent ?? '',
+      font: (theme.font ?? theme.fontFamily ?? '') as string,
+      fontSize: (theme.fontSize ?? theme.fontWeight ?? '') as string,
+      accentColor: (theme.accentColor ?? theme.accent ?? '') as string,
       template: 'FILM',
       canEnlarge: Boolean(theme.canEnlarge),
       appearanceEffect: Boolean(theme.appearanceEffect),
     },
     basicInformation: {
-      groomFirstName: groom.firstName ?? '',
-      groomLastName: groom.lastName ?? '',
-      groomFatherName: groom.fatherName ?? groom.father ?? '',
-      groomMotherName: groom.motherName ?? groom.mother ?? '',
-      brideFirstName: bride.firstName ?? '',
-      brideLastName: bride.lastName ?? '',
-      brideFatherName: bride.fatherName ?? bride.father ?? '',
-      brideMotherName: bride.motherName ?? bride.mother ?? '',
+      groomFirstName: (groom.firstName ?? '') as string,
+      groomLastName: (groom.lastName ?? '') as string,
+      groomFatherName: (groom.fatherName ?? groom.father ?? '') as string,
+      groomMotherName: (groom.motherName ?? groom.mother ?? '') as string,
+      brideFirstName: (bride.firstName ?? '') as string,
+      brideLastName: (bride.lastName ?? '') as string,
+      brideFatherName: (bride.fatherName ?? bride.father ?? '') as string,
+      brideMotherName: (bride.motherName ?? bride.mother ?? '') as string,
       groomFatherDead: Boolean(
         groom.fatherDeceased ?? groom.fatherDead ?? groom.isFatherDead ?? false,
       ),
@@ -70,32 +89,28 @@ export function toInvitationPayload(
       brideMotherDead: Boolean(
         bride.motherDeceased ?? bride.motherDead ?? bride.isMotherDead ?? false,
       ),
-      brideFirst:
-        anyForm.order === 'BRIDE_FIRST' ||
-        anyForm.order === 'BRIDE' ||
-        anyForm.order === 'BRIDE_FIRST_ORDER' ||
-        Boolean(anyForm.brideFirst),
+      brideFirst,
     },
     greetings: {
-      greetingsTitle: anyForm.greeting?.title ?? '',
-      greetingsContent: anyForm.greeting?.body ?? '',
+      greetingsTitle: (greeting.title ?? '') as string,
+      greetingsContent: (greeting.body ?? '') as string,
       greetingsSortInOrder: true,
     },
     marriageDate: {
-      marriageDate: ceremony.date ?? '',
+      marriageDate: (ceremony.date ?? '') as string,
       marriageTime:
-        ceremony.time ??
+        (ceremony.time as string | undefined) ??
         (typeof ceremony.hour === 'number' &&
         typeof ceremony.minute === 'number'
-          ? `${String(ceremony.hour).padStart(2, '0')}:${String(ceremony.minute).padStart(2, '0')}`
+          ? `${String(ceremony.hour as number).padStart(2, '0')}:${String(ceremony.minute as number).padStart(2, '0')}`
           : ''),
       representDDay: Boolean(
         ceremony.representDDay ?? ceremony.showDday ?? true,
       ),
     },
     marriagePlace: {
-      vendorName: place.venueName ?? '',
-      floorAndHall: place.hallInfo ?? '',
+      vendorName: (place.venueName ?? '') as string,
+      floorAndHall: (place.hallInfo ?? '') as string,
       drawSketchMap: Boolean(place.showMap),
     },
     gallery: {
@@ -113,8 +128,8 @@ export function toInvitationPayload(
       typeof p === 'string'
         ? { mediaKey: p, contentType: '', sortOrder: idx }
         : {
-            mediaKey: p?.key ?? '',
-            contentType: p?.contentType ?? '',
+            mediaKey: (p?.key ?? '') as string,
+            contentType: (p?.contentType ?? '') as string,
             sortOrder: idx,
           },
     ),
