@@ -148,7 +148,7 @@ export default function EstimateCartPage() {
             <h3 className="mb-3 text-base font-semibold text-text--default">{label}</h3>
             <div className="relative -mx-5 overflow-hidden">
               <div className="no-scrollbar overflow-x-auto">
-                <div className="flex gap-[10px] px-5 py-1 snap-x snap-mandatory">
+                <div className="flex gap-[12px] px-5 py-1 snap-x snap-mandatory">
                   {group.length === 0 ? (
                     <div className="text-sm text-text--secondary py-4">담긴 항목이 없어요</div>
                   ) : (

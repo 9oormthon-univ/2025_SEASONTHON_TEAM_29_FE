@@ -113,7 +113,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           />
         </section>
 
-        <section className="mt-4 px-0">
+        <section className="my-4 px-0">
           <CategoryRow value={cat} onChange={setCat} />
         </section>
 
@@ -122,19 +122,19 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           {cat === 'hall' && (
             <>
               <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
                 <ChipGroup values={['호텔', '컨벤션', '하우스']} selected={hallStyle} onToggle={(v) => toggle(hallStyle, v, setHallStyle)} />
               </section>
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">식사</h3>
                 <ChipGroup values={['뷔페', '코스', '세미코스']} selected={hallMeal} onToggle={(v) => toggle(hallMeal, v, setHallMeal)} />
               </section>
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">하객 수</h3>
                 <ChipSingle values={['50명', '100명', '300명']} value={guest} onChange={setGuest} />
               </section>
-              <section className="mt-2 mb-4">
+              <section className="mt-4 mb-4">
                 <h3 className="mb-3 font-bold text-gray-800">주차장</h3>
                 <ChipSingle values={['있음', '없음']} value={parking} onChange={setParking} />
               </section>
@@ -145,11 +145,11 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           {cat === 'dress' && (
             <>
               <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">주력스타일</h3>
                 <ChipGroup values={['모던', '클래식', '로맨틱', '단아', '유니크', '하이엔드']} selected={dressStyle} onToggle={(v) => toggle(dressStyle, v, setDressStyle)} />
               </section>
-              <section className="mt-2 mb-4">
+              <section className="mt-4 mb-4">
                 <h3 className="mb-3 font-bold text-gray-800">제작사</h3>
                 <ChipGroup values={['국내', '수입']} selected={dressOrigin} onToggle={(v) => toggle(dressOrigin, v, setDressOrigin)} />
               </section>
@@ -160,15 +160,15 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           {cat === 'studio' && (
             <>
               <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
                 <ChipGroup values={['인물중심', '자연', '감성', '클래식', '흑백']} selected={studioStyle} onToggle={(v) => toggle(studioStyle, v, setStudioStyle)} />
               </section>
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">특수촬영</h3>
                 <ChipGroup values={['한옥', '수중', '반려동물']} selected={studioShot} onToggle={(v) => toggle(studioShot, v, setStudioShot)} />
               </section>
-              <section className="mt-2 mb-4">
+              <section className="mt-4 mb-4">
                 <h3 className="mb-3 font-bold text-gray-800">아이폰 스냅</h3>
                 <ChipSingle values={['있음', '없음']} value={iphoneSnap} onChange={setIphoneSnap} />
               </section>
@@ -179,15 +179,15 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           {cat === 'makeup' && (
             <>
               <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
                 <ChipGroup values={['청순', '로맨틱', '내추럴', '글램']} selected={makeupStyle} onToggle={(v) => toggle(makeupStyle, v, setMakeupStyle)} />
               </section>
-              <section className="mt-2">
+              <section className="mt-4">
                 <h3 className="mb-3 font-bold text-gray-800">담당지정</h3>
                 <ChipSingle values={['가능', '불가능']} value={stylist} onChange={setStylist} />
               </section>
-              <section className="mt-2 mb-4">
+              <section className="mt-4 mb-4">
                 <h3 className="mb-3 font-bold text-gray-800">단독룸</h3>
                 <ChipSingle values={['있음', '없음']} value={room} onChange={setRoom} />
               </section>
@@ -196,7 +196,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
         </div>
 
         <div className="fixed inset-x-0 bottom-0 z-10">
-          <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+        <div className="mx-auto w-full max-w-[420px] bg-white px-[22px] pb-20 pt-3">
             <Button fullWidth size="lg" disabled={!canSearch} onClick={goResults}>
               검색하기
             </Button>

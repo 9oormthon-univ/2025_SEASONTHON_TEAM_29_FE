@@ -69,14 +69,14 @@ export default function CalendarPage() {
       <section className="px-[22px] pt-2">
         <div className="flex items-center gap-2">
           <SvgObject src="/icons/MyRing.svg" width={32} height={37} />
-          <p className="text-[18px] font-medium">
+          <p className="text-[20px] font-medium">
             결혼까지 <span className="text-primary-500">D-{d}</span>
           </p>
         </div>
         <p className="mt-1 !text-sm text-gray-500">
           끝까지 웨딧이 함께 할게요 :)
         </p>
-        <div className="mt-4">
+        <div className="mt-6">
           <SummaryCard />
         </div>
       </section>

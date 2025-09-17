@@ -44,7 +44,7 @@ export default function ReviewCompanyPicker({
     return <p className="mt-3 text-sm text-text-secondary">후기 작성 가능한 계약이 없어요.</p>;
 
   return (
-    <ul className="mt-3 max-h-[60vh] overflow-y-auto rounded-md border border-gray-100">
+    <ul className="mt-3 max-h-[60vh] overflow-y-auto rounded-md">
       {items.map((r) => {
         const vendorName = r.vendorName;
         const logo = r.vendorLogoUrl || r.mainImageUrl || '/logos/placeholder.png';
@@ -67,19 +67,27 @@ export default function ReviewCompanyPicker({
                 })
               }
             >
-              <div className="flex items-center gap-2">
-                <Image
-                  src={logo}
-                  alt={vendorName}
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 rounded-md object-cover"
-                  unoptimized
-                />
+              <div className="flex items-center gap-2 border-b border-gray-200 pb-4 w-full">
+                <div className="relative size-12 shrink-0 overflow-hidden rounded-md border border-gray-200">
+                  <Image
+                    src={logo}
+                    alt={vendorName}
+                    fill
+                    className="object-contain"
+                    sizes="40px"
+                    draggable={false}
+                    unoptimized
+                  />
+                </div>
                 <div className="flex flex-col">
                   <span className="text-sm text-foreground">{vendorName}</span>
                   {when && <span className="text-xs text-text-secondary">{when}</span>}
                 </div>
+                <span aria-hidden className="rounded-full p-2 text-gray-400 ml-auto">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
               </div>
             </button>
           </li>

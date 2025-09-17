@@ -18,15 +18,13 @@ export default function VendorReviewCard({ r }: { r: RawVendorReview }) {
   }, [r.createdAt]);
 
   const content = useMemo(() => {
-    if (r.content?.trim()) return r.content.trim();
-    const parts = [r.contentBest?.trim(), r.contentWorst?.trim()].filter(Boolean);
-    return parts.join('\n\n');
+    if (r.contentBest?.trim()) return r.contentBest.trim();
   }, [r]);
 
   const images = r.imageUrls ?? [];
 
   return (
-    <article className="border-t pt-6 first:border-t-0">
+    <article className="border-t pt-6 first:border-t-0 border-gray-100">
       {/* header */}
       <div className="flex items-center justify-between text-xs text-text-secondary">
         <div className="flex items-center gap-2">
@@ -34,14 +32,13 @@ export default function VendorReviewCard({ r }: { r: RawVendorReview }) {
           <span className="text-sm text-text--default">{r.writerName}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span>{date}</span>
-          <button className="underline underline-offset-2">신고하기</button>
+          <span>{date} | 신고하기</span>
         </div>
       </div>
 
       {/* images */}
       {images.length > 0 && (
-        <div className="mt-3 grid grid-cols-3 gap-2">
+        <div className="mt-4 grid grid-cols-3 gap-2">
           {images.slice(0, 9).map((src, i) => (
             <button
               key={i}
@@ -56,12 +53,12 @@ export default function VendorReviewCard({ r }: { r: RawVendorReview }) {
       )}
 
       {/* ring chip */}
-      <div className="mt-3 inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-[11px] text-primary-700">
+      <div className="mt-3 inline-flex items-center rounded-md bg-primary-200 px-3 py-1 text-[11px] text-primary-700">
         웨딧링 {Math.round(r.rating)}개
       </div>
 
       {/* body */}
-      {content && <p className="mt-3 whitespace-pre-wrap text-[15px] leading-relaxed">{content}</p>}
+      {content && <p className="mt-3 pl-0.5 whitespace-pre-wrap text-[15px] leading-relaxed">{content}</p>}
 
       {lb.open && (
         <ImageLightbox images={images} startIndex={lb.i} onClose={() => setLb({ open: false, i: 0 })} />

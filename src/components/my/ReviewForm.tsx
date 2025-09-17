@@ -66,12 +66,17 @@ export default function ReviewForm({
             total={MAX_PHOTOS}
             domain="REVIEW"
             domainId={contractId}
-            onUploadSelect={(added) => setFiles((s) => [...s, ...added].slice(0, MAX_PHOTOS))}
+            onUploadSelect={(added) =>
+              setFiles((s) => [...s, ...added].slice(0, MAX_PHOTOS))
+            }
             onUploaded={(s3Keys) => {
               setImageKeys((prev) => {
                 const next = Array.from(new Set([...(prev ?? []), ...s3Keys]));
-                return next.slice(0, 5);
+                return next.slice(0, MAX_PHOTOS);
               });
+            }}
+            onRemoveAt={(idx) => {
+              setFiles((s) => s.filter((_, i) => i !== idx));
             }}
           />
         </section>
@@ -83,8 +88,8 @@ export default function ReviewForm({
             value={good}
             onChange={setGood}
             maxLength={maxLen}
-            placeholder="좋았던 점을 적어주세요."
-            className="w-80 h-52"
+            placeholder="좋았던 마음을 담아주세요."
+            className="w-full h-[180px]"
           />
         </section>
 
@@ -94,8 +99,8 @@ export default function ReviewForm({
             value={bad}
             onChange={setBad}
             maxLength={maxLen}
-            placeholder="아쉬웠던 점을 적어주세요."
-            className="w-80 h-52"
+            placeholder="솔직한 마음을 담아주세요."
+            className="w-full h-[180px]"
           />
         </section>
 

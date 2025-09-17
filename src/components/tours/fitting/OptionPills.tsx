@@ -14,7 +14,7 @@ export default function OptionPills({
   onToggle,
 }: Props) {
   return (
-    <section className="px-[22px] py-2">
+    <section className="py-2">
       <h2 className="mb-2 text-md text-[14px] font-extrabold text-text-defaul">
         {title}
       </h2>
@@ -29,8 +29,8 @@ export default function OptionPills({
               className={[
                 'rounded-full px-3 py-1 text-sm border',
                 on
-                  ? 'border-pink-300 bg-pink-50 text-pink-600'
-                  : 'border-gray-200 bg-white text-gray-600',
+                  ? 'border-primary-400 bg-primary-300 text-text-default'
+                  : 'border-gray-200 bg-white text-text-default',
               ].join(' ')}
             >
               {m}

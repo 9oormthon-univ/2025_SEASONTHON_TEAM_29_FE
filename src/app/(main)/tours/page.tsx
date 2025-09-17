@@ -73,7 +73,7 @@ export default function ToursPage() {
         showBack
         onBack={() => router.push('/home')}
         value="투어일지"
-        rightSlot={<PlusButton activeTab={activeTab} />}
+        rightSlot={activeTab === 'dressRomance' ? <PlusButton activeTab={activeTab} /> : null}
       />
 
       <TourTabs value={activeTab} onChange={setActiveTab} />

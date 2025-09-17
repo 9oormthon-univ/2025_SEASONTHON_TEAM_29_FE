@@ -14,7 +14,7 @@ export default function ReviewSortTabs({
   onChange,
 }: { value: Key; onChange: (v: Key) => void }) {
   return (
-    <div className="mt-3 flex gap-2">
+    <div className="mt-3 flex gap-1">
       {TABS.map(t => {
         const active = value === t.key;
         return (
@@ -23,7 +23,7 @@ export default function ReviewSortTabs({
             type="button"
             onClick={() => onChange(t.key)}
             className={[
-              'py-[7px] rounded-full px-[16px] !text-[14px] border transition',
+              'py-[4px] rounded-full px-[14px] !text-[14px] border transition',
               active
                 ? 'border-primary-300 bg-primary-50 text-primary-600'
                 : 'border-gray-200 text-text-default',

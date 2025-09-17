@@ -29,7 +29,7 @@ export default function ReservationCard({
       aria-pressed={selected}
       onClick={onClick}
       className={cn(
-        'w-[346px] h-28 relative rounded-lg overflow-hidden transition-colors text-sm font-medium',
+        'w-[346px] h-30 relative rounded-lg overflow-hidden transition-colors text-sm font-medium',
         'outline outline-offset-[-1px]',
         isPink
           ? 'bg-primary-200 outline-2 outline-offset-[-2px] outline-primary-300'

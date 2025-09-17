@@ -11,7 +11,7 @@ export default function VendorActions({ vendorId }: { vendorId: number }) {
 
   return (
     <div className="px-4">
-      <div className="mt-4 grid grid-cols-1 gap-2">
+      <div className="mt-8 grid grid-cols-1 gap-2">
         <button
           className={baseBtn}
           onClick={() => router.push(`/vendor/${vendorId}/reviews`)}

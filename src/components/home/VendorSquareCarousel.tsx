@@ -15,7 +15,7 @@ export default function VendorSquareCarousel({
   const [ref] = useEmblaCarousel({ align: 'start', containScroll: 'trimSnaps' });
 
   return (
-    <Section title={title} onMore={() => {}} bleed="viewport" className="mt-8">
+    <Section title={title} bleed="viewport" className="mt-12">
       <div ref={ref} className="overflow-hidden">
         <div className="flex touch-pan-y px-4 gap-3">
           {items.slice(0, 5).map((v) => (

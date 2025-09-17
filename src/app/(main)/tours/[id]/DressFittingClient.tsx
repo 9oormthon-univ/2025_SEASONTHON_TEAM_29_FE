@@ -76,49 +76,52 @@ export default function DressFittingClient({ id }: { id: string }) {
   };
 
   return (
+
     <main className="w-full max-w-[420px] mx-auto pb-[calc(env(safe-area-inset-bottom)+96px)]">
       <Header showBack onBack={() => router.push('/tours')} value="투어일지" />
+        <div className='px-[22px] '>
 
-      <Preview
-        neckOverlay={neck?.overlay ?? null}
-        neckFit={neck?.fit ?? null}
-        lineOverlay={line?.overlay ?? null}
-        lineFit={line?.fit ?? null}
-        canvasRatioPct={90}
-      />
-
-      <div className="pt-4">
-        <OptionPills
-          title="소재"
-          options={dressMaterials}
-          selected={materials}
-          onToggle={(name) => {
-            const target = name;
-            materials.forEach(m => { if (m !== target) toggleMaterial(m); });
-            if (!materials.includes(target)) toggleMaterial(target);
-          }}
+        <Preview
+          neckOverlay={neck?.overlay ?? null}
+          neckFit={neck?.fit ?? null}
+          lineOverlay={line?.overlay ?? null}
+          lineFit={line?.fit ?? null}
+          canvasRatioPct={90}
         />
 
-        <Section title="넥라인" titleSize="md" bleed="viewport" className="mt-[10px]">
-          <ThumbGrid
-            items={dressNecklines}
-            selectedId={neck?.id}
-            onSelect={(it) => setNeck(neck?.id === it.id ? null : it)}
+        <div className="pt-4">
+          <OptionPills
+            title="소재"
+            options={dressMaterials}
+            selected={materials}
+            onToggle={(name) => {
+              const target = name;
+              materials.forEach(m => { if (m !== target) toggleMaterial(m); });
+              if (!materials.includes(target)) toggleMaterial(target);
+            }}
           />
-        </Section>
 
-        <Section title="라인" titleSize="md" bleed="viewport" className="mt-[10px]">
-          <ThumbGrid
-            items={dressLines}
-            selectedId={line?.id}
-            onSelect={(it) => setLine(line?.id === it.id ? null : it)}
-          />
-        </Section>
+          <Section title="넥라인" titleSize="md" bleed="viewport" className="mt-[10px]">
+            <ThumbGrid
+              items={dressNecklines}
+              selectedId={neck?.id}
+              onSelect={(it) => setNeck(neck?.id === it.id ? null : it)}
+            />
+          </Section>
 
-        <div className="mt-10 mx-5.5">
-          <Button onClick={onSave} disabled={!canSave || saving} ariaLabel="드레스 옵션 저장">
-            {saving ? '저장 중…' : '저장하기'}
-          </Button>
+          <Section title="라인" titleSize="md" bleed="viewport" className="mt-[10px]">
+            <ThumbGrid
+              items={dressLines}
+              selectedId={line?.id}
+              onSelect={(it) => setLine(line?.id === it.id ? null : it)}
+            />
+          </Section>
+
+          <div className="mt-10">
+            <Button onClick={onSave} disabled={!canSave || saving} ariaLabel="드레스 옵션 저장">
+              {saving ? '저장 중…' : '저장하기'}
+            </Button>
+          </div>
         </div>
       </div>
     </main>

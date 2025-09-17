@@ -87,6 +87,7 @@ export default function RomanceFittingClient({ id }: { id: string }) {
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[calc(env(safe-area-inset-bottom)+96px)]">
       <Header showBack onBack={() => router.push('/tours')} value="드레스 로망" />
+        <div className='px-[22px] '>
 
       <Preview
         neckOverlay={neck?.overlay ?? null}
@@ -126,7 +127,7 @@ export default function RomanceFittingClient({ id }: { id: string }) {
           />
         </Section>
 
-        <div className="mt-10 mx-5.5">
+        <div className="mt-10">
           <Button
             onClick={onSave}
             disabled={!canSave || saving}
@@ -135,6 +136,7 @@ export default function RomanceFittingClient({ id }: { id: string }) {
             {saving ? '저장 중…' : '저장하기'}
           </Button>
         </div>
+      </div>
       </div>
     </main>
   );

@@ -52,7 +52,7 @@ export default function CalendarToggle({
       <div className="pointer-events-none relative grid h-full grid-cols-2 text-[10px] leading-none">
         <div
           className={clsx(
-            'flex items-center justify-center',
+            'pl-1 flex items-center justify-center',
             selected === 'event' ? 'font-semibold text-white' : 'font-medium text-text-secondary',
           )}
         >
@@ -60,7 +60,7 @@ export default function CalendarToggle({
         </div>
         <div
           className={clsx(
-            'flex items-center justify-center',
+            'pr-1 flex items-center justify-center',
             selected === 'schedule' ? 'font-semibold text-white' : 'font-medium text-text-secondary',
           )}
         >

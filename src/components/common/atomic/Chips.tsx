@@ -26,8 +26,8 @@ export default function Chips({
 
   const sizeClass =
     size === 'sm'
-      ? 'px-3 text-sm font-medium leading-loose'
-      : 'px-6 py-1.5 text-sm font-medium leading-loose';
+      ? 'px-3.5 text-sm font-normal leading-loose'
+      : 'px-6 py-1.5 text-sm font-normal leading-loose';
 
   const frameClass = selected
     ? 'bg-primary-200 outline outline-2 outline-offset-[-1px] outline-primary-500'

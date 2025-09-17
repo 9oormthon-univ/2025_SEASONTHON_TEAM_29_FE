@@ -15,18 +15,18 @@ export default function ReviewSquareCarousel({ items }: { items: HomeReviewItem[
   });
 
   return (
-    <Section title="웨딧 유저가 말해주는 솔직 리뷰" onMore={() => {}} bleed="viewport" className="mt-8">
+    <Section title="웨딧 유저가 말해주는 솔직 리뷰" bleed="viewport" className="mt-8">
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4 touch-pan-y">
           {items.slice(0, 5).map((it, i) => (
             <a
               key={it.id}
               href={it.href}
-              className={`min-w-0 flex-[0_0_65%] ${i === items.length - 1 ? 'mr-4' : ''}`}
+              className={`min-w-0 flex-[0_0_55%] ${i === items.length - 1 ? 'mr-4' : ''}`}
               aria-label={`${it.category} 후기: ${it.title}`}
             >
-              <article className="overflow-hidden border border-gray-200 rounded-xl bg-white">
-                <div className="relative w-full" style={{ aspectRatio: '3 / 2' }}>
+              <article className="overflow-hidden border border-gray-200 rounded-xl bg-white pb-1">
+                <div className="relative w-full" style={{ aspectRatio: '3/2' }}>
                   {it.src ? (
                     <Image
                       src={it.src}
@@ -43,17 +43,16 @@ export default function ReviewSquareCarousel({ items }: { items: HomeReviewItem[
                   )}
                 </div>
 
-                <div className="p-3">
-                  <span className="text-xs font-semibold text-primary-500">{it.category}</span>
+                <div className="px-4 py-2">
+                  <span className="text-xs font-semibold text-text-secondary">{it.category}</span>
                   <h3 className="line-clamp-1 text-[14px] font-extrabold text-gray-900">{it.title}</h3>
 
-                  <div className="mt-1 flex items-center gap-1.5 py-3">
-                    <span className="text-xs text-gray-500">웨딧링</span>
+                  <div className="flex items-center gap-0.5 py-1">
                     {Array.from({ length: it.rings }).map((_, idx) => (
-                      <SvgObject key={idx} src="/icons/ring.svg" alt="웨딧링" width={16} height={16} />
+                      <SvgObject key={idx} src="/icons/ring.svg" alt="웨딧링" width={20} height={20} />
                     ))}
                   </div>
-                  <div className="mt-1 flex items-center justify-between text-xs text-gray-500">
+                  <div className="flex items-center justify-between text-xs text-gray-500">
                     <span>{it.writer} | {it.date}</span>
                   </div>
                 </div>

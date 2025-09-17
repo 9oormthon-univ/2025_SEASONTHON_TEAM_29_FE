@@ -129,7 +129,7 @@ export default function ConsultTimePage() {
       )}
       {error && <div className="text-sm text-red-500">오류: {error}</div>}
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 gap-y-3">
         {slots.map((s) => (
           <TimeChip
             key={s.slotId}

@@ -163,7 +163,7 @@ export default function CalendarNewPage() {
           className={clsx(
             'mt-50 h-12 w-full rounded-2xl text-[15px] font-semibold transition',
             disabled || loading
-              ? 'bg-primary-200/40 text-rose-300 cursor-not-allowed'
+              ? 'bg-primary-200 text-primary-300 cursor-not-allowed'
               : 'bg-primary-500 text-white active:scale-[0.98]',
           )}
         >

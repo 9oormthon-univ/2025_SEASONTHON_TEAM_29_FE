@@ -55,7 +55,6 @@ export default function CompanyCard({
   executionDateTime,
   /** 새 프롭들 기본값 */
   disabled = false,
-  selecting = false,
 }: Props) {
   const altText = alt ?? name;
 
@@ -98,12 +97,12 @@ export default function CompanyCard({
         {/* 뱃지 영역 */}
         <div className="mb-1 mt-1 flex gap-1">
           {category === '웨딩홀' && productName && (
-            <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-500">
+            <span className="rounded-md bg-primary-200 px-1.5 py-0.5 text-[11px] font-medium text-primary-500">
               {productName === 'Details' ? '단독홀' : productName}
             </span>
           )}
           {executionDateTime && (
-            <span className="rounded-md bg-red-50 px-1.5 py-0.5 text-[11px] font-medium text-red-500">
+            <span className="rounded-md bg-primary-200 px-1.5 py-0.5 text-[11px] font-medium text-primary-500">
               {formatDate(executionDateTime)}
             </span>
           )}
@@ -118,7 +117,7 @@ export default function CompanyCard({
 
         {/* 가격 */}
         {priceText && (
-          <span className="text-text--default text-xs font-semibold leading-normal">
+          <span className="text-text--default text-[13px] font-semibold leading-normal">
             {priceText}~
           </span>
         )}

@@ -33,7 +33,7 @@ export default function Preview({
   const line = normFit(lineFit ?? undefined);
 
   return (
-    <section className="relative overflow-hidden bg-primary-200">
+    <section className="relative overflow-hidden bg-primary-200 mx-[-22px] w-[calc(100%+44px)]">
       <div className="relative w-full" style={{ paddingTop: `${canvasRatioPct}%` }}>
         {/* 배경 */}
         <Image

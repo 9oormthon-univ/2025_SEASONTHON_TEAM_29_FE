@@ -54,12 +54,13 @@ function CoupleLinkingView({ onComplete }: Props) {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-background flex justify-center">
-      <div className="w-96 px-6 py-5 space-y-8 pb-28">
-        <Header 
+    <main className="min-h-screen bg-background pb-24">
+      <Header 
         showBack
         onBack={()=>router.push('/mypage')}
         value="계정연동" />
+      <div className="w-96 px-6 py-5 space-y-8 pb-28">
+
 
         <section className="space-y-2">
           <h2 className="text-sm font-medium text-text--default">코드번호 생성</h2>
@@ -112,7 +113,7 @@ function CoupleLinkingView({ onComplete }: Props) {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

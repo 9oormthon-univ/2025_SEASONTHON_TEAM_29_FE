@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import clsx from 'clsx';
+import { useEffect } from 'react';
 
 type Props = {
   open: boolean;
@@ -62,7 +62,18 @@ export default function BottomSheet({
         <div className="flex justify-center pt-3">
           <div className="h-1.5 w-11 rounded-full bg-gray-300" />
         </div>
-        <div className="p-4 pt-3 max-h-[80vh] overflow-y-auto">{children}</div>
+        <div
+          className={clsx(
+            'relative w-full max-w-96 rounded-t-xl bg-white shadow-xl',
+            'pb-[env(safe-area-inset-bottom)]',
+            'transition-transform duration-300 ease-out',
+            open ? 'translate-y-0' : 'translate-y-full',
+            'h-[40vh]',   // ✅ 고정 높이
+            className,
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
