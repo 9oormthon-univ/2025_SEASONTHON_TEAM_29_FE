@@ -17,9 +17,9 @@ export default function VendorSquareCarousel({
   return (
     <Section title={title} onMore={() => {}} bleed="viewport" className="mt-8">
       <div ref={ref} className="overflow-hidden">
-        <div className="flex touch-pan-y px-4">
-          {items.map((v) => (
-            <div key={v.vendorId} className="min-w-0 flex-[0_0_35%]">
+        <div className="flex touch-pan-y px-4 gap-3">
+          {items.slice(0, 5).map((v) => (
+            <div key={v.vendorId} className="min-w-0 flex-[0_0_33%]">
               <VendorCard
                 item={v}
                 href={`/vendor/${v.vendorId}`}
