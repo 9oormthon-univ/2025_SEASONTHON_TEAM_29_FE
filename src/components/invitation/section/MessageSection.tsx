@@ -45,21 +45,6 @@ export default function MessageSection({
     next[path] = v;
     onChange(next);
   };
-  useEffect(() => {
-    const t = value.title ?? '';
-    const b = value.body ?? '';
-    const needsClearTitle = t && sameText(t, DEFAULT_TITLE);
-    const needsClearBody = b && sameText(b, DEFAULT_BODY);
-    if (needsClearTitle || needsClearBody) {
-      onChange({
-        ...value,
-        title: needsClearTitle ? '' : value.title,
-        body: needsClearBody ? '' : value.body,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <section
       className={clsx(
