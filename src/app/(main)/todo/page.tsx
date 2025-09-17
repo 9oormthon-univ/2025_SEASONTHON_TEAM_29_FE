@@ -4,7 +4,7 @@ import HeartRain, { type HeartRainHandle } from '@/components/anim/HeartRain';
 import Header from '@/components/common/monocules/Header';
 import { getTodoList, toggleTodo } from '@/services/todo.api';
 import type { TodoItemApi } from '@/types/todo';
-import { animate, motion, useMotionValue } from 'framer-motion';
+import { animate, motion, useDragControls, useMotionValue } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
@@ -62,6 +62,24 @@ export default function TodoPage() {
     animate(y, target, { type: 'spring', stiffness: 130, damping: 20 });
   };
 
+  // ✅ 시트 드래그: 전체 영역에서 시작 (스크롤과 제스처 충돌 방지)
+  const dragControls = useDragControls();
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const onPointerDownSheet = (e: React.PointerEvent) => {
+    // 인터랙티브 요소에선 드래그 시작 안 함
+    const el = e.target as HTMLElement;
+    if (el.closest('input,button,a,textarea,select,label,[role="button"]')) return;
+
+    // (옵션) 스크롤 맨 위에서만 드래그 허용하려면 다음 2줄 주석 해제
+    // const scroller = contentRef.current;
+    // if (scroller && scroller.scrollTop > 0) return;
+
+    // 제스처 우선권 확보
+    e.preventDefault();
+    dragControls.start(e);
+  };
+
   // ✅ 시트 열림 정도에 따라 bottomOffset 동적 계산
   const [bottomOffset, setBottomOffset] = useState(0);
   useEffect(() => {
@@ -95,7 +113,7 @@ export default function TodoPage() {
   };
 
   return (
-    <main className="relative min-h-screen w-full max-w-[420px] mx-auto bg-[#191919]">
+    <main className="relative min-h-screen w-full max-w-[420px] mx-auto bg-[#191919] overflow-x-hidden">
       <Header
         ref={headerRef}
         value="TO-DO"
@@ -121,11 +139,7 @@ export default function TodoPage() {
             ref={heartsRef}
             height={heartHeight}
             bottomOffset={bottomOffset}
-            textures={[
-              '/hearts/heart-pink.png',
-              '/hearts/heart-purple.png',
-              '/hearts/heart-yellow.png',
-            ]}
+            textures={['/hearts/heart-pink.png', '/hearts/heart-purple.png', '/hearts/heart-yellow.png']}
             sizeRange={[15, 70]}
             tightness={0.84}
             scaleFactor={2.35}
@@ -134,13 +148,21 @@ export default function TodoPage() {
         </div>
       )}
 
-      {/* ✅ 바텀시트 */}
+      {/* ✅ 바텀시트: 어디를 잡아도 드래그 */}
       <motion.div
         className="fixed left-0 right-0"
-        style={{ bottom: TABBAR_H, y }}
+        style={{
+          bottom: TABBAR_H,
+          y,
+          // 모바일에서 스크롤보다 드래그 제스처를 우선 인식
+          touchAction: 'none',
+        }}
         drag="y"
+        dragControls={dragControls}
+        dragListener={false} // 수동 시작만 허용
         dragConstraints={{ top: 0, bottom: CLOSED_OFFSET }}
         dragElastic={0.15}
+        onPointerDownCapture={onPointerDownSheet} // ⬅️ 바텀시트 어디서든 드래그 시작
         onDragEnd={(_, info) => {
           const next = info.velocity.y < -200 || y.get() < CLOSED_OFFSET / 2 ? 0 : CLOSED_OFFSET;
           animate(y, next, { type: 'spring', stiffness: 100, damping: 30 });
@@ -160,7 +182,16 @@ export default function TodoPage() {
             <div className="h-1.5 w-14 rounded-full bg-neutral-300" />
           </button>
 
-          <div className="px-4 pt-3 pb-6 overflow-y-auto" style={{ height: SHEET_OPEN - HANDLE_H }}>
+          <div
+            ref={contentRef}
+            className="px-4 pt-3 pb-6 overflow-y-auto"
+            style={{
+              height: SHEET_OPEN - HANDLE_H,
+              // 내부 콘텐츠는 스크롤도 돼야 하므로 세로 스크롤 허용
+              touchAction: 'pan-y',
+              overscrollBehavior: 'contain', // iOS 체인 스크롤/바운스 방지
+            }}
+          >
             <p className="font-bold text-[18px] text-neutral-700 mb-6 mt-2">수행한 항목을 선택해 주세요.</p>
             {!loaded ? (
               <p className="text-sm text-neutral-500">불러오는 중…</p>

@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useCreateReview({
-  vendorId,
+  contractId,
   maxLen = 250,
   redirectMs = 5000,
 }: {
-  vendorId: number;
+  contractId: number;
   maxLen?: number;
   redirectMs?: number;
 }) {
@@ -31,7 +31,7 @@ export function useCreateReview({
   }, []);
 
   const canSubmit =
-    !!vendorId &&
+    !!contractId &&
     rating !== null &&
     rating >= 1 &&
     rating <= 5 &&
@@ -48,7 +48,7 @@ export function useCreateReview({
     setDoneMsg(null);
     
     const payload: CreateReviewPayload = {
-      vendorId,
+      contractId,
       rating: rating!,
       contentBest: good.trim(),
       contentWorst: bad.trim(),
@@ -74,7 +74,7 @@ export function useCreateReview({
     } finally {
       setSubmitting(false);
     }
-  }, [canSubmit, vendorId, rating, good, bad, imageKeys, router, redirectMs]);
+  }, [canSubmit, contractId, rating, good, bad, imageKeys, router, redirectMs]);
 
   return {
     // state
