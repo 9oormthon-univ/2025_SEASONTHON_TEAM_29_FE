@@ -28,41 +28,45 @@ export default function CompanyLongCard({
     <Link
       href={`/vendor/${vendorId}`}  // ✅ 클릭 시 이동
       className={clsx(
-        'relative w-80 h-22',
+        'relative w-80 h-24',
         'border-y border-box-line',
         'block cursor-pointer active:bg-gray-50', // ✅ 버튼 느낌
         className,
       )}
     >
-      <div className="absolute left-0 top-1.5 text-primary-500 text-xs font-normal leading-loose">
+      <div className="absolute left-0 top-3 text-primary-400 text-sm font-normal leading-loose">
         {type}
       </div>
-      <div className="absolute left-0 top-7 right-20">
-        <p className="truncate text-base font-medium text-text--default leading-loose">
+      <div className="absolute left-0 top-8 right-20">
+        <p className="truncate text-md font-medium text-text--default leading-loose">
           {title}
         </p>
       </div>
       <div className="absolute right-2 top-3 flex items-center gap-2">
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white outline-1 outline-offset-[-1px] outline-box-line">
+        {/* 로고 박스 */}
+        <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-white outline-1 outline-offset-[-1px] outline-box-line">
           {logoUrl ? (
             <Image
               src={logoUrl}
-              alt="company-logo"
-              width={64}
-              height={64}
-              className="w-16 h-16 object-cover"
+              alt={`${title} logo`}
+              fill
+              className="object-contain object-center"
+              sizes="(max-width: 768px) 65vw, 420px"
               unoptimized
+              draggable={false}
             />
           ) : (
             <div className="w-full h-full bg-white" />
           )}
         </div>
+
+        {/* 화살표 아이콘 */}
         <SvgObject
           src="/icons/arrowRight.svg"
           alt="arrow-right"
-          width={16}
-          height={16}
-          className="mr-[1px]"
+          width={24}
+          height={24}
+          className="shrink-0 text-text--secondary"
         />
       </div>
       <div className="absolute left-0 bottom-1 text-text--secondary text-xs leading-loose">
