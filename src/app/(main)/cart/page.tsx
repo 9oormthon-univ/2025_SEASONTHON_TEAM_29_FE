@@ -125,7 +125,7 @@ export default function EstimateCartPage() {
             }}
             className="text-sm font-medium text-primary-500"
           >
-            {selecting ? '취소' : '선택'}
+            {selecting ? '취소' : '선택삭제'}
           </button>
         }
       />

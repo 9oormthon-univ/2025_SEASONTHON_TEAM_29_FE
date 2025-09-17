@@ -16,7 +16,8 @@ import {
   neckIdFromOrder,
   neckOrderFromId,
 } from '@/services/mappers/tourMappers';
-import { getTourRomanceDetail, updateTourRomance } from '@/services/tourRomance.api';
+import { getTourRomanceDetail } from '@/services/tourRomance.api';
+import { updateRomance } from '@/services/tours.api';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -70,7 +71,7 @@ export default function RomanceFittingClient({ id }: { id: string }) {
     if (!canSave || saving) return;
     setSaving(true);
     try {
-      await updateTourRomance(Number(id), {
+      await updateRomance(Number(id), {
         materialOrder: materialOrderFromName(materials[0] ?? null),
         neckLineOrder: neckOrderFromId(neck?.id),
         lineOrder: lineOrderFromId(line?.id),

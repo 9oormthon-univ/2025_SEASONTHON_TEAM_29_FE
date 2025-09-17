@@ -1,15 +1,14 @@
+// types/tour.ts
 export type TourTab = 'dressTour' | 'dressRomance';
 export type TourStatus = 'WAITING' | 'COMPLETE';
 export type Category = 'WEDDING_HALL';
 
 /** 앱에서 쓰는 목록 아이템 (드레스 투어) */
 export interface DressTourItem {
-  id: number;
+  id: number;              // ✅ 통일: 항상 id
   status: TourStatus;
   vendorName: string;
-  vendorDescription?: string;
-  vendorCategory?: Category;
-  logoImageUrl?: string;
+  logoImageUrl?: string;   // ✅ camelCase
   owned?: boolean;
 
   materialOrder?: number;

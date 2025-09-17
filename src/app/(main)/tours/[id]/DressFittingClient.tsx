@@ -16,7 +16,7 @@ import {
   neckIdFromOrder,
   neckOrderFromId,
 } from '@/services/mappers/tourMappers';
-import { getTourDetail, saveDress } from '@/services/tours.api';
+import { getTourDetail, updateDress } from '@/services/tours.api';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -62,8 +62,7 @@ export default function DressFittingClient({ id }: { id: string }) {
     if (!canSave || saving) return;
     setSaving(true);
     try {
-      await saveDress({
-        tourId: Number(id),
+      await updateDress(Number(id), {
         materialOrder: materialOrderFromName(materials[0] ?? null),
         neckLineOrder: neckOrderFromId(neck?.id),
         lineOrder: lineOrderFromId(line?.id),

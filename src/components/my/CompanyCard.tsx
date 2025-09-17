@@ -107,12 +107,6 @@ export default function CompanyCard({
               {formatDate(executionDateTime)}
             </span>
           )}
-          {/* 선택 모드 시 스타일 힌트 (필요시 커스텀) */}
-          {selecting && (
-            <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] text-gray-500">
-              선택모드
-            </span>
-          )}
         </div>
 
         {/* 이름/지역 */}
