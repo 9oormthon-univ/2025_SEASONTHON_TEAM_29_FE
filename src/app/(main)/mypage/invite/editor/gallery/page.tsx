@@ -8,6 +8,7 @@ import Header from '@/components/common/monocules/Header';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useS3MultiUpload } from '@/hooks/useS3MultiUpload';
 import { useQueryClient } from '@tanstack/react-query';
+import LottiePlayer from '@/components/common/atomic/LottiePlayer';
 
 const PER_PAGE = 9;
 const TOTAL = 27;
@@ -207,7 +208,9 @@ export default function Page() {
               <br />
               예쁘게 담는 중이에요
             </div>
-            <div className="absolute left-1/2 -translate-x-1/2 top-[80px] w-36 h-32 bg-zinc-300 rounded-md" />
+            <div className="absolute left-1/2 -translate-x-1/2 top-[80px] w-36 h-32">
+              <LottiePlayer src="/loading.json" className="w-full h-full" />
+            </div>
           </div>
         </div>
       )}
