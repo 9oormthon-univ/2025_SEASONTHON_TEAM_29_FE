@@ -67,8 +67,10 @@ export default function Page() {
   const selectedPairs = slots
     .map((s, i) => (s.file ? { file: s.file, i } : null))
     .filter(Boolean) as { file: File; i: number }[];
-
+  const KEY = ['invitation', 'mediaList', String(draftId)] as const;
   const handleSubmit = async () => {
+    console.log('[GALLERY-UPLOAD] draftId:', draftId);
+    console.log('[GALLERY-UPLOAD] selectedPairs:', selectedPairs);
     if (!Number.isFinite(draftId)) {
       alert('draft 파라미터가 없어 업로드할 수 없어요.');
       return;
@@ -77,9 +79,12 @@ export default function Page() {
       alert('업로드할 사진을 선택해 주세요.');
       return;
     }
+
     try {
       const files = selectedPairs.map((p) => p.file);
       const issued = await uploadAll('INVITATION', draftId, files);
+      console.log('[GALLERY-UPLOAD] issued from S3:', issued);
+
       const mediaList = issued
         .map((u, idx) => ({
           mediaKey: u.s3Key,
@@ -87,9 +92,14 @@ export default function Page() {
           sortOrder: selectedPairs[idx].i,
         }))
         .sort((a, b) => a.sortOrder - b.sortOrder);
-      qc.setQueryData(['invitation', 'mediaList', String(draftId)], mediaList);
-      alert(`${mediaList.length}장의 사진이 업로드되었습니다.`);
-      router.push(`/mypage/invite/editor?draft=${draftId}`);
+
+      console.log('[GALLERY-UPLOAD] mediaList to cache:', mediaList);
+      qc.setQueryData(KEY, mediaList);
+      const cached = qc.getQueryData(KEY);
+      console.log('[GALLERY-UPLOAD] cached readback:', cached);
+      const next = `/mypage/invite/editor?draft=${draftId}`;
+      console.log('[GALLERY-UPLOAD] navigate to:', next);
+      router.push(next);
     } catch (e) {
       console.error(e);
       alert('갤러리 업로드에 실패했어요.');
@@ -179,7 +189,7 @@ export default function Page() {
           fullWidth
           disabled={uploading || selectedPairs.length === 0}
         >
-          {uploading ? '업로드 중…' : `등록하기 (${selectedPairs.length})`}
+          {uploading ? '업로드 중…' : `등록하기`}
         </Button>
         {error && (
           <p className="mt-2 text-center text-xs text-red-600">
