@@ -22,7 +22,7 @@ const ICON_CFG: Record<
     className:
       'origin-top-left rotate-[-30.22deg] -translate-x-4 translate-y-7',
   },
-  STUDIO: { w: 64, h: 46 },
+  STUDIO: { w: 50, h: 46 },
   WEDDING_HALL: { w: 46, h: 46, className: 'translate-y-0.5' },
   DRESS: { w: 40, h: 50 },
   PARTY: { w: 51, h: 61 },

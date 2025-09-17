@@ -10,8 +10,8 @@ export default function SummaryCard() {
       className="
         flex h-20 items-center justify-center
         rounded-lg border border-zinc-300/50 bg-white
-        px-3 py-2.5 shadow-sm
-        transition hover:shadow-md hover:border-zinc-300
+        px-3 py-2.5
+        transition hover:border-zinc-300
       "
     >
       <div className="flex items-center gap-2.5">
