@@ -1,7 +1,7 @@
 'use client';
 
 import clsx from 'clsx';
-import Image from 'next/image';
+import SvgObject from '../common/atomic/SvgObject';
 
 type CheckIconProps = {
   selected: boolean;
@@ -22,13 +22,12 @@ export default function CheckComponent({
   const fallbackAlt = selected ? '선택됨' : '선택 안 됨';
 
   return (
-    <Image
+    <SvgObject
       src={src}
       alt={alt ?? fallbackAlt}
       width={16}
       height={16}
       className={clsx('w-4 h-4', className)}
-      priority
     />
   );
 }

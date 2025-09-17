@@ -13,11 +13,26 @@ type Props = {
   onPickDay: (date: Date) => void;
 };
 
+const WEEK_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
+
 export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
   const cells = daysMatrix5(monthBase);
 
   return (
-    <ul className="grid grid-cols-7 gap-[9px]">
+    <div className="grid grid-cols-7 gap-[9px]">
+      {WEEK_LABELS.map((w, idx) => (
+        <div key={w} className="flex justify-center">
+          <div
+            className={clsx(
+              'w-10 h-7 flex items-center justify-center text-[11px] font-medium leading-none',
+              idx === 0 ? 'text-[#E32727]' : 'text-text--secondary',
+            )}
+          >
+            {w}
+          </div>
+        </div>
+      ))}
+
       {cells.map((cell, i) => {
         const ymd = toYMD(cell);
         const isPrevNext = cell.getMonth() !== monthBase.getMonth();
@@ -25,7 +40,6 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
         const isSun = widx === 0;
         const events = byDate.get(ymd) ?? [];
 
-        // 가장 id 큰거 고르기
         const primary = events.length
           ? events.reduce((best, cur) => {
               const nb = parseInt(String(best.id).replace(/\D/g, ''), 10) || 0;
@@ -35,28 +49,27 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
           : null;
 
         return (
-          <li key={i} className="flex justify-center">
+          <div key={i} className="flex justify-center">
             <div className="w-10 flex flex-col items-center overflow-hidden">
               <div
                 className={clsx(
                   'h-7 w-full flex items-center justify-center text-center',
                   'text-xs font-medium leading-none',
-                  isPrevNext
-                    ? 'opacity-40 text-text--default'
-                    : 'text-text--default',
-                  !isPrevNext && isSun && 'text-[#FF6B6B]',
+                  isPrevNext && 'opacity-40',
+                  isSun ? 'text-[#E32727]' : 'text-text--default',
                 )}
               >
                 {cell.getDate()}
               </div>
+
               {primary ? (
                 <button
                   type="button"
                   onClick={() => onPickDay(cell)}
                   aria-label={`${cell.getMonth() + 1}월 ${cell.getDate()}일`}
-                  className="mt-[3px] w-10 h-10 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
+                  className="relative mt-[3px] w-10 h-10 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-300/60 active:scale-95"
                 >
-                  {primary && STICKER_SRC[primary.sticker] ? (
+                  {STICKER_SRC[primary.sticker] ? (
                     <Image
                       src={STICKER_SRC[primary.sticker]}
                       alt={primary.sticker}
@@ -93,9 +106,9 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
                 </div>
               )}
             </div>
-          </li>
+          </div>
         );
       })}
-    </ul>
+    </div>
   );
 }

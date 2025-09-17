@@ -61,8 +61,8 @@ const Header = forwardRef(function Header(
             <SvgObject
               src="/icons/arrowRight.svg"
               alt="back"
-              width={28}
-              height={28}
+              width={35}
+              height={35}
               className="rotate-180"
             />
           </button>
