@@ -1,5 +1,8 @@
 import RomanceFittingClient from './RomanceFittingClient';
 
-export default function Page({ params }: { params: { id: string } }) {
-  return <RomanceFittingClient id={params.id} />;
+type Params = { id: string };
+
+export default async function Page({ params }: { params: Promise<Params> }) {
+  const { id } = await params; // ✅ Promise 해제
+  return <RomanceFittingClient id={id} />;
 }
