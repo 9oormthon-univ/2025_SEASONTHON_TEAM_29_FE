@@ -2,7 +2,6 @@
 
 import { useSignupWizard } from '@/hooks/useSignupWizard';
 import useEmblaCarousel from 'embla-carousel-react';
-import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Button from '../common/atomic/Button';

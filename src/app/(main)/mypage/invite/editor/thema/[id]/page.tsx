@@ -29,7 +29,7 @@ export default function ThemaEditorPage() {
   ]);
   const [ThirdPhoto, setThirdPhoto] = useState<File | null>(null);
 
-  const { staged, stageMainMedia, stageFilmMedia, stageTicketMedia } =
+  const { stageMainMedia, stageFilmMedia, stageTicketMedia } =
     useStagedInvitationMedia(inviteId);
   const { uploadAll, uploading, error } = useS3MultiUpload();
 

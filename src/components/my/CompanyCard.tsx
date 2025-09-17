@@ -24,7 +24,7 @@ type Props = {
   executionDateTime?: string;
   productName?: string;
   dimImage?: boolean;
-  selecting? : boolean;
+  selecting?: boolean;
 };
 
 const formatDate = (iso?: string) => {
@@ -41,8 +41,6 @@ export default function CompanyCard({
   region,
   imageSrc,
   priceText,
-  category,
-  productName,
   rating,
   variant = 'category',
   alt,
