@@ -20,6 +20,5 @@ export const Default: Story = {};
 
 export const WithReportHandler: Story = {
   args: {
-    onReport: () => alert('신고하기 클릭!'),
   },
 };
