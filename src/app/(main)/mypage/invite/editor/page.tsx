@@ -15,16 +15,11 @@ import PlaceSection, {
 import ThemaSection from '@/components/invitation/section/ThemaSection';
 import { defaultInviteForm, type InviteForm } from '@/types/invite';
 import clsx from 'clsx';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, type ComponentProps } from 'react';
-import { useCreateInvitation } from '@/hooks/useCreateInvitation';
-import { useSearchParams } from 'next/navigation';
 import { useStagedInvitationMedia } from '@/hooks/useStagedInvitationMedia';
-import { useQueryClient } from '@tanstack/react-query';
-import {
-  buildInvitationPayload,
-  clearDraftCache,
-} from '@/lib/buildInvitationPayload';
+import { useSubmitInvitation } from '@/hooks/useSubmitInvitation';
+import { useInviteDraftAutosave } from '@/hooks/useInviteDraftAutosave';
 
 const DEFAULT_PLACE: PlaceSectionValue = {
   venueName: '',
@@ -33,12 +28,10 @@ const DEFAULT_PLACE: PlaceSectionValue = {
 };
 
 export default function InviteEditorPage() {
-  const router = useRouter();
   const sp = useSearchParams();
   const draftId = Number(sp.get('draft') ?? '0');
 
   const [form, setForm] = useState<InviteForm>(defaultInviteForm);
-  const [saving, setSaving] = useState(false);
   const [placeLocal, setPlaceLocal] =
     useState<PlaceSectionValue>(DEFAULT_PLACE);
   const [galleryLocal, setGalleryLocal] = useState<GallerySectionValue>({
@@ -47,8 +40,9 @@ export default function InviteEditorPage() {
     photos: [],
   });
 
-  const { mutateAsync, isPending } = useCreateInvitation();
   const { staged, clear } = useStagedInvitationMedia(draftId);
+  useInviteDraftAutosave(draftId, form, placeLocal, galleryLocal);
+
   type ThemaValue = ComponentProps<typeof ThemaSection>['value'];
   type ThemaOnChange = ComponentProps<typeof ThemaSection>['onChange'];
   type BasicValue = ComponentProps<typeof BasicInfoSection>['value'];
@@ -78,37 +72,22 @@ export default function InviteEditorPage() {
       ceremony: v as unknown as InviteForm['ceremony'],
     }));
 
-  const qc = useQueryClient();
-
-  const onSubmit = async () => {
-    setSaving(true);
-    try {
-      const payload = buildInvitationPayload({
-        form,
-        placeLocal,
-        galleryLocal,
-        staged: {
-          mainMedia: staged.mainMedia ?? undefined,
-          filmMedia: staged.filmMedia ?? undefined,
-          ticketMedia: staged.ticketMedia ?? undefined,
-        },
-        draftId,
-        qc,
-      });
-      console.log('[SUBMIT payload]', payload);
-
-      await mutateAsync(payload);
-      clear();
-      clearDraftCache(qc, draftId);
-
-      router.replace('/mypage/invite/view');
-    } catch (e) {
+  const { submit, isSubmitting } = useSubmitInvitation({
+    form,
+    placeLocal,
+    galleryLocal,
+    staged: {
+      mainMedia: staged.mainMedia ?? null,
+      filmMedia: staged.filmMedia ?? null,
+      ticketMedia: staged.ticketMedia ?? null,
+    },
+    draftId,
+    clearStaged: clear,
+    onError: (e) => {
       console.error(e);
       alert('청첩장 저장에 실패했어요. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setSaving(false);
-    }
-  };
+    },
+  });
 
   return (
     <main className="mx-auto min-h-screen max-w-96 bg-background">
@@ -158,7 +137,6 @@ export default function InviteEditorPage() {
           value={placeLocal}
           onChange={setPlaceLocal}
         />
-
         <PlainCollapsible title="교통수단" />
         <GallerySection
           value={galleryLocal}
@@ -173,22 +151,22 @@ export default function InviteEditorPage() {
         <PlainCollapsible title="엔딩사진/문구" />
         <PlainCollapsible title="계좌번호" />
         <PlainCollapsible title="배경음악/파티클" />
-
         <div className="w-90 mx-auto pt-15 pb-6">
           <Button
             type="button"
-            onClick={onSubmit}
-            disabled={saving || isPending}
+            onClick={submit}
+            disabled={isSubmitting}
             fullWidth
             size="lg"
           >
-            {saving || isPending ? '제작 중…' : '제작하기'}
+            {isSubmitting ? '제작 중…' : '제작하기'}
           </Button>
         </div>
       </section>
     </main>
   );
 }
+
 function PlainCollapsible({
   title,
   children,
@@ -230,7 +208,6 @@ function PlainCollapsible({
           )}
         />
       </button>
-
       {open && (
         <div id={panelId} role="region" aria-labelledby={headerId}>
           <Hr />
