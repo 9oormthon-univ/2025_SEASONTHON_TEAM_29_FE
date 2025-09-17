@@ -66,7 +66,7 @@ export default function ThemaSection({
   return (
     <section
       className={clsx(
-        'w-80 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden',
+        'w-90 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden',
         className,
       )}
       aria-labelledby={headerId}

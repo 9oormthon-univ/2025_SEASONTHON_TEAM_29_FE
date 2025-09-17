@@ -3,7 +3,7 @@
 
 import { resolveRegionCode } from '@/lib/region';
 import {
-  dressProductionMap, dressStyleMap, hallMealMap, hallStyleMap, makeupStyleMap,
+  dressOriginMap, dressStyleMap, hallMealMap, hallStyleMap, makeupStyleMap,
   studioShotMap, studioStyleMap,
 } from '@/services/mappers/searchMapper';
 import { CategoryKey } from '@/types/category';
@@ -15,7 +15,6 @@ import CategoryRow from './CategoryRow';
 import { ChipGroup, ChipSingle } from './Chips';
 import PriceRange from './PriceRange';
 import QueryInput from './QueryInput';
-
 export default function SearchPage({ initialCat = null as CategoryKey | null }) {
   const router = useRouter();
 
@@ -33,7 +32,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   // 드레스
   const [dressStyle, setDressStyle] = useState<string[]>([]);
-  const [dressProduction, setDressProduction] = useState<string[]>([]);
+  const [dressOrigin, setDressOrigin] = useState<string[]>([]);
 
   // 스튜디오
   const [studioStyle, setStudioStyle] = useState<string[]>([]);
@@ -45,28 +44,10 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
   const [stylist, setStylist] = useState<string | null>(null);
   const [room, setRoom] = useState<string | null>(null);
 
-  /** ✅ 카테고리별 필수 조건 검사 */
   const canSearch = useMemo(() => {
-    if (!cat || areas.length === 0 || price === null) return false;
-
-    switch (cat) {
-      case 'hall':
-        return (
-          hallStyle.length > 0 &&
-          hallMeal.length > 0 &&
-          guest !== null &&
-          parking !== null
-        );
-      case 'dress':
-        return dressStyle.length > 0 && dressProduction.length > 0;
-      case 'studio':
-        return studioStyle.length > 0 && iphoneSnap !== null;
-      case 'makeup':
-        return makeupStyle.length > 0 && stylist !== null && room !== null;
-      default:
-        return false;
-    }
-  }, [cat, areas, price, hallStyle, hallMeal, guest, parking, dressStyle, dressProduction, studioStyle, iphoneSnap, makeupStyle, stylist, room]);
+    if (!cat) return false; // 카테고리만 있어도 가능
+    return true;
+  }, [cat]);
 
   const toggle = (list: string[], v: string, set: (v: string[]) => void) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -88,16 +69,26 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
     // 웨딩홀
     hallStyle.forEach((v) => p.append('hallStyle', hallStyleMap[v]));
     hallMeal.forEach((v) => p.append('hallMeal', hallMealMap[v]));
-    if (guest) p.set('guest', guest);
-    if (parking) p.set('parking', parking === '있음' ? 'true' : 'false');
+    if (guest) p.set('guest', guest.replace(/명$/, ''));
+    if (parking === '있음') {
+      p.set('hasParking', 'true');
+    } else if (parking === '없음') {
+      p.set('hasParking', 'false');
+    }
 
     // 드레스
     dressStyle.forEach((v) => p.append('dressStyle', dressStyleMap[v]));
-    dressProduction.forEach((v) => p.append('dressProduction', dressProductionMap[v]));
+    dressOrigin.forEach((v) => p.append('dressOrigin', dressOriginMap[v]));
 
     // 스튜디오
     studioStyle.forEach((v) => p.append('studioStyle', studioStyleMap[v]));
-    studioShot.forEach((v) => p.append('specialShots', studioShotMap[v]));
+
+    // 선택된 특수촬영만 추가
+    if (studioShot.length > 0) {
+      studioShot.forEach((v) => p.append('specialShots', studioShotMap[v]));
+    }
+    
+    // 아이폰 스냅
     if (iphoneSnap) p.set('iphoneSnap', iphoneSnap === '있음' ? 'true' : 'false');
 
     // 메이크업
@@ -110,7 +101,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
 
   return (
     <main className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden">
-      <Header showBack onBack={() => router.back()} value="검색" />
+      <Header showBack onBack={() => router.push('/home')} value="검색" />
       <div className="px-[22px] flex-1 overflow-y-auto">
 
         <section className="px-0">
@@ -133,7 +124,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
               <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
               <section className="mt-2">
                 <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
-                <ChipGroup values={['채플', '호텔', '컨벤션', '하우스']} selected={hallStyle} onToggle={(v) => toggle(hallStyle, v, setHallStyle)} />
+                <ChipGroup values={['호텔', '컨벤션', '하우스']} selected={hallStyle} onToggle={(v) => toggle(hallStyle, v, setHallStyle)} />
               </section>
               <section className="mt-2">
                 <h3 className="mb-3 font-bold text-gray-800">식사</h3>
@@ -153,14 +144,14 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           {/* 드레스 */}
           {cat === 'dress' && (
             <>
-              <PriceRange value={price ?? 100} selected={price !== null} onFirstPick={() => setPrice(100)} onChange={setPrice} />
+              <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
               <section className="mt-2">
                 <h3 className="mb-3 font-bold text-gray-800">주력스타일</h3>
                 <ChipGroup values={['모던', '클래식', '로맨틱', '단아', '유니크', '하이엔드']} selected={dressStyle} onToggle={(v) => toggle(dressStyle, v, setDressStyle)} />
               </section>
               <section className="mt-2 mb-4">
                 <h3 className="mb-3 font-bold text-gray-800">제작사</h3>
-                <ChipGroup values={['국내', '수입']} selected={dressProduction} onToggle={(v) => toggle(dressProduction, v, setDressProduction)} />
+                <ChipGroup values={['국내', '수입']} selected={dressOrigin} onToggle={(v) => toggle(dressOrigin, v, setDressOrigin)} />
               </section>
             </>
           )}
@@ -168,7 +159,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           {/* 스튜디오 */}
           {cat === 'studio' && (
             <>
-              <PriceRange value={price ?? 100} selected={price !== null} onFirstPick={() => setPrice(100)} onChange={setPrice} />
+              <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
               <section className="mt-2">
                 <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
                 <ChipGroup values={['인물중심', '자연', '감성', '클래식', '흑백']} selected={studioStyle} onToggle={(v) => toggle(studioStyle, v, setStudioStyle)} />
@@ -187,7 +178,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
           {/* 메이크업 */}
           {cat === 'makeup' && (
             <>
-              <PriceRange value={price ?? 50} selected={price !== null} onFirstPick={() => setPrice(50)} onChange={setPrice} />
+              <PriceRange value={price ?? 10} selected={price !== null} onFirstPick={() => setPrice(10)} onChange={setPrice} />
               <section className="mt-2">
                 <h3 className="mb-3 font-bold text-gray-800">스타일</h3>
                 <ChipGroup values={['청순', '로맨틱', '내추럴', '글램']} selected={makeupStyle} onToggle={(v) => toggle(makeupStyle, v, setMakeupStyle)} />

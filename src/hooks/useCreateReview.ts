@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function useCreateReview({
-  vendorId,
+  contractId,
   maxLen = 250,
   redirectMs = 5000,
 }: {
-  vendorId: number;
+  contractId: number;
   maxLen?: number;
   redirectMs?: number;
 }) {
@@ -31,7 +31,7 @@ export function useCreateReview({
   }, []);
 
   const canSubmit =
-    !!vendorId &&
+    !!contractId &&
     rating !== null &&
     rating >= 1 &&
     rating <= 5 &&
@@ -46,13 +46,17 @@ export function useCreateReview({
     setSubmitting(true);
     setErrorMsg(null);
     setDoneMsg(null);
-
+    
     const payload: CreateReviewPayload = {
-      vendorId,
-      rating: rating!, // canSubmit 보장
+      contractId,
+      rating: rating!,
       contentBest: good.trim(),
       contentWorst: bad.trim(),
-      imageKeys,
+      mediaList: imageKeys.map((key, i) => ({
+        mediaKey: key,
+        contentType: 'image/jpeg', // 실제 업로드 시점에서 받아온 MIME 타입
+        sortOrder: i,
+      })),
     };
 
     try {
@@ -70,7 +74,7 @@ export function useCreateReview({
     } finally {
       setSubmitting(false);
     }
-  }, [canSubmit, vendorId, rating, good, bad, imageKeys, router, redirectMs]);
+  }, [canSubmit, contractId, rating, good, bad, imageKeys, router, redirectMs]);
 
   return {
     // state

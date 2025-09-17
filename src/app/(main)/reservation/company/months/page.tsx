@@ -1,9 +1,9 @@
 'use client';
 
-import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import clsx from 'clsx';
 import ReservationStepLayout from '@/components/reservation/layout/ReservationLayout';
+import clsx from 'clsx';
+import { useRouter, useSearchParams } from 'next/navigation';
+import * as React from 'react';
 
 const months = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -35,6 +35,9 @@ function MonthChip({
 
 export default function TypeFlowPage() {
   const router = useRouter();
+  const sp = useSearchParams();
+  const productId = sp.get('productId'); // 🔑 유지 필요
+
   const [selected, setSelected] = React.useState<number[]>([]);
   const toggle = (m: number) =>
     setSelected((prev) =>
@@ -43,7 +46,7 @@ export default function TypeFlowPage() {
         : [...prev, m].sort((a, b) => a - b),
     );
 
-  const year = new Date().getFullYear() + 1;
+  const year = new Date().getFullYear();
 
   return (
     <ReservationStepLayout
@@ -53,11 +56,15 @@ export default function TypeFlowPage() {
       mode="single"
       primaryText="다음"
       active={selected.length > 0}
-      onPrimary={() =>
+      onPrimary={() => {
+        if (!productId) {
+          alert('productId가 없습니다.');
+          return;
+        }
         router.replace(
-          `/reservation/company/select?step=3&months=${selected.join(',')}`,
-        )
-      }
+          `/reservation/company/select?step=3&months=${selected.join(',')}&productId=${productId}`,
+        );
+      }}
     >
       <div className="mb-4 text-base font-medium text-text--default">
         {year}년

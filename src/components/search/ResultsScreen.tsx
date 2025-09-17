@@ -4,7 +4,7 @@ import Header from '@/components/common/monocules/Header';
 import { categories } from '@/data/homeData';
 import { resolveRegionName } from '@/lib/region';
 import {
-  dressProductionLabel,
+  dressOriginLabel,
   dressStyleLabel,
   hallMealLabel,
   hallStyleLabel,
@@ -64,7 +64,7 @@ export default function ResultsScreen({
 
     // 드레스
     sp.getAll('dressStyle').forEach((v) => out.push(dressStyleLabel[v] ?? v));
-    sp.getAll('dressProduction').forEach((v) => out.push(dressProductionLabel[v] ?? v));
+    sp.getAll('dressOrigin').forEach((v) => out.push(dressOriginLabel[v] ?? v));
 
     // 스튜디오
     sp.getAll('studioStyle').forEach((v) => out.push(studioStyleLabel[v] ?? v));
@@ -98,7 +98,13 @@ export default function ResultsScreen({
       className="mx-auto w-full max-w-[420px] h-dvh flex flex-col overflow-hidden"
       data-hide-bottombar
     >
-      <Header showBack onBack={() => router.back()} value="검색결과" />
+      <Header
+        showBack
+        onBack={() => {
+          router.back();
+        }}
+        value="검색결과"
+      />
         <div className="px-[22px] flex-1 overflow-y-auto">
 
         {/* ✅ Chips: 가로 스크롤 */}
@@ -144,9 +150,7 @@ export default function ResultsScreen({
                         <button
                           onClick={() => {
                             const cat = sp.get('cat');
-                            const params = new URLSearchParams();
-                            if (cat) params.set('cat', cat); // ✅ 카테고리만 유지
-                            router.push(`/search/filters?${params.toString()}`);
+                            router.push(`/search/filters?cat=${cat}`);
                           }}
                           className="text-xs text-gray-400 hover:text-gray-600"
                         >
@@ -154,7 +158,7 @@ export default function ResultsScreen({
                         </button>
                       )}
                     </div>
-                    <div className="grid grid-cols-3">
+                    <div className="grid grid-cols-3 gap-3">
                       {list.map((it) => (
                         <VendorCard
                           key={it.id}
@@ -165,7 +169,7 @@ export default function ResultsScreen({
                             regionName: it.region,
                             averageRating: it.rating,
                             reviewCount: it.count,
-                            minPrice: grouped[key]?.minPrice, // ✅ 추가
+                            minPrice: grouped[key]?.minPrice,
                           }}
                           href={`/vendor/${it.id}`}
                         />

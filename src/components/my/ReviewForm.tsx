@@ -11,7 +11,7 @@ import PhotoCard from './PhotoCard';
 const MAX_PHOTOS = 5;
 
 export type ReviewFormProps = {
-  vendorId: number;
+  contractId: number;
   vendorName: string;
   good: string;
   setGood: (v: string) => void;
@@ -30,7 +30,7 @@ export type ReviewFormProps = {
 };
 
 export default function ReviewForm({
-  vendorId,
+  contractId,
   vendorName,
   good, setGood,
   bad, setBad,
@@ -45,13 +45,9 @@ export default function ReviewForm({
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-background flex justify-center">
+    <main className="min-h-screen bg-background pb-24">
+      <Header showBack onBack={()=>router.push('/mypage')} value="후기" />
       <div className="w-96 px-6 pb-36">
-        <Header 
-        showBack
-        onBack={()=>router.back()}
-        value="후기" />
-
         {/* 헤더 & 평점 */}
         <section className="mt-2 text-center">
           <h1 className="text-sm font-medium text-text--default">{vendorName}</h1>
@@ -69,7 +65,7 @@ export default function ReviewForm({
             files={files}
             total={MAX_PHOTOS}
             domain="REVIEW"
-            domainId={vendorId}
+            domainId={contractId}
             onUploadSelect={(added) => setFiles((s) => [...s, ...added].slice(0, MAX_PHOTOS))}
             onUploaded={(s3Keys) => {
               setImageKeys((prev) => {
@@ -122,6 +118,6 @@ export default function ReviewForm({
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

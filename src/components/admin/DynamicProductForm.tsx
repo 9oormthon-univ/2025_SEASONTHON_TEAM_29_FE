@@ -30,6 +30,7 @@ export default function DynamicProductForm({
   // 공통 필드
   const [name, setName] = useState('');
   const [basePrice, setBasePrice] = useState(0);
+  const [description, setDescription] = useState('');
   const [duration, setDuration] = useState(60);
   const [images, setImages] = useState<
     { mediaKey: string; contentType: string; sortOrder: number }[]
@@ -42,14 +43,14 @@ export default function DynamicProductForm({
     capacity: 0,
     hasParking: false,
   });
-  const [studio, setStudio] = useState<Pick<CreateStudioProduct, 'studioStyle' | 'specialShot' | 'iphoneSnap'>>({
+  const [studio, setStudio] = useState<Pick<CreateStudioProduct, 'studioStyle' | 'specialShots' | 'iphoneSnap'>>({
     studioStyle: 'PORTRAIT_FOCUSED',
-    specialShot: undefined,
+    specialShots: 'NONE',
     iphoneSnap: false,
   });
-  const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressProduction'>>({
+  const [dress, setDress] = useState<Pick<CreateDressProduct, 'dressStyle' | 'dressOrigin'>>({
     dressStyle: 'ROMANTIC',
-    dressProduction: 'DOMESTIC',
+    dressOrigin: 'DOMESTIC',
   });
   const [makeup, setMakeup] = useState<Pick<CreateMakeupProduct, 'makeupStyle' | 'isStylistDesignationAvailable' | 'hasPrivateRoom'>>({
     makeupStyle: 'NATURAL',
@@ -60,11 +61,12 @@ export default function DynamicProductForm({
   // 폼이 바뀔 때마다 상위에 전달
   useEffect(() => {
     let body: ProductForm;
-
+  
     if (vendorType === 'WEDDING_HALL') {
       body = {
-        vendorType,
+        vendorType: 'WEDDING_HALL', // 🔑 이렇게 리터럴 고정
         name,
+        description,
         basePrice,
         durationInMinutes: duration,
         productImages: images,
@@ -72,8 +74,9 @@ export default function DynamicProductForm({
       };
     } else if (vendorType === 'STUDIO') {
       body = {
-        vendorType,
+        vendorType: 'STUDIO', // 🔑 리터럴 고정
         name,
+        description,
         basePrice,
         durationInMinutes: duration,
         productImages: images,
@@ -81,8 +84,9 @@ export default function DynamicProductForm({
       };
     } else if (vendorType === 'DRESS') {
       body = {
-        vendorType,
+        vendorType: 'DRESS', // 🔑 리터럴 고정
         name,
+        description,
         basePrice,
         durationInMinutes: duration,
         productImages: images,
@@ -90,21 +94,22 @@ export default function DynamicProductForm({
       };
     } else {
       body = {
-        vendorType,
+        vendorType: 'MAKEUP', // 🔑 리터럴 고정
         name,
+        description,
         basePrice,
         durationInMinutes: duration,
         productImages: images,
         ...makeup,
       };
     }
-
+  
     onChange(body);
-  }, [name, basePrice, duration, images, hall, studio, dress, makeup, vendorType, onChange]);
-
+  }, [name, description, basePrice, duration, images, hall, studio, dress, makeup, vendorType, onChange]);
   return (
     <div className="grid gap-3 mt-4">
       <TextField label="상품명" value={name} onChange={setName} />
+      <TextField label="상품 설명" value={description} onChange={setDescription} />
       <NumberField label="가격" value={basePrice} onChange={setBasePrice} />
       <NumberField
         label="소요 시간(분)"
@@ -160,14 +165,14 @@ export default function DynamicProductForm({
           />
           <SelectField
             label="특수 촬영"
-            value={studio.specialShot ?? ''}
+            value={studio.specialShots ?? ''}
             onChange={(v) =>
               setStudio((prev) => ({
                 ...prev,
-                specialShot: v as CreateStudioProduct['specialShot'],
+                specialShots: v as CreateStudioProduct['specialShots'],
               }))
             }
-            options={['HANOK', 'UNDERWATER', 'WITH_PET']}
+            options={['NONE', 'HANOK', 'UNDERWATER', 'WITH_PET']}
           />
           <label className="flex items-center gap-2 text-sm">
             <input
@@ -197,11 +202,11 @@ export default function DynamicProductForm({
           />
           <SelectField
             label="제작 방식"
-            value={dress.dressProduction}
+            value={dress.dressOrigin}
             onChange={(v) =>
               setDress((prev) => ({
                 ...prev,
-                dressProduction: v as CreateDressProduct['dressProduction'],
+                dressOrigin: v as CreateDressProduct['dressOrigin'],
               }))
             }
             options={['DOMESTIC', 'IMPORTED']}

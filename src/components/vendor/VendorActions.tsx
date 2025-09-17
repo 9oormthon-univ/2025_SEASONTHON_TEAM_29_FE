@@ -11,17 +11,10 @@ export default function VendorActions({ vendorId }: { vendorId: number }) {
 
   return (
     <div className="px-4">
-      <div className="mt-4 grid grid-cols-2 gap-2">
+      <div className="mt-4 grid grid-cols-1 gap-2">
         <button
           className={baseBtn}
-          onClick={() => router.push(`/reservation?vendor=${vendorId}`)}
-        >
-          <SvgObject src="/icons/Clock.svg" className="h-6 w-6" />
-          예약하러가기
-        </button>
-        <button
-          className={baseBtn}
-          onClick={() => router.push(`/coming-soon`)}
+          onClick={() => router.push(`/vendor/${vendorId}/reviews`)}
         >
           <SvgObject src="/icons/Chat.svg" className="h-6 w-6" />
           리뷰 보러가기

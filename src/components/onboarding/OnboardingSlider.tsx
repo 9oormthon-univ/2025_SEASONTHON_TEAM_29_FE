@@ -2,20 +2,26 @@
 
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
-import Image, { StaticImageData } from 'next/image';
+import Lottie, { type LottieComponentProps } from 'lottie-react';
 import { useCallback, useEffect, useState } from 'react';
 
-import calendar from '@/../public/onboarding/illus/calendar.png';
-import rings from '@/../public/onboarding/illus/rings.png';
-import scale from '@/../public/onboarding/illus/scale.png';
+import Art1 from '@/assets/animations/Artboard_1.json';
+import Art2 from '@/assets/animations/Artboard_2.json';
+import Art3 from '@/assets/animations/Artboard_3.json';
+
 import EdgeBleed from '../common/atomic/EdgeBleed';
 import Slider from '../common/atomic/Slider';
 
-type Slide = { img: StaticImageData; title: string; desc?: string };
+type Slide = {
+  anim: LottieComponentProps['animationData'];
+  title: string;
+  desc?: string;
+};
+
 const slides: Slide[] = [
-  { img: scale, title: '원하는 곳만 골라서\n비교 할 수 있게!' },
-  { img: calendar, title: '행사와 투어 일정\n공유도 자동으로!' },
-  { img: rings, title: '한 번 뿐인 결혼식,\n이제는 웨딧과 함께해요' },
+  { anim: Art1, title: '원하는 곳만 골라서\n비교 할 수 있게!' },
+  { anim: Art2, title: '행사와 투어 일정\n공유도 자동으로!' },
+  { anim: Art3, title: '한 번 뿐인 결혼식,\n이제는 웨딧과 함께해요' },
 ];
 
 export default function OnboardingSlider() {
@@ -41,23 +47,23 @@ export default function OnboardingSlider() {
       <div>
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex touch-pan-y select-none">
-            {' '}
-            {/* ← 페이지 좌우 스크롤 완화 */}
             {slides.map((s, i) => (
               <section key={i} className="min-w-0 flex-[0_0_100%]">
-                <div className="mt-8">
+                <div className="mt-8 mb-13">
                   <h2 className="whitespace-pre-line pl-10 text-left text-[24px] font-bold leading-tight text-gray-900">
                     {s.title}
                   </h2>
                 </div>
 
-                <div className="relative mx-auto mt-4 mb-9 h-[291px] w-[410px]">
-                  <Image
-                    src={s.img}
-                    alt={s.title}
-                    fill
-                    className="object-contain"
-                    priority={i === 0}
+                {/* ✅ 가로폭 맞춤 + 비율 유지 */}
+                <div className="relative mx-auto mt-4 mb-9 w-full max-w-[420px] aspect-[410/291]">
+                  <Lottie
+                    animationData={s.anim}
+                    loop
+                    autoplay
+                    role="img"
+                    aria-label={s.title.replace(/\n/g, ' ')}
+                    className="absolute inset-0 w-full h-full"
                   />
                 </div>
               </section>

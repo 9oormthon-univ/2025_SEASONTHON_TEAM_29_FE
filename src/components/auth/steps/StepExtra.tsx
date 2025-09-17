@@ -122,7 +122,6 @@ export default function StepExtra(props: Props) {
             value={extra.role}
             onChange={(v) => setExtraField('role', v as 'groom' | 'bride')}
           />
-          {!flags.roleOk && <FieldHint>역할을 선택해주세요.</FieldHint>}
         </Field>
       </div>
     </section>

@@ -39,6 +39,7 @@ export default function BasicInfoSection({
   const sectionId = useId();
   const headerId = `${sectionId}-header`;
   const panelId = `${sectionId}-panel`;
+
   function patch(path: 'groom', v: BasicInfoPerson): void;
   function patch(path: 'bride', v: BasicInfoPerson): void;
   function patch(path: 'order', v: BasicInfoValue['order']): void;
@@ -89,7 +90,7 @@ export default function BasicInfoSection({
   return (
     <section
       className={clsx(
-        'w-80 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden',
+        'w-90 rounded-lg outline-[1.2px] outline-offset-[-1.2px] outline-box-line overflow-hidden',
         className,
       )}
       aria-labelledby={headerId}
@@ -112,10 +113,10 @@ export default function BasicInfoSection({
         <SvgObject
           src="/icons/down.svg"
           alt=""
-          width={20}
-          height={20}
+          width={12}
+          height={6}
           className={clsx(
-            'transition-transform opacity-60',
+            'shrink-0 transition-transform',
             open && 'rotate-180',
           )}
         />
@@ -308,18 +309,18 @@ function FieldRow({
     </div>
   );
 }
-
 function BoxInput({
   value,
   onChange,
   placeholder,
   className,
 }: {
-  value: string;
+  value?: string | null;
   onChange: (v: string) => void;
   placeholder?: string;
   className?: string;
 }) {
+  const controlled = value ?? '';
   return (
     <div
       className={clsx(
@@ -329,7 +330,7 @@ function BoxInput({
       )}
     >
       <input
-        value={value}
+        value={controlled}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={clsx(

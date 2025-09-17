@@ -169,7 +169,7 @@ export default function ReviewDetailPage() {
               logoUrl={data.vendorLogoUrl || '/logos/placeholder.png'}
               date={fmtDate(data.createdAt)}
               type={categoryKo}
-              onReport={() => alert('신고하기 눌림')}
+              vendorId={data.vendorId}
             />
           </section>
 

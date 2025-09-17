@@ -1,17 +1,20 @@
-// components/common/Section.tsx
-import React from 'react';
+'use client';
+
+import SvgObject from '@/components/common/atomic/SvgObject';
+import * as React from 'react';
 
 type SectionProps = {
   title?: string;
   onMore?: () => void;
-  /** 콘텐츠 폭: 'none' = 일반, 'viewport' = 뷰포트로 edge-bleed */
   bleed?: 'none' | 'viewport';
-  /** edge-bleed일 때 내부 정렬: 'container' = 중앙정렬, 'edge' = 좌우 끝까지 */
   contentAlign?: 'container' | 'edge';
   titleSize?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   children: React.ReactNode;
 };
+
+const CONTAINER_MAX = 420;
+const CONTAINER_PX = 22;
 
 export default function Section({
   title,
@@ -22,26 +25,38 @@ export default function Section({
   className,
   children,
 }: SectionProps) {
-  const titleCls = {
-    sm: 'text-sm font-bold',
-    md: 'text-[14px] font-extrabold text-text-default',
-    lg: 'text-lg font-extrabold',
-    xl: 'text-xl font-extrabold',
-  }[titleSize];
+  const titleCls =
+    {
+      sm: 'text-sm font-bold',
+      md: 'text-[14px] font-extrabold',
+      lg: 'text-[18px] font-extrabold ',
+      xl: 'text-[20px] font-extrabold ',
+    }[titleSize] + ' text-text--default leading-tight';
 
   return (
     <section className={className}>
-      {/* 1) 타이틀은 항상 중앙 컨테이너 */}
       {title && (
-        <div className="mx-auto w-full max-w-[420px]">
-          <div className="mx-[22px] mb-3 flex items-center justify-between">
-            <h2 className={titleCls}>{title}</h2>
+        <div className="mx-auto w-full" style={{ maxWidth: CONTAINER_MAX }}>
+          {/* 타이틀: 컨테이너 안에 그대로 */}
+          <div
+            className="relative mb-2 flex items-center justify-between"
+            style={{ paddingLeft: 0, paddingRight: 0 }}
+          >
+            <h2 className={`${titleCls} truncate`}>{title}</h2>
+
             {onMore && (
               <button
+                type="button"
                 onClick={onMore}
-                className="text-[14px] text-semibold text-text-default"
+                className="shrink-0 active:scale-95 ml-2"
+                aria-label="더 보기"
               >
-                더보기
+                <SvgObject
+                  src="/icons/arrowRight.svg"
+                  alt="더보기"
+                  width={20}
+                  height={20}
+                />
               </button>
             )}
           </div>
@@ -50,19 +65,30 @@ export default function Section({
 
       {/* 2) 콘텐츠 */}
       {bleed === 'viewport' ? (
-        // 뷰포트 전폭으로 빼되, 섹션 중앙 기준을 유지하기 위한 보정 래퍼
         <div className="relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] w-screen">
           {contentAlign === 'container' ? (
-            // 전폭 배경/터치영역 + 내부는 여전히 중앙 컨테이너
-            <div className="mx-auto w-full max-w-[420px]">{children}</div>
+            <div className="mx-auto w-full" style={{ maxWidth: CONTAINER_MAX }}>
+              {children}
+            </div>
           ) : (
-            // 진짜 edge까지 붙이고 싶을 때(가로 스크롤 등)
-            <div className="px-[22px]">{children}</div>
+            <div
+              style={{ paddingLeft: CONTAINER_PX, paddingRight: CONTAINER_PX }}
+            >
+              {children}
+            </div>
           )}
         </div>
       ) : (
-        // 일반 섹션
-        <div className="mx-auto w-full max-w-[420px] px-[22px]">{children}</div>
+        <div
+          className="mx-auto w-full"
+          style={{
+            maxWidth: CONTAINER_MAX,
+            paddingLeft: CONTAINER_PX,
+            paddingRight: CONTAINER_PX,
+          }}
+        >
+          {children}
+        </div>
       )}
     </section>
   );

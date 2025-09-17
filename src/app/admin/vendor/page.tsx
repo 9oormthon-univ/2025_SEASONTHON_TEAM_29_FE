@@ -103,6 +103,8 @@ export default function VendorAdminPage() {
         {/* 기본 입력 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl">
           <TextField label="업체명" value={name} onChange={setName} />
+          <TextField label="전화번호" value={phoneNumber} onChange={setPhoneNumber} />
+          <TextField label="설명" value={description} onChange={setDescription} />
           <SelectField
             label="Vendor Type"
             value={vendorType}
@@ -195,6 +197,8 @@ export default function VendorAdminPage() {
               logo && main
                 ? {
                     name,
+                    phoneNumber,
+                    description,
                     vendorType,
                     regionCode,
                     fullAddress,

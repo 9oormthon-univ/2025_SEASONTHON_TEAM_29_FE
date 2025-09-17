@@ -62,13 +62,13 @@ export const dressStyleMap: Record<string, string> =
   Object.fromEntries(Object.entries(dressStyleLabel).map(([k, v]) => [v, k]));
 export const reverseDressStyleMap = dressStyleLabel;
 
-export const dressProductionLabel: Record<string, string> = {
+export const dressOriginLabel: Record<string, string> = {
   DOMESTIC: '국내',
   IMPORTED: '수입',
 };
-export const dressProductionMap: Record<string, string> =
-  Object.fromEntries(Object.entries(dressProductionLabel).map(([k, v]) => [v, k]));
-export const reverseDressProductionMap = dressProductionLabel;
+export const dressOriginMap: Record<string, string> =
+  Object.fromEntries(Object.entries(dressOriginLabel).map(([k, v]) => [v, k]));
+export const reverseDressOriginMap = dressOriginLabel;
 
 /* =========================
  * 스튜디오
@@ -85,6 +85,7 @@ export const studioStyleMap: Record<string, string> =
 export const reverseStudioStyleMap = studioStyleLabel;
 
 export const studioShotLabel: Record<string, string> = {
+  NONE: '없음',
   HANOK: '한옥',
   UNDERWATER: '수중',
   WITH_PET: '반려동물',
@@ -100,7 +101,6 @@ export const hallStyleLabel: Record<string, string> = {
   HOTEL: '호텔',
   CONVENTION: '컨벤션',
   HOUSE: '하우스',
-  CHAPEL: '채플',
 };
 export const hallStyleMap: Record<string, string> =
   Object.fromEntries(Object.entries(hallStyleLabel).map(([k, v]) => [v, k]));

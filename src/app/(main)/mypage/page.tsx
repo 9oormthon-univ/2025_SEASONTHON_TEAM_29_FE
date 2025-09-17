@@ -1,4 +1,3 @@
-// src/app/mypage/page.tsx
 'use client';
 
 import BottomNav from '@/components/common/atomic/BottomNav';
@@ -7,26 +6,27 @@ import BottomSheet from '@/components/my/CompanyModal';
 import DdayCard from '@/components/my/D-dayCheck';
 import ProfileHeader from '@/components/my/ProfileHeader';
 import ReviewCompanyPicker from '@/components/my/ReviewCompanyPicker';
+import { useMyContracts } from '@/hooks/useMyContracts';
 import { useMyProfile } from '@/hooks/useMyProfile';
-import { useMyReservations } from '@/hooks/useMyReservations';
 import { useMyReviews } from '@/hooks/useMyReviews';
-import { isPastYMDSeoul } from '@/lib/dateKR';
 import { resolveWeddingTarget } from '@/services/mypage.api';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
+import ContractsTab from '@/components/my/ContractsTab';
 import InviteCreateCard from '@/components/my/InviteCreateCard';
 import MyTabs from '@/components/my/MyTabs';
-import ReservationsTab from '@/components/my/ReservationsTab';
 import ReviewsTab from '@/components/my/ReviewsTab';
+import { useReviewables } from '@/hooks/useReviewables';
 
 export default function Page() {
   const [tab, setTab] = useState<'reserve' | 'review' | 'invite'>('reserve');
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const { data: profile, loading: profLoading, error: profErr } = useMyProfile();
-  const { data: reservations, loading: resLoading, error: resErr } = useMyReservations();
+  const { data: contractsRes, loading: resLoading, error: resErr } = useMyContracts();
   const { items: reviews, loading: revLoading, error: revErr, hasMore, loadMore } = useMyReviews(9);
+  const { items: reviewables, loading: rvLoading, error: rvErr } = useReviewables(50);
 
   const router = useRouter();
 
@@ -35,18 +35,9 @@ export default function Page() {
     [profile?.weddingDay],
   );
 
-  const hasPastReservation = useMemo(
-    () => reservations.some((r) => isPastYMDSeoul(r.reservationDate)),
-    [reservations],
-  );
-  const pastOnlyReservations = useMemo(
-    () => reservations.filter((r) => isPastYMDSeoul(r.reservationDate)),
-    [reservations],
-  );
-
   return (
     <main className="min-h-screen bg-background pb-24">
-      <Header showBack onBack={() => router.back()} value="마이" />
+      <Header showBack onBack={() => router.push('/home')} value="마이" />
 
       <section className="mx-auto max-w-96 px-5 pt-2">
         <ProfileHeader
@@ -63,7 +54,11 @@ export default function Page() {
         <MyTabs value={tab} onChange={setTab} />
 
         {tab === 'reserve' && (
-          <ReservationsTab items={reservations} loading={resLoading} error={resErr} />
+          <ContractsTab
+            groups={contractsRes?.contractGroups ?? []}
+            loading={resLoading}
+            error={resErr}
+          />
         )}
 
         {tab === 'review' && (
@@ -75,7 +70,7 @@ export default function Page() {
             onMore={loadMore}
             onWriteClick={() => setSheetOpen(true)}
             onCardClick={(id) => router.push(`/review/${id}`)}
-            allowWrite={hasPastReservation}
+            allowWrite
           />
         )}
 
@@ -84,21 +79,22 @@ export default function Page() {
 
       <BottomNav innerMax="max-w-96" />
 
-      {/* 후기 작성 업체 선택 바텀시트 */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <h3 className="px-1 text-base font-semibold text-foreground">업체 선택</h3>
         <ReviewCompanyPicker
-          reservations={pastOnlyReservations}
-          loading={resLoading}
-          error={resErr ?? undefined}
-          onPick={({ vendorId, vendorName, reservationId, date, time }) => {
+          items={reviewables.map((r) => ({
+            id: r.vendorId,
+            contractId: r.contractId,
+            vendorName: r.vendorName,
+            vendorLogoUrl: r.logoImageUrl,
+          }))}
+          loading={rvLoading}
+          error={rvErr ?? undefined}
+          onPick={({ contractId, vendorName }) => {
             setSheetOpen(false);
             const q = new URLSearchParams({
-              vendorId,
-              vendorName: encodeURIComponent(vendorName),
-              reservationId,
-              date,
-              time,
+              contractId: String(contractId),
+              vendorName,
             }).toString();
             router.push(`/mypage/review?${q}`);
           }}

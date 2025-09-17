@@ -58,7 +58,7 @@ function CoupleLinkingView({ onComplete }: Props) {
       <div className="w-96 px-6 py-5 space-y-8 pb-28">
         <Header 
         showBack
-        onBack={()=>router.back()}
+        onBack={()=>router.push('/mypage')}
         value="계정연동" />
 
         <section className="space-y-2">

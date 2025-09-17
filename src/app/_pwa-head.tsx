@@ -4,7 +4,7 @@ export function PwaHead() {
     <>
       {/* PWA 기본 */}
       <link rel="manifest" href="/manifest.json?v=20250902" />
-      <meta name="theme-color" content="#6b5bd7" />
+      <meta name="theme-color" content="#FDFDFD" />
 
       {/* iOS PWA */}
       <meta name="apple-mobile-web-app-capable" content="yes" />
