@@ -19,14 +19,14 @@ export default function InvitationHeader({
   const mm = String(month).padStart(2, '0');
   const dd = String(day).padStart(2, '0');
   const CONTAINER_W = 360;
-  const YEAR_FS = 64;
-  const DATE_FS = 64;
-  const REC_W = 180,
-    REC_H = 80;
+  const YEAR_FS = 36;
+  const DATE_FS = 36;
+  const REC_W = 150,
+    REC_H = 50;
   const TALK_W = 80,
     TALK_H = 32;
-  const TALK_SHIFT_R = 70;
-  const GAP_MAIN = 6;
+  const TALK_SHIFT_R = 15;
+  const GAP_MAIN = -300;
   const DATE_SHIFT_L = 2;
 
   return (
