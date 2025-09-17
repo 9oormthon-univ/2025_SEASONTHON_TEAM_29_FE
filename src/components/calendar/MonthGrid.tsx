@@ -19,7 +19,7 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
   const cells = daysMatrix5(monthBase);
 
   return (
-    <div className="grid grid-cols-7 gap-[9px]">
+    <div className="grid grid-cols-7 gap-y-[3px]">
       {WEEK_LABELS.map((w, idx) => (
         <div key={w} className="flex justify-center">
           <div
