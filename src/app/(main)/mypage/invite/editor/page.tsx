@@ -108,6 +108,14 @@ export default function InviteEditorPage() {
       alert('청첩장 저장에 실패했어요. 잠시 후 다시 시도해 주세요.');
     },
   });
+  const { saveNow } = useInviteDraftAutosave(
+    draftId,
+    form,
+    placeLocal,
+    galleryLocal,
+    { enabled: hydrated },
+  );
+  const router = useRouter();
 
   return (
     <main className="mx-auto min-h-screen max-w-96 bg-background">
@@ -116,9 +124,15 @@ export default function InviteEditorPage() {
         showBack
         onBack={() => history.back()}
         rightSlot={
-          <a href="editor/view" className="text-xs text-primary-500 underline">
+          <button
+            onClick={() => {
+              saveNow();
+              router.push(`/mypage/invite/editor/view?draft=${draftId}`);
+            }}
+            className="text-xs text-primary-500 underline"
+          >
             미리보기
-          </a>
+          </button>
         }
       />
       <section className="mx-auto max-w-100 px-2 pt-2 flex flex-col items-center gap-3">
