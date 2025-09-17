@@ -77,7 +77,7 @@ export default function Step2({
         style={{
           width: `${WIDTH_VW}vw`,
           left: '50%',
-          transform: 'translateX(-50%)',
+          transform: 'translateX(-50%) translateY(-30%)',
           position: 'relative',
         }}
       >
@@ -138,7 +138,7 @@ export default function Step2({
           sizes="100vw"
         />
       </div>
-      <p className="mt-3 text-xs text-text--secondary text-center">
+      <p className="-mt-10 text-xs text-text--secondary text-center">
         프레임을 클릭하면 사진을 넣을 수 있어요.
       </p>
       <div className="fixed inset-x-0 bottom-0 px-6 pb-20 pt-4 bg-white/80 backdrop-blur">
