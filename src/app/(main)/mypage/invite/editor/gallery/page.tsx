@@ -5,6 +5,9 @@ import React, { useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
 import Button from '@/components/common/atomic/Button';
 import Header from '@/components/common/monocules/Header';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useS3MultiUpload } from '@/hooks/useS3MultiUpload';
+import { useQueryClient } from '@tanstack/react-query';
 
 const PER_PAGE = 9;
 const TOTAL = 27;
@@ -13,6 +16,14 @@ const PAGES = Math.ceil(TOTAL / PER_PAGE);
 type Slot = { file: File | null; url: string | null };
 
 export default function Page() {
+  const router = useRouter();
+  const sp = useSearchParams();
+  const draftQ = sp.get('draft');
+  const draftId = Number(draftQ);
+
+  const qc = useQueryClient();
+  const { uploadAll, uploading, error } = useS3MultiUpload();
+
   const [slots, setSlots] = useState<Slot[]>(
     Array.from({ length: TOTAL }, () => ({ file: null, url: null })),
   );
@@ -35,27 +46,61 @@ export default function Page() {
     const next = [...slots];
     const prevUrl = next[idx].url;
     if (prevUrl) URL.revokeObjectURL(prevUrl);
-
     next[idx] = { file: f, url: URL.createObjectURL(f) };
     setSlots(next);
 
     pendingIndex.current = null;
     e.currentTarget.value = '';
   };
+
   function staggeredIndices(start: number, count = 9, pageIndex: number) {
     const ids = Array.from({ length: count }, (_, i) => start + i);
     const [a, b, c, d, e, f, g, h, i] = ids;
 
-    // 왼-오-왼
+    // 오-왼-오
     const patternA = [a, b, c, null, null, d, e, f, g, h, i, null];
-
-    //  오-왼-오
     const patternB = [null, a, b, c, d, e, f, null, null, g, h, i];
 
     return (pageIndex % 2 === 0 ? patternA : patternB).slice(0, 12) as Array<
       number | null
     >;
   }
+
+  const selectedPairs = slots
+    .map((s, i) => (s.file ? { file: s.file, i } : null))
+    .filter(Boolean) as { file: File; i: number }[];
+
+  const handleSubmit = async () => {
+    if (!Number.isFinite(draftId)) {
+      alert('draft 파라미터가 없어 업로드할 수 없어요.');
+      return;
+    }
+    if (selectedPairs.length === 0) {
+      alert('업로드할 사진을 선택해 주세요.');
+      return;
+    }
+    try {
+      const files = selectedPairs.map((p) => p.file);
+      const issued = await uploadAll('INVITATION', draftId, files);
+
+      const mediaList = issued
+        .map((u, idx) => ({
+          mediaKey: u.s3Key,
+          contentType: u.contentType || files[idx].type || '',
+          sortOrder: selectedPairs[idx].i,
+        }))
+        .sort((a, b) => a.sortOrder - b.sortOrder);
+
+      qc.setQueryData(['invitation', 'mediaList', String(draftId)], mediaList);
+
+      console.log('[GALLERY mediaList]', mediaList);
+      alert(`${mediaList.length}장의 사진이 업로드되었습니다.`);
+      router.push(`/mypage/invite/editor?draft=${draftId}`);
+    } catch (e) {
+      console.error(e);
+      alert('갤러리 업로드에 실패했어요.');
+    }
+  };
 
   return (
     <main className="relative mx-auto flex max-w-[420px] flex-col h-[100svh] bg-white">
@@ -77,13 +122,13 @@ export default function Page() {
           사진을 추가해 주세요.
         </h2>
       </div>
+
       <div className="mt-25">
         <div className="flex snap-x snap-mandatory overflow-x-auto scroll-pl-6 gap-6 px-6 pb-2">
           {pages.map((p) => {
             const start = p * PER_PAGE;
             const end = Math.min(start + PER_PAGE, TOTAL);
             const indices = staggeredIndices(start, end - start, p);
-
             return (
               <section
                 key={p}
@@ -97,7 +142,6 @@ export default function Page() {
                     ) : (
                       <div key={idx} className="relative">
                         <button
-                          key={idx}
                           type="button"
                           onClick={() => handlePick(idx)}
                           className={clsx(
@@ -130,20 +174,26 @@ export default function Page() {
           })}
         </div>
       </div>
+
       <p className="mt-4 text-center text-xs text-text--secondary">
         좌우로 움직이면 더 많은 사진을 넣을 수 있어요.
       </p>
+
       <div className="mt-auto px-6 pb-15 pt-4">
         <Button
-          onClick={() => {
-            const count = slots.filter((s) => s.file).length;
-            alert(`${count}장의 사진이 선택되었습니다.`);
-          }}
+          onClick={handleSubmit}
           fullWidth
+          disabled={uploading || selectedPairs.length === 0}
         >
-          등록하기
+          {uploading ? '업로드 중…' : `등록하기 (${selectedPairs.length})`}
         </Button>
+        {error && (
+          <p className="mt-2 text-center text-xs text-red-600">
+            업로드 실패: {error}
+          </p>
+        )}
       </div>
+
       <input
         ref={fileInputRef}
         type="file"
