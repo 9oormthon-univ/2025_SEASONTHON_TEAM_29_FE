@@ -1,5 +1,9 @@
 'use client';
 
+import * as React from 'react';
+import { useInvitationQuery } from '@/hooks/useInvitationQuery';
+import { toInvitationApiData } from '@/lib/invitationAdapter';
+
 import InvitationHeader from './InvitationHeader';
 import MainImage from './MainImage';
 import FilmImage from './FilmImage';
@@ -10,7 +14,6 @@ import Location from './Location';
 import Gallery from './Gallery';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import Reveal from '@/components/invitation/Reveal';
-import { type InvitationApi } from '@/types/invitation';
 
 const dayAbbr = (iso: string) =>
   ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][new Date(iso).getDay()];
@@ -33,13 +36,29 @@ const timeToPmStyle = (t: string) => {
   return `${pm ? 'P.M.' : 'A.M.'} ${h12}:${mm}`;
 };
 
-export default function InvitationFromData({
-  payload,
-  className,
-}: {
-  payload: InvitationApi['data'];
-  className?: string;
-}) {
+export default function Invitation() {
+  const { data, isLoading, isError, error } = useInvitationQuery();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-svh w-full bg-[#090909] text-white grid place-items-center">
+        로딩 중…
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className="min-h-svh w-full bg-[#090909] text-white grid place-items-center">
+        {error instanceof Error
+          ? error.message
+          : '초청장 데이터를 불러오지 못했어요.'}
+      </div>
+    );
+  }
+
+  const payload = toInvitationApiData(data);
+
   const {
     basicInformation: b,
     greetings: g,
@@ -61,16 +80,14 @@ export default function InvitationFromData({
   const floorOnly = mp.floorAndHall;
 
   return (
-    <div
-      className={`min-h-svh w-full overflow-x-hidden overflow-y-auto bg-[#090909] ${className ?? ''}`}
-    >
+    <div className="min-h-svh w-full overflow-x-hidden overflow-y-auto bg-[#090909]">
       <main className="mx-auto w-full max-w-[420px] pb-20">
         <Reveal>
           <InvitationHeader year={y} month={Number(m)} day={Number(dd)} />
         </Reveal>
 
         <Reveal delay={60}>
-          <div className="px-6">
+          <div className="mt-5 px-6">
             <MainImage src={mainMediaUrl} />
           </div>
         </Reveal>
@@ -83,9 +100,10 @@ export default function InvitationFromData({
             height={150}
           />
         </Reveal>
+
         <Reveal delay={120}>
           <FilmImage
-            className="mt-6 -ml-35"
+            className="mt-3 -ml-35"
             photos={[
               filmMediaUrl[0] ?? null,
               filmMediaUrl[1] ?? null,
@@ -96,7 +114,7 @@ export default function InvitationFromData({
 
         <Reveal delay={180}>
           <InvitationMessage
-            className="mt-10"
+            className="mt-15"
             title={g.greetingsTitle}
             message={g.greetingsContent}
           />
@@ -104,7 +122,7 @@ export default function InvitationFromData({
 
         <Reveal delay={240}>
           <InvitationCast
-            className="mt-14 px-6"
+            className="mt-25 px-6"
             groomName={groomName}
             brideName={brideName}
             groomFatherName={b.groomFatherName}
@@ -115,10 +133,10 @@ export default function InvitationFromData({
         </Reveal>
 
         <Reveal delay={320} effect="fade">
-          <div className="mt-14 flex items-center justify-center">
+          <div className="mt-12 flex items-center justify-center">
             <SvgObject src="/Date.svg" alt="Date" width={160} height={80} />
           </div>
-          <div className="mt-4 flex items-center justify-center">
+          <div className="mt-12 flex items-center justify-center">
             <TicketImage
               imageUrl={ticketMediaUrl || null}
               dayText={dayText}
@@ -132,7 +150,7 @@ export default function InvitationFromData({
 
         <Reveal delay={360}>
           <Location
-            className="mt-14"
+            className="mt-33"
             vendorTitle={mp.vendorName}
             floor={mp.floorAndHall}
             address={address}
@@ -142,7 +160,7 @@ export default function InvitationFromData({
         </Reveal>
 
         <Reveal delay={420}>
-          <Gallery className="mt-14" images={mediaUrls} showHint />
+          <Gallery className="mt-30" images={mediaUrls} showHint />
         </Reveal>
       </main>
     </div>

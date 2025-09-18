@@ -1,7 +1,12 @@
-import type { InvitationRequestBody, MediaItem } from '@/types/invitation';
+import type {
+  InvitationRequestBody,
+  MediaItem,
+  InvitationApi,
+} from '@/types/invitation';
 import type { InviteForm } from '@/types/invite';
 import type { PlaceSectionValue } from '@/components/invitation/section/PlaceSection';
 import type { GallerySectionValue } from '@/components/invitation/section/GallerySection';
+import type { InvitationData } from '@/types/invitationGet';
 
 type MediaArg = {
   mainMedia?: MediaItem | null;
@@ -15,6 +20,7 @@ type GalleryItem = string | { key?: string; contentType?: string };
 function asDict(v: unknown): Dict {
   return v && typeof v === 'object' ? (v as Dict) : {};
 }
+
 function asGalleryArr(v: unknown): GalleryItem[] {
   if (!Array.isArray(v)) return [];
   return v.filter(
@@ -22,6 +28,7 @@ function asGalleryArr(v: unknown): GalleryItem[] {
       typeof x === 'string' || (x && typeof x === 'object'),
   );
 }
+
 export function toInvitationPayload(
   form: InviteForm,
   place: PlaceSectionValue,
@@ -140,4 +147,46 @@ export function toInvitationPayload(
   if (media?.ticketMedia) payload.ticketMedia = media.ticketMedia;
 
   return payload;
+}
+
+type InvitationExtras = Partial<
+  Pick<InvitationApi['data'], 'ending' | 'account' | 'background'>
+>;
+type PlaceExtras = Partial<{ location: string; lat: number; lng: number }>;
+type InvitationDataCompat = InvitationData &
+  InvitationExtras & {
+    marriagePlace: InvitationData['marriagePlace'] & PlaceExtras;
+  };
+
+export function toInvitationApiData(
+  d: InvitationDataCompat,
+): InvitationApi['data'] {
+  const { ending = '', account = '', background = '' } = d;
+  const { vendorName, floorAndHall, drawSketchMap, location, lat, lng } =
+    d.marriagePlace;
+
+  return {
+    id: d.id,
+    memberId: d.memberId,
+    ending,
+    account,
+    background,
+    theme: d.theme,
+    basicInformation: d.basicInformation,
+    greetings: d.greetings,
+    marriageDate: d.marriageDate,
+    marriagePlace: {
+      vendorName,
+      floorAndHall,
+      drawSketchMap,
+      address: location,
+      lat,
+      lng,
+    },
+    mainMediaUrl: d.mainMediaUrl,
+    filmMediaUrl: d.filmMediaUrl ?? [],
+    ticketMediaUrl: d.ticketMediaUrl,
+    mediaUrls: d.mediaUrls ?? [],
+    gallery: d.gallery,
+  };
 }

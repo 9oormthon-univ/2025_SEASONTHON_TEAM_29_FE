@@ -1,7 +1,6 @@
 'use client';
 
 import Header from '@/components/common/monocules/Header';
-import LineStepProgress from '@/components/invitation/LineStepProgress';
 import Step1 from '@/components/invitation/ThemaStep/Step1';
 import Step2 from '@/components/invitation/ThemaStep/Step2';
 import Step3 from '@/components/invitation/ThemaStep/Step3';
@@ -9,6 +8,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { useStagedInvitationMedia } from '@/hooks/useStagedInvitationMedia';
 import { useS3MultiUpload } from '@/hooks/useS3MultiUpload';
+import ProgressBar from '@/components/common/atomic/ProgressBar';
 
 export default function ThemaEditorPage() {
   const router = useRouter();
@@ -48,11 +48,7 @@ export default function ThemaEditorPage() {
     <div className="min-h-screen bg-white">
       <Header value="청첩장 제작" showBack onBack={handleBack}>
         <div className="px-4">
-          <LineStepProgress
-            step={step}
-            total={3}
-            className="mx-auto mt-[-2px]"
-          />
+          <ProgressBar step={step} total={3} className="mx-auto mt-[-2px]" />
         </div>
       </Header>
 
