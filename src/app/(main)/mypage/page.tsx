@@ -31,8 +31,8 @@ export default function Page() {
   const router = useRouter();
 
   const profileTarget = useMemo(
-    () => resolveWeddingTarget(profile?.weddingDay) ?? '2026-05-10',
-    [profile?.weddingDay],
+    () => resolveWeddingTarget(profile?.weddingDday) ?? '',
+    [profile?.weddingDday],
   );
 
   return (

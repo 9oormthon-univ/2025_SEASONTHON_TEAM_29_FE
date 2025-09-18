@@ -2,7 +2,7 @@
 export type MyProfile = {
   name?: string;
   type?: 'BRIDE' | 'GROOM';
-  weddingDay?: number | string; // D-offset or YYYY-MM-DD
+  weddingDday?: number | string; // D-offset or YYYY-MM-DD
   partnerName?: string;
   coupled?: boolean;
 };
