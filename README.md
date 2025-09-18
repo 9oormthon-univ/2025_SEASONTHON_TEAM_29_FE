@@ -141,3 +141,25 @@ src/
 ├─ types/              # 타입 정의 (Auth, Vendor, Tour, Review 등)
 ├─ data/               # 정적/샘플 데이터 (홈, 에디토리얼 등)
 └─ utills/cn.ts        # className 유틸 함수
+```
+---
+
+## 👥 팀원
+
+### **Frontend 개발팀**
+
+| 이름      | 역할 | GitHub                                         | 담당 업무                  |
+|---------|------|------------------------------------------------|------------------------|
+| **김정훈** | Frontend Lead | [@Jeong011010](https://github.com/jeong011010)   | 아키텍처 및 디렉터리 구조 설계, 상태관리 & 품질, UI구현, API 연동 |
+| **박수민** | Frontend Developer | [@psm1st](https://github.com/psm1st) | UI디자인, 청첩장 구현, 공통 컴포넌트 제작 |
+
+---
+
+<div align="center">
+
+**🎉 Wedit과 함께 완벽한 웨딩을 준비하세요! 🎉**
+
+[![Website](https://img.shields.io/badge/Website-wedit.me-blue?style=for-the-badge)](https://wedit.me)
+[![API Documentation](https://img.shields.io/badge/API%20Docs-Swagger-green?style=for-the-badge)](https://wedit.me/api/swagger-ui.html)
+
+</div>
