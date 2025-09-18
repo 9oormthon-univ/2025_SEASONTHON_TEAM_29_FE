@@ -21,6 +21,7 @@ export default function InvitePreviewBox({
             fill
             sizes="160px"
             className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full bg-gray-100" />
