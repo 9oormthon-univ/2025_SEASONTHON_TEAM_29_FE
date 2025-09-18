@@ -1,7 +1,6 @@
-// src/app/(public)/(auth)/social/page.tsx
 'use client';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Button from '@/components/common/atomic/Button';
 import ProgressBar from '@/components/common/atomic/ProgressBar';
@@ -12,9 +11,11 @@ import { InputWithButton } from '@/components/forms/InputWithButton';
 import { PillRadio } from '@/components/forms/PillRadio';
 import SmsCodeField from '@/components/forms/SmsCodeField';
 
+import Header from '@/components/common/monocules/Header';
 import * as api from '@/services/auth.api';
 import type { SocialSignupPayload } from '@/types/auth';
-import Header from '@/components/common/monocules/Header';
+
+const MAX_SMS_PER_DAY = 5;
 
 export default function SocialSignupPage() {
   const router = useRouter();
@@ -30,6 +31,7 @@ export default function SocialSignupPage() {
   const [codeRequested, setCodeRequested] = useState(false);
   const [resendKey, setResendKey] = useState(0);
   const [codeVerified, setCodeVerified] = useState(false);
+  const [smsCount, setSmsCount] = useState(0);
 
   // ui
   const [loading, setLoading] = useState(false);
@@ -43,6 +45,8 @@ export default function SocialSignupPage() {
       birth.replace(/\s/g, ''),
     );
   const isValidWedding = isValidYMD(wedding);
+
+  const smsRemaining = Math.max(0, MAX_SMS_PER_DAY - smsCount);
   const canSubmit =
     isValidPhone &&
     codeVerified &&
@@ -50,6 +54,31 @@ export default function SocialSignupPage() {
     isValidWedding &&
     !!role &&
     !loading;
+
+  // utils
+  function getTodayCount() {
+    if (typeof window === 'undefined') return 0;
+    const today = new Date().toDateString();
+    const storedDay = localStorage.getItem('smsDay');
+    let todayCount = Number(localStorage.getItem('smsCount') || '0');
+
+    if (storedDay !== today) {
+      todayCount = 0;
+      localStorage.setItem('smsDay', today);
+      localStorage.setItem('smsCount', '0');
+    }
+    return todayCount;
+  }
+
+  function canSendSms(): { ok: boolean; reason?: string } {
+    if (typeof window === 'undefined') {
+      return { ok: false, reason: '클라이언트 환경에서만 가능합니다.' };
+    }
+    if (smsCount >= MAX_SMS_PER_DAY) {
+      return { ok: false, reason: '오늘은 더 이상 인증번호를 보낼 수 없습니다.' };
+    }
+    return { ok: true };
+  }
 
   // actions
   const prev = () => {
@@ -59,11 +88,27 @@ export default function SocialSignupPage() {
 
   async function sendSms() {
     if (!isValidPhone || sendingCode) return;
+    if (!canSendSms().ok) return;
     setSendingCode(true);
     try {
       await api.sendSms(phoneDigits);
       setCodeRequested(true);
       setCodeVerified(false);
+
+      if (typeof window !== 'undefined') {
+        const today = new Date().toDateString();
+        const prevDay = localStorage.getItem('smsDay');
+        let todayCount = Number(localStorage.getItem('smsCount') || '0');
+
+        if (today !== prevDay) {
+          todayCount = 0;
+          localStorage.setItem('smsDay', today);
+        }
+
+        todayCount += 1;
+        localStorage.setItem('smsCount', String(todayCount));
+        setSmsCount(todayCount);
+      }
     } catch (e) {
       setErr(e instanceof Error ? e.message : '인증번호 전송 실패');
     } finally {
@@ -112,10 +157,15 @@ export default function SocialSignupPage() {
     }
   }
 
+  // ✅ mount 시 localStorage에서 횟수 불러오기
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setSmsCount(getTodayCount());
+    }
+  }, []);
+
   return (
-    // ✅ SignupWizard와 동일: 루트는 flex 컬럼 + min-h-dvh
     <main className="flex min-h-dvh flex-col">
-      {/* Header (완전 동일) */}
       <Header
         value="회원가입"
         showBack
@@ -126,27 +176,20 @@ export default function SocialSignupPage() {
         <ProgressBar value={1} max={1} size="xs" className="w-full" />
       </Header>
 
-      {/* Body (컨텐츠 박스 폭/여백/스크롤 영역 동일) */}
       <div className="flex-1 overflow-hidden mx-5.5">
         <div className="pt-6">
-          <p className="text-sm text-text-default font-medium">
-            이제 다 끝났어요!
-          </p>
-          <h2 className="mt-1 text-2xl font-extrabold">
-            추가정보를 입력해주세요.
-          </h2>
+          <p className="text-sm text-text-default font-medium">이제 다 끝났어요!</p>
+          <h2 className="mt-1 text-2xl font-extrabold">추가정보를 입력해주세요.</h2>
 
           {/* 생년월일 */}
           <Field label="생년월일" htmlFor="birth" className="mt-4">
             <DateInput raw={birth} onRawChange={setBirth} />
             {!!birth && !isValidBirth && (
-              <FieldHint tone="error">
-                YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.
-              </FieldHint>
+              <FieldHint tone="error">YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.</FieldHint>
             )}
           </Field>
 
-          {/* 전화번호 + 인증 버튼 */}
+          {/* 전화번호 */}
           <Field label="전화번호" htmlFor="phone" className="mt-4">
             <InputWithButton
               inputProps={{
@@ -157,25 +200,25 @@ export default function SocialSignupPage() {
                 onChange: (e) => setPhone(e.target.value),
               }}
               buttonText={
-                codeRequested
-                  ? sendingCode
-                    ? '전송중…'
-                    : '재전송'
-                  : sendingCode
-                    ? '전송중…'
-                    : '인증번호'
+                sendingCode
+                  ? '전송중…'
+                  : canSendSms().ok
+                  ? codeRequested ? '재전송' : '인증번호'
+                  : '오늘 횟수 초과'
               }
               onButtonClick={async () => {
                 const was = codeRequested;
                 await sendSms();
                 if (was) setResendKey((k) => k + 1);
               }}
-              disabled={!isValidPhone || sendingCode}
+              disabled={!isValidPhone || sendingCode || !canSendSms().ok}
               invalid={!!phone && !isValidPhone}
             />
+            <div className="mt-1 text-xs text-text-secondary">
+              오늘 남은 인증 횟수: {smsRemaining}회
+            </div>
           </Field>
 
-          {/* 인증번호 입력 */}
           {codeRequested && (
             <SmsCodeField key={resendKey} onVerify={verifySms} seconds={300} />
           )}
@@ -184,13 +227,11 @@ export default function SocialSignupPage() {
           <Field label="결혼예정일" htmlFor="wedding" className="mt-4">
             <DateInput raw={wedding} onRawChange={setWedding} />
             {!!wedding && !isValidWedding && (
-              <FieldHint tone="error">
-                YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.
-              </FieldHint>
+              <FieldHint tone="error">YYYY / MM / DD 형식의 유효한 날짜를 입력해주세요.</FieldHint>
             )}
           </Field>
 
-          {/* 역할 선택 */}
+          {/* 역할 */}
           <Field label="부부 형태" className="mt-4">
             <PillRadio
               options={[
@@ -206,7 +247,6 @@ export default function SocialSignupPage() {
         </div>
       </div>
 
-      {/* Footer (완전 동일) */}
       <div className="sticky bottom-0 bg-white/70 px-4 pb-[calc(env(safe-area-inset-bottom))] pt-3 mb-20 backdrop-blur">
         <Button
           size="md"
