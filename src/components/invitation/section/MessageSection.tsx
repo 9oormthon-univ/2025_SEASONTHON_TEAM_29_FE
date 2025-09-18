@@ -24,7 +24,7 @@ const PLACEHOLDER_BODY = `시간을 돌릴 수 있다면, 우리는 언제나 �
 
 export default function MessageSection({
   className,
-  title,
+  title = '인사말',
   defaultOpen,
   value,
   onChange,

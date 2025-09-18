@@ -8,13 +8,14 @@ import SummaryCard from '@/components/calendar/SummaryCard';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import Header from '@/components/common/monocules/Header';
 import { useCalendarRange } from '@/hooks/useCalendarRange';
-import { dday, toYMD } from '@/lib/calendar';
+import { useMyProfile } from '@/hooks/useMyProfile';
+import { toYMD } from '@/lib/calendar';
+import { formatDDayLabel, getDDay } from '@/lib/dday';
+import { resolveWeddingTarget } from '@/services/mypage.api';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 
 type Mode = 'schedule' | 'event';
-
-const WEDDING_YMD = '2025-12-31';
 
 export default function CalendarPage() {
   const [base, setBase] = useState<Date>(new Date());
@@ -26,7 +27,13 @@ export default function CalendarPage() {
     mode === 'schedule' ? 'USER' : 'ADMIN',
   );
 
-  const d = dday(WEDDING_YMD);
+  const { data: profile } = useMyProfile();
+  console.log(profile);
+  const weddingTarget = resolveWeddingTarget(profile?.weddingDday);
+  console.log(weddingTarget);
+  const d = getDDay(weddingTarget ?? '');
+  console.log(d);
+  const dLabel = formatDDayLabel(d);
   const openDay = (date: Date) => setActiveYmd(toYMD(date));
 
   // 현재 달 기준 시트
@@ -70,7 +77,7 @@ export default function CalendarPage() {
         <div className="flex items-center gap-2">
           <SvgObject src="/icons/MyRing.svg" width={32} height={37} />
           <p className="text-[20px] font-medium">
-            결혼까지 <span className="text-primary-500">D-{d}</span>
+            결혼까지 <span className="text-primary-500">{dLabel}</span>
           </p>
         </div>
         <p className="mt-1 !text-sm text-gray-500">

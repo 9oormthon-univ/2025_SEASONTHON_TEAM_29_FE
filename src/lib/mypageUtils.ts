@@ -6,6 +6,7 @@ import type { MyProfile, MyReservation, ReservationApiItem, ReviewCompany } from
 
 export async function fetchMyProfile(): Promise<MyProfile | null> {
   const res = await http<ApiEnvelope<MyProfile>>('/v1/member/mypage', { method: 'GET' });
+  console.log(res);
   return res?.data ?? null;
 }
 
