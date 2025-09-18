@@ -1,7 +1,6 @@
 'use client';
 
 import Header from '@/components/common/monocules/Header';
-import LineStepProgress from '@/components/invitation/LineStepProgress';
 import Step1 from '@/components/invitation/ThemaStep/Step1';
 import Step2 from '@/components/invitation/ThemaStep/Step2';
 import Step3 from '@/components/invitation/ThemaStep/Step3';

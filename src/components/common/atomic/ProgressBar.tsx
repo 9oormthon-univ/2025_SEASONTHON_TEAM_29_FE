@@ -28,7 +28,7 @@ export type ProgressBarProps = (ValueModeProps | StepModeProps) & {
 };
 
 function isStepMode(p: ProgressBarProps): p is StepModeProps {
-  return typeof (p as any).step === 'number';
+  return 'step' in p;
 }
 
 export default function ProgressBar(props: ProgressBarProps) {
