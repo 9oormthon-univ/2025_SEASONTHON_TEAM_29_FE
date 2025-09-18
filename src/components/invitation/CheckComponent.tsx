@@ -18,7 +18,6 @@ export default function CheckComponent({
   srcChecked = '/icons/check.png',
   srcUnchecked = '/icons/CheckGray.png',
   alt,
-  unoptimized = true,
 }: CheckIconProps) {
   const src = selected ? srcChecked : srcUnchecked;
   const fallbackAlt = selected ? '선택됨' : '선택 안 됨';

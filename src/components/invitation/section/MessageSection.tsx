@@ -19,17 +19,17 @@ type Props = {
   onChange: (next: MessageSectionValue) => void;
 };
 
-const DEFAULT_TITLE = '소중한 분들을 초대합니다.';
-const DEFAULT_BODY = `시간을 돌릴 수 있다면, 우리는 언제나 다시 서로를 선택할 것입니다. 함께하는 오늘이 늘 가장 특별한 날이 되도록, 이제 부부로서 평생의 시간을 함께하고자 합니다. 저희 두 사람의 첫걸음을 축복해 주시면 큰 기쁨이 되겠습니다.`;
+const PLACEHOLDER_TITLE = '소중한 분들을 초대합니다.';
+const PLACEHOLDER_BODY = `시간을 돌릴 수 있다면, 우리는 언제나 다시 서로를 선택할 것입니다. 함께하는 오늘이 늘 가장 특별한 날이 되도록, 이제 부부로서 평생의 시간을 함께하고자 합니다. 저희 두 사람의 첫걸음을 축복해 주시면 큰 기쁨이 되겠습니다.`;
 
 export default function MessageSection({
   className,
-  title = '인사말',
-  defaultOpen = true,
+  title,
+  defaultOpen,
   value,
   onChange,
 }: Props) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(Boolean(defaultOpen));
   const sectionId = useId();
   const headerId = `${sectionId}-header`;
   const panelId = `${sectionId}-panel`;
@@ -60,7 +60,7 @@ export default function MessageSection({
         className="w-full h-[52px] px-4 py-0 inline-flex items-center justify-between"
       >
         <span className="text-text--default text-sm font-semibold leading-normal">
-          {title}
+          {title ?? ''}
         </span>
         <SvgObject
           src="/icons/down.svg"
@@ -80,7 +80,7 @@ export default function MessageSection({
           <div className="px-4 pt-3 pb-4">
             <FieldRow label="제목" className="mt-1">
               <BoxInput
-                placeholder={DEFAULT_TITLE}
+                placeholder={PLACEHOLDER_TITLE}
                 value={value.title}
                 onChange={(s) => patch('title', s)}
                 className="w-full max-w-[240px]"
@@ -89,7 +89,7 @@ export default function MessageSection({
 
             <FieldRow label="내용" className="mt-4">
               <BoxTextarea
-                placeholder={DEFAULT_BODY}
+                placeholder={PLACEHOLDER_BODY}
                 value={value.body}
                 onChange={(s) => patch('body', s)}
                 className="w-full max-w-[240px]"
