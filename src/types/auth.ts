@@ -35,6 +35,8 @@ export type SignupWizardCtx = {
   isValidPhone: boolean;
   sendSms: () => Promise<void>;
   verifySms: (code: string) => Promise<boolean>;
+  canSendSms: () => { ok: boolean; reason?: string };
+  smsRemaining: number;
 
   isValidEmail: boolean;
   emailVerified: boolean;

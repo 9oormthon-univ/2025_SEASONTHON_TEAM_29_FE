@@ -23,7 +23,7 @@ export default function StepBasic(props: Props) {
     codeRequested,
     verifySms,
     sendSms,
-    flags, // { nameOk, birthOk, phoneOk }
+    flags,
   } = props;
 
   const touchedName = basic.name.length > 0;
@@ -72,7 +72,7 @@ export default function StepBasic(props: Props) {
           )}
         </Field>
 
-        {/* 전화번호 + 인증 버튼 */}
+        {/* 전화번호 */}
         <Field label="전화번호" htmlFor="phone" className="mt-4">
           <InputWithButton
             inputProps={{
@@ -83,22 +83,29 @@ export default function StepBasic(props: Props) {
               onChange: (e) => setBasicField('phone', e.target.value),
             }}
             buttonText={
-              codeRequested
-                ? sendingCode
-                  ? '전송중…'
-                  : '재전송'
-                : sendingCode
-                  ? '전송중…'
-                  : '인증번호'
+              sendingCode
+                ? '전송중…'
+                : props.canSendSms().ok
+                ? codeRequested ? '재전송' : '인증번호'
+                : '오늘 횟수 초과'
             }
             onButtonClick={async () => {
-              const wasRequested = codeRequested; // 재전송 여부 체크
-              await sendSms(); // 전송(성공 시 hook에서 codeRequested true 유지/설정)
-              if (wasRequested) setResendKey((k) => k + 1); // ✅ 재전송이면 입력칸/타이머 초기화
+              try {
+                await sendSms();
+                if (codeRequested) setResendKey((k) => k + 1);
+              } catch (e) {
+                alert(e instanceof Error ? e.message : '인증번호 전송 실패');
+              }
             }}
-            disabled={!isValidPhone || sendingCode}
+            disabled={!isValidPhone || sendingCode || !props.canSendSms().ok}
             invalid={touchedPhone && !isValidPhone}
           />
+
+          {/* ✅ 남은 횟수 안내 */}
+          <div className="mt-1 text-xs text-text-secondary">
+            오늘 남은 인증 횟수: {props.smsRemaining}회
+          </div>
+
           {touchedPhone && !isValidPhone && (
             <FieldHint tone="error">
               휴대전화 형식이 올바르지 않습니다. 예) 010-1234-5678
@@ -106,14 +113,12 @@ export default function StepBasic(props: Props) {
           )}
         </Field>
 
-        {/* 인증번호 입력 (key가 바뀌면 초기화) */}
+        {/* 인증번호 입력 */}
         {codeRequested && (
           <SmsCodeField
             key={resendKey}
             onVerify={verifySms}
-            onExpire={() => {
-              console.log('만료됨');
-            }}
+            onExpire={() => console.log('만료됨')}
             seconds={300}
           />
         )}
