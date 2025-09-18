@@ -2,6 +2,8 @@ import type { InvitationRequestBody, MediaItem } from '@/types/invitation';
 import type { InviteForm } from '@/types/invite';
 import type { PlaceSectionValue } from '@/components/invitation/section/PlaceSection';
 import type { GallerySectionValue } from '@/components/invitation/section/GallerySection';
+import type { InvitationData } from '@/types/invitationGet';
+import type { InvitationApi } from '@/types/invitation';
 
 type MediaArg = {
   mainMedia?: MediaItem | null;
@@ -140,4 +142,29 @@ export function toInvitationPayload(
   if (media?.ticketMedia) payload.ticketMedia = media.ticketMedia;
 
   return payload;
+}
+export function toInvitationApiData(d: InvitationData): InvitationApi['data'] {
+  return {
+    id: d.id,
+    memberId: d.memberId,
+    ending: (d as any).ending ?? '', // 응답에 없으면 기본값
+    account: (d as any).account ?? '',
+    background: (d as any).background ?? '',
+    theme: d.theme,
+    basicInformation: d.basicInformation,
+    greetings: d.greetings,
+    marriageDate: d.marriageDate,
+    marriagePlace: {
+      vendorName: d.marriagePlace.vendorName,
+      floorAndHall: d.marriagePlace.floorAndHall,
+      drawSketchMap: d.marriagePlace.drawSketchMap,
+      address: d.marriagePlace.location ?? undefined, // ✅ 위치 문자열을 address로
+      // lat/lng은 서버가 주면 여기서 추가
+    },
+    mainMediaUrl: d.mainMediaUrl,
+    filmMediaUrl: d.filmMediaUrl ?? [],
+    ticketMediaUrl: d.ticketMediaUrl,
+    mediaUrls: d.mediaUrls ?? [],
+    gallery: d.gallery,
+  };
 }
