@@ -1,13 +1,24 @@
 'use client';
 
-import * as React from 'react';
 import clsx from 'clsx';
 
 type BarSize = 'xs' | 'sm' | 'md' | 'lg';
 
-export type ProgressBarProps = {
+type ValueModeProps = {
   value: number;
   max?: number;
+  step?: never;
+  total?: never;
+};
+
+type StepModeProps = {
+  step: number;
+  total: number;
+  value?: never;
+  max?: never;
+};
+
+export type ProgressBarProps = (ValueModeProps | StepModeProps) & {
   size?: BarSize;
   className?: string;
   trackClassName?: string;
@@ -16,18 +27,37 @@ export type ProgressBarProps = {
   ariaLabel?: string;
 };
 
-export default function ProgressBar({
-  value,
-  max = 100,
-  size = 'sm',
-  className = 'w-80',
-  trackClassName,
-  indicatorClassName,
-  rounded = true,
-  ariaLabel,
-}: ProgressBarProps) {
-  const clamped = Math.max(0, Math.min(value, max));
-  const pct = max === 0 ? 0 : (clamped / max) * 100;
+function isStepMode(p: ProgressBarProps): p is StepModeProps {
+  return typeof (p as any).step === 'number';
+}
+
+export default function ProgressBar(props: ProgressBarProps) {
+  const {
+    size = 'sm',
+    className = 'w-80',
+    trackClassName,
+    indicatorClassName,
+    rounded = true,
+    ariaLabel,
+  } = props;
+
+  let pct = 0;
+  let ariaMax = 100;
+  let ariaNow = 0;
+
+  if (isStepMode(props)) {
+    const total: number = Math.max(0, props.total);
+    const step: number = Math.max(0, Math.min(props.step, total));
+    ariaMax = total;
+    ariaNow = step;
+    pct = total > 0 ? (step / total) * 100 : 0;
+  } else {
+    const max: number = Math.max(0, props.max ?? 100);
+    const value: number = Math.max(0, Math.min(props.value, max));
+    ariaMax = max;
+    ariaNow = value;
+    pct = max > 0 ? (value / max) * 100 : 0;
+  }
 
   const height =
     size === 'xs'
@@ -43,8 +73,8 @@ export default function ProgressBar({
       role="progressbar"
       aria-label={ariaLabel}
       aria-valuemin={0}
-      aria-valuemax={max}
-      aria-valuenow={Math.round(pct)}
+      aria-valuemax={ariaMax}
+      aria-valuenow={ariaNow}
       className={clsx('relative overflow-hidden', height, className)}
     >
       <div

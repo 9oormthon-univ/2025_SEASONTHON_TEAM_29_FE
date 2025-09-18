@@ -87,14 +87,23 @@ export default function Invitation() {
         </Reveal>
 
         <Reveal delay={60}>
-          <div className="px-6">
+          <div className="mt-5 px-6">
             <MainImage src={mainMediaUrl} />
           </div>
+        </Reveal>
+        <Reveal delay={60}>
+          <SvgObject
+            className="mt-10 ml-10"
+            src="/InvitationComent.svg"
+            alt="Invitation Comment"
+            width={300}
+            height={150}
+          />
         </Reveal>
 
         <Reveal delay={120}>
           <FilmImage
-            className="mt-6 -ml-35"
+            className="mt-3 -ml-35"
             photos={[
               filmMediaUrl[0] ?? null,
               filmMediaUrl[1] ?? null,
@@ -105,7 +114,7 @@ export default function Invitation() {
 
         <Reveal delay={180}>
           <InvitationMessage
-            className="mt-10"
+            className="mt-15"
             title={g.greetingsTitle}
             message={g.greetingsContent}
           />
@@ -113,7 +122,7 @@ export default function Invitation() {
 
         <Reveal delay={240}>
           <InvitationCast
-            className="mt-14 px-6"
+            className="mt-25 px-6"
             groomName={groomName}
             brideName={brideName}
             groomFatherName={b.groomFatherName}
@@ -124,10 +133,10 @@ export default function Invitation() {
         </Reveal>
 
         <Reveal delay={320} effect="fade">
-          <div className="mt-14 flex items-center justify-center">
+          <div className="mt-12 flex items-center justify-center">
             <SvgObject src="/Date.svg" alt="Date" width={160} height={80} />
           </div>
-          <div className="mt-4 flex items-center justify-center">
+          <div className="mt-12 flex items-center justify-center">
             <TicketImage
               imageUrl={ticketMediaUrl || null}
               dayText={dayText}
@@ -141,7 +150,7 @@ export default function Invitation() {
 
         <Reveal delay={360}>
           <Location
-            className="mt-14"
+            className="mt-33"
             vendorTitle={mp.vendorName}
             floor={mp.floorAndHall}
             address={address}
@@ -151,7 +160,7 @@ export default function Invitation() {
         </Reveal>
 
         <Reveal delay={420}>
-          <Gallery className="mt-14" images={mediaUrls} showHint />
+          <Gallery className="mt-30" images={mediaUrls} showHint />
         </Reveal>
       </main>
     </div>
