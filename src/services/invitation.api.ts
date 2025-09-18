@@ -2,6 +2,7 @@ import type { InvitationRequestBody } from '@/types/invitation';
 import { tokenStore } from '@/lib/tokenStore';
 const BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
 import type { InvitationResponse, InvitationData } from '@/types/invitationGet';
+import type { MyInvitationResponse } from '@/types/myInvitation';
 export type CreateInvitationResponse = ApiResponse<{ id: number }>;
 //청첩장 생성
 export async function createInvitation(
@@ -63,4 +64,26 @@ export interface ApiResponse<T> {
   success: boolean;
   message: string;
   data: T;
+}
+
+//mypage 청첩장 조회
+export async function getMyInvitation(options?: {
+  signal?: AbortSignal;
+}): Promise<MyInvitationResponse> {
+  const token = tokenStore.get();
+  const headers = new Headers({ Accept: 'application/json' });
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+
+  const res = await fetch(`${BASE}/v1/invitation/myPage`, {
+    method: 'GET',
+    headers,
+    credentials: 'include',
+    signal: options?.signal,
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(text || `Failed to fetch my invitation (${res.status})`);
+  }
+  return res.json() as Promise<MyInvitationResponse>;
 }
