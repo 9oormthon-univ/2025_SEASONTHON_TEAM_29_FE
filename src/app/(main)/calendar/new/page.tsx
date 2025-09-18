@@ -7,7 +7,7 @@ import Header from '@/components/common/monocules/Header';
 import { createCalendarEvent } from '@/services/calendar.api';
 import clsx from 'clsx';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 type StickerKey = keyof typeof STICKER_SRC;
@@ -19,8 +19,6 @@ const ICON_CFG: Record<
   INVITATION: {
     w: 60,
     h: 62,
-    className:
-      'origin-top-left rotate-[-30.22deg] -translate-x-4 translate-y-7',
   },
   STUDIO: { w: 50, h: 46 },
   WEDDING_HALL: { w: 46, h: 46, className: 'translate-y-0.5' },
@@ -32,6 +30,7 @@ const ICON_CFG: Record<
 
 export default function CalendarNewPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [title, setTitle] = useState('');
   const [titleStarted, setTitleStarted] = useState(false);
   const [memo, setMemo] = useState('');
@@ -39,6 +38,32 @@ export default function CalendarNewPage() {
   const [loading, setLoading] = useState(false);
 
   const disabled = !title.trim() || !sticker;
+
+  // ?date=2025-09-18 이런 형태로 들어온 값 읽기
+  const dateParam = searchParams.get('date');
+  // 없으면 오늘 날짜
+  const targetDate = dateParam ? new Date(dateParam) : new Date();
+
+  // ISO string (자정 기준 allDay 이벤트)
+  const startDateTime = new Date(
+    targetDate.getFullYear(),
+    targetDate.getMonth(),
+    targetDate.getDate(),
+    23,
+    0,
+    0,
+    0,
+  ).toISOString();
+
+  const endDateTime = new Date(
+    targetDate.getFullYear(),
+    targetDate.getMonth(),
+    targetDate.getDate(),
+    23,
+    59,
+    59,
+    999,
+  ).toISOString();
 
   const stickers: StickerKey[] = useMemo(
     () => [
@@ -62,8 +87,8 @@ export default function CalendarNewPage() {
         title,
         description: memo,
         eventCategory: sticker.toUpperCase(),
-        startDateTime: new Date().toISOString(),
-        endDateTime: new Date().toISOString(),
+        startDateTime,
+        endDateTime,
         isAllDay: true,
       });
       router.back();
@@ -107,7 +132,7 @@ export default function CalendarNewPage() {
         <div className="mt-5 grid grid-cols-4 gap-2">
           {stickers.map((key) => {
             const active = sticker === key;
-            const { w, h, className } = ICON_CFG[key];
+            const { w, h, className: iconClass } = ICON_CFG[key];
             return (
               <button
                 key={key}
@@ -129,7 +154,7 @@ export default function CalendarNewPage() {
                     width={w}
                     height={h}
                     draggable={false}
-                    className={clsx('pointer-events-none', className)}
+                    className={clsx('block object-contain', iconClass)}
                   />
                 </span>
               </button>
@@ -142,7 +167,7 @@ export default function CalendarNewPage() {
           className={clsx(
             'mt-50 h-12 w-full rounded-2xl text-[15px] font-semibold transition',
             disabled || loading
-              ? 'bg-primary-200/40 text-rose-300 cursor-not-allowed'
+              ? 'bg-primary-200 text-primary-300 cursor-not-allowed'
               : 'bg-primary-500 text-white active:scale-[0.98]',
           )}
         >

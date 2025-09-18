@@ -74,7 +74,15 @@ export default function InvitationFromData({
             <MainImage src={mainMediaUrl} />
           </div>
         </Reveal>
-
+        <Reveal delay={60}>
+          <SvgObject
+            className="mt-10 ml-10"
+            src="/InvitationComent.svg"
+            alt="Invitation Comment"
+            width={300}
+            height={150}
+          />
+        </Reveal>
         <Reveal delay={120}>
           <FilmImage
             className="mt-6 -ml-35"

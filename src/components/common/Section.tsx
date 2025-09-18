@@ -39,7 +39,7 @@ export default function Section({
         <div className="mx-auto w-full" style={{ maxWidth: CONTAINER_MAX }}>
           {/* 타이틀: 컨테이너 안에 그대로 */}
           <div
-            className="relative mb-2 flex items-center justify-between"
+            className="relative mb-4 flex items-center justify-between"
             style={{ paddingLeft: 0, paddingRight: 0 }}
           >
             <h2 className={`${titleCls} truncate`}>{title}</h2>

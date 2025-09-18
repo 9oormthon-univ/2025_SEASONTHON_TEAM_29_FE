@@ -1,4 +1,3 @@
-// src/app/(main)/mypage/connection/page.tsx
 'use client';
 
 import Button from '@/components/common/atomic/Button';
@@ -8,14 +7,15 @@ import { connectCouple, generateCoupleCode } from '@/services/couple.api';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
-type Props = {
-  onComplete?: () => void;
-};
+type Props = { onComplete?: () => void };
 
 const getErrorMessage = (e: unknown) =>
-  e instanceof Error ? e.message : typeof e === 'string' ? e : '알 수 없는 오류가 발생했어요.';
+  e instanceof Error
+    ? e.message
+    : typeof e === 'string'
+      ? e
+      : '알 수 없는 오류가 발생했어요.';
 
-/** 실제 화면 컴포넌트(기본 내보내기 아님) */
 function CoupleLinkingView({ onComplete }: Props) {
   const [myCode, setMyCode] = React.useState('');
   const [partnerCode, setPartnerCode] = React.useState('');
@@ -25,6 +25,7 @@ function CoupleLinkingView({ onComplete }: Props) {
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
   const bottomDisabled = !isConnected;
+  const router = useRouter();
 
   const handleGenerate = async () => {
     try {
@@ -51,18 +52,15 @@ function CoupleLinkingView({ onComplete }: Props) {
       setLoadingConn(false);
     }
   };
-  const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-background flex justify-center">
+    <main className="min-h-screen bg-background pb-24">
+      <Header showBack onBack={() => router.push('/mypage')} value="계정연동" />
       <div className="w-96 px-6 py-5 space-y-8 pb-28">
-        <Header 
-        showBack
-        onBack={()=>router.push('/mypage')}
-        value="계정연동" />
-
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-text--default">코드번호 생성</h2>
+          <h2 className="text-sm font-medium text-text--default">
+            코드번호 생성
+          </h2>
           <Input
             value={myCode}
             readOnly
@@ -79,7 +77,9 @@ function CoupleLinkingView({ onComplete }: Props) {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-text--default">배우자 코드 입력</h2>
+          <h2 className="text-sm font-medium text-text--default">
+            배우자 코드 입력
+          </h2>
           <Input
             value={partnerCode}
             onChange={(e) => setPartnerCode(e.currentTarget.value)}
@@ -93,14 +93,18 @@ function CoupleLinkingView({ onComplete }: Props) {
             onBadgeClick={handleConnect}
             badgeDisabled={loadingConn || !partnerCode.trim()}
           />
-          {isConnected && <p className="text-xs text-primary-500">커플 연동이 완료되었어요.</p>}
+          {isConnected && (
+            <p className="text-xs text-primary-500">
+              커플 연동이 완료되었어요.
+            </p>
+          )}
         </section>
 
         {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
       </div>
 
       <div className="fixed bottom-6 left-0 right-0 flex justify-center">
-        <div className="w-96 px-6">
+        <div className="w-96 px-6 pb-8">
           <Button
             size="lg"
             state={bottomDisabled ? 'inactive' : 'default'}
@@ -112,11 +116,10 @@ function CoupleLinkingView({ onComplete }: Props) {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 
-/** ✅ page.tsx의 기본 내보내기는 props를 받지 않는 래퍼여야 함 */
 export default function Page() {
   const router = useRouter();
   return <CoupleLinkingView onComplete={() => router.push('/mypage')} />;

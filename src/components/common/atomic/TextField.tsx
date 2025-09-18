@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
 import clsx from 'clsx';
+import * as React from 'react';
 
 export type TextFieldProps = {
   value?: string;
@@ -65,7 +65,7 @@ export default function TextField({
         maxLength={maxLength}
         className={clsx(
           'h-full w-full resize-none bg-transparent outline-none',
-          'text-sm leading-normal',
+          'text-xs leading-snug',
           'text-text-secondary placeholder:text-text-tertiary',
           textareaClassName,
         )}

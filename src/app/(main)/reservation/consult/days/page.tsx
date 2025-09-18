@@ -96,7 +96,7 @@ export default function ConsultDaysPage() {
       active={!!selectedDay}
       onPrimary={handleNext}
     >
-      <div className="mb-2 text-base font-medium text-text--default">{label}</div>
+      <div className="mb-13 text-base font-medium text-text--default">{label}</div>
 
       {loading && (
         <div className="mb-2 text-sm text-text--secondary">

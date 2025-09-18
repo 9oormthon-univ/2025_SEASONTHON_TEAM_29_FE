@@ -19,12 +19,12 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
   const cells = daysMatrix5(monthBase);
 
   return (
-    <div className="grid grid-cols-7 gap-[9px]">
+    <div className="grid grid-cols-7 gap-y-[3px]">
       {WEEK_LABELS.map((w, idx) => (
         <div key={w} className="flex justify-center">
           <div
             className={clsx(
-              'w-10 h-7 flex items-center justify-center text-[11px] font-medium leading-none',
+              'w-10 h-4 flex items-center justify-center text-[15px] font-medium leading-none',
               idx === 0 ? 'text-[#E32727]' : 'text-text--secondary',
             )}
           >
@@ -54,7 +54,7 @@ export default function MonthGrid({ monthBase, byDate, onPickDay }: Props) {
               <div
                 className={clsx(
                   'h-7 w-full flex items-center justify-center text-center',
-                  'text-xs font-medium leading-none',
+                  'text-[15px] font-medium leading-none',
                   isPrevNext && 'opacity-40',
                   isSun ? 'text-[#E32727]' : 'text-text--default',
                 )}

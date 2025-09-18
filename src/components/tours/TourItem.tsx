@@ -36,15 +36,18 @@ export default function TourItem({ name, logo, status, onClick, withLogo = true 
         {/* 로고 (옵션) */}
         {withLogo && (
           logo ? (
-            <Image
-              src={logo}
-              alt={name}
-              width={56}
-              height={56}
-              className="h-[50px] w-[50px] rounded-2xl object-cover ring-1 ring-gray-100"
-              priority={false}
-              unoptimized
-            />
+            <div className="relative size-12 shrink-0 overflow-hidden rounded-md border border-gray-200">
+              <Image
+                src={logo}
+                alt={name}
+                fill
+                className="object-contain"
+                sizes="40px"
+                draggable={false}
+                unoptimized
+              />
+            </div>
+
           ) : (
             <div
               className="h-[50px] w-[50px] rounded-2xl bg-gray-100 ring-1 ring-gray-100"
@@ -60,7 +63,7 @@ export default function TourItem({ name, logo, status, onClick, withLogo = true 
               {name}
             </p>
             {status && 
-              <span className={`rounded-lg px-3 py-1 text-xs ${badgeClass}`}>
+              <span className={`rounded-lg px-2 py-1 text-xs ${badgeClass}`}>
                 {status}
               </span>
             }

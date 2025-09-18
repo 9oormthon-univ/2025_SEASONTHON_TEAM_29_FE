@@ -1,10 +1,10 @@
 'use client';
 
-import clsx from 'clsx';
-import Image from 'next/image';
-import { useEffect, useRef, useState, useCallback } from 'react';
 import SvgObject from '@/components/common/atomic/SvgObject';
 import { tokenStore } from '@/lib/tokenStore';
+import clsx from 'clsx';
+import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type Domain = 'VENDOR' | 'REVIEW';
 
@@ -20,6 +20,7 @@ type Props = {
   concurrency?: number;
   acceptMimes?: string[];
   maxFileSize?: number;
+  onRemoveAt?: (index: number) => void;
 };
 
 type UploadReqItem = {
@@ -45,7 +46,7 @@ function useObjectURL(file?: File) {
   return url;
 }
 
-function Thumb({ file }: { file: File }) {
+function Thumb({ file, onRemove }: { file: File; onRemove?: () => void }) {
   const url = useObjectURL(file);
   return (
     <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-white ring-1 ring-black/10 shadow-sm">
@@ -58,6 +59,29 @@ function Thumb({ file }: { file: File }) {
           unoptimized
           sizes="80px"
         />
+      )}
+
+      {/* ✅ 우측 상단 X 버튼 */}
+      {onRemove && (
+        <button
+          type="button"
+          aria-label="사진 삭제"
+          onClick={onRemove}
+          className={clsx(
+            'absolute top-1 right-1 size-5 rounded-full',
+            'bg-neutral-200 text-neutral-700 hover:bg-neutral-300',
+            'flex items-center justify-center shadow ring-1 ring-black/10'
+          )}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
       )}
     </div>
   );
@@ -140,6 +164,7 @@ export default function PhotoCard({
   concurrency,
   acceptMimes = ['image/jpeg', 'image/png', 'image/webp'],
   maxFileSize = 20 * 1024 * 1024,
+  onRemoveAt
 }: Props) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL!;
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -286,7 +311,16 @@ export default function PhotoCard({
           onChange={handleUpload}
         />
         {files.map((f, i) => (
-          <Thumb key={`${f.name}-${f.lastModified}-${f.size}-${i}`} file={f} />
+          <Thumb
+            key={`${f.name}-${f.lastModified}-${f.size}-${i}`}
+            file={f}
+            onRemove={() => {
+              // 부모에게 콜백 전달
+              if (typeof onRemoveAt === 'function') {
+                onRemoveAt(i);
+              }
+            }}
+          />
         ))}
       </div>
 

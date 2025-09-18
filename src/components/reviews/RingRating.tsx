@@ -1,9 +1,8 @@
 'use client';
 
-import Image from 'next/image';
+import clsx from 'clsx';
 import { useState } from 'react';
 import SvgObject from '../common/atomic/SvgObject';
-import clsx from 'clsx';
 
 type RingRatingProps = {
   max?: number;
@@ -34,7 +33,7 @@ export default function RingRating({
   };
 
   return (
-    <div className="flex gap-2" role="radiogroup" aria-label="평점">
+    <div className="flex gap-1" role="radiogroup" aria-label="평점">
       {Array.from({ length: max }).map((_, i) => {
         const filled = i < current;
         const isInteractive = !readOnly && (onChange != null || !isControlled);
@@ -48,7 +47,7 @@ export default function RingRating({
             onClick={isInteractive ? () => handleClick(i) : undefined}
             disabled={!isInteractive}
             className={clsx(
-              'w-7 h-6 shrink-0 p-0 m-0 bg-transparent border-0 outline-none',
+              'w-[32px] h-[32px] shrink-0 p-0 m-0 bg-transparent border-0 outline-none',
               'flex items-center justify-center select-none',
               'leading-none overflow-hidden',
               'transform-gpu !scale-100 active:!scale-100',
@@ -57,20 +56,20 @@ export default function RingRating({
             )}
           >
             {filled ? (
-              <Image
+              <SvgObject
                 src="/icons/PinkRing.svg"
                 alt={`ring-${i + 1}`}
-                width={28}
-                height={24}
-                className="block w-[28px] h-[24px] pointer-events-none"
+                width={32}
+                height={32}
+                className="block w-[32px] h-[32px] pointer-events-none"
               />
             ) : (
               <SvgObject
                 src="/icons/GrayRing.svg"
                 alt={`ring-${i + 1}`}
-                width={28}
-                height={24}
-                className="block w-[28px] h-[24px] pointer-events-none"
+                width={32}
+                height={32}
+                className="block w-[32px] h-[32px] pointer-events-none"
               />
             )}
           </button>

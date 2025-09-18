@@ -32,11 +32,14 @@ export default function SlotSelectPage() {
   const productId = useMemo(() => Number(sp.get('productId') ?? 0), [sp]);
 
   const months = useMemo(() => {
-    const now = new Date();
-    const m = now.getMonth() + 1;
-    return [m, m + 1, m + 2].map((x) => ((x - 1) % 12) + 1);
-  }, []);
-
+    const raw = sp.get('months');
+    if (!raw) return [];
+    return raw
+      .split(',')
+      .map((x) => parseInt(x.trim(), 10))
+      .filter((n) => !isNaN(n) && n >= 1 && n <= 12);
+  }, [sp]);
+  
   const { slots, loading, error, refetch } = useContractSlots(productId, months);
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -109,7 +112,7 @@ export default function SlotSelectPage() {
       )}
       {err && <p className="text-sm text-red-500 text-center my-1">{err}</p>}
 
-      <div className="flex flex-col gap-4 items-center">
+      <div className="flex flex-col gap-3 items-center pt-4">
         {loading &&
           slots.length === 0 &&
           Array.from({ length: 4 }).map((_, i) => (

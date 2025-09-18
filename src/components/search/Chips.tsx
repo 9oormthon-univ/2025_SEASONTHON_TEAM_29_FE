@@ -34,7 +34,7 @@ export function ChipGroup({
   onToggle: (v: string) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex flex-wrap gap-2 gap-y-3">
       {values.map((v) => (
         <Chip key={v} active={selected.includes(v)} onClick={() => onToggle(v)}>
           {v}

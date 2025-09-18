@@ -16,6 +16,7 @@ import type { CategoryKey } from '@/types/category';
 import type { SearchItem } from '@/types/search';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
+import SvgObject from '../common/atomic/SvgObject';
 import VendorCard from '../common/atomic/VendorCard';
 
 export default function ResultsScreen({
@@ -113,7 +114,7 @@ export default function ResultsScreen({
             {chips.map((c, i) => (
               <span
                 key={`chip-${i}`}
-                className="shrink-0 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[13px] font-medium text-rose-400"
+                className="shrink-0 rounded-full border border-primary-400 bg-primary-200 px-3 py-1 text-[13px] font-medium text-text-default"
               >
                 {c}
               </span>
@@ -143,7 +144,7 @@ export default function ResultsScreen({
                 return (
                   <section key={key} className="px-1 pt-5">
                     <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-[15px] font-extrabold text-gray-900">
+                      <h2 className="text-[16px] font-bold text-gray-900">
                         {label}
                       </h2>
                       {cat === key && (
@@ -152,13 +153,15 @@ export default function ResultsScreen({
                             const cat = sp.get('cat');
                             router.push(`/search/filters?cat=${cat}`);
                           }}
-                          className="text-xs text-gray-400 hover:text-gray-600"
+                          className="text-text-secondary hover:text-gray-600 flex"
                         >
-                          다시 설정
+                          <SvgObject src='/icons/redo.svg' className='pr-1.5 w-5.5'/>
+                          <span className='text-sm'>다시 설정</span>
+                          
                         </button>
                       )}
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-x-3 gap-y-6 pt-4">
                       {list.map((it) => (
                         <VendorCard
                           key={it.id}

@@ -42,7 +42,7 @@ export default function InvitationMessage({
       <h2
         className={clsx(
           alignCls,
-          'leading-10 font-normal text-3xl',
+          'leading-10 font-normal text-2xl',
           'text-primary-500',
           titleClassName,
         )}

@@ -14,9 +14,8 @@ export default function StoryWideCarousel({ items }: { items: StoryItem[] }) {
   return (
     <Section
       title="따끈따끈, 신규 스토리"
-      onMore={() => {}}
       bleed="viewport"
-      className="mt-8"
+      className="mt-12"
     >
       <div ref={ref} className="overflow-hidden">
         <div className="flex gap-3 px-4 touch-pan-y">
@@ -45,7 +44,7 @@ export default function StoryWideCarousel({ items }: { items: StoryItem[] }) {
 
                 {/* 이미지 대신 플레이스홀더 */}
                 <div className="relative mx-1 h-[60px] w-[60px] overflow-hidden rounded-md">
-                  <Image src={s.img} width={60} height={60} alt="" />
+                  <Image src={s.img} className="object-contain" alt="" fill />
                 </div>
               </article>
             </a>

@@ -29,7 +29,7 @@ export default function CategorySelectPage() {
           선택해 주세요.
         </h1>
 
-        <div className="mt-5 grid grid-cols-2 gap-4">
+        <div className="mt-20 grid grid-cols-2 gap-3">
           {categories.map((c) => {
             const active = selected === c.key;
             return (
@@ -38,7 +38,7 @@ export default function CategorySelectPage() {
                 type="button"
                 onClick={() => setSelected(c.key)}
                 className={[
-                  'flex aspect-square flex-col items-center justify-center rounded-2xl border bg-white transition',
+                  'flex aspect-square flex-col items-center justify-center rounded-md border bg-white transition',
                   active
                     ? 'border-primary-500 ring-2 ring-primary-500/30'
                     : 'border-gray-200',

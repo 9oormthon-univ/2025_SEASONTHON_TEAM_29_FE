@@ -7,7 +7,10 @@ import { useRouter } from 'next/navigation';
 import SvgObject from '@/components/common/atomic/SvgObject';
 
 type Props = {
-  files: File[];
+  /** 썸네일을 직접 보여줄 때만 필요 */
+  files?: File[];
+  /** 파일 개수만 알고 싶을 때 사용 (퍼시스트 복원용) */
+  count?: number;
   total: number;
   className?: string;
   linkTo?: string;
@@ -82,7 +85,8 @@ function UploadTile({
 }
 
 export default function PhotoCard({
-  files,
+  files = [],
+  count,
   total,
   className,
   linkTo,
@@ -92,6 +96,9 @@ export default function PhotoCard({
   const wrapRef = useRef<HTMLDivElement>(null);
   const [canRight, setCanRight] = useState(false);
 
+  const used = typeof count === 'number' ? count : files.length;
+  const hasThumbs = files.length > 0; // files 전달되었을 때만 썸네일 렌더링
+
   const checkScroll = () => {
     const el = wrapRef.current;
     if (!el) return;
@@ -100,14 +107,15 @@ export default function PhotoCard({
 
   useEffect(() => {
     checkScroll();
-  }, [files]);
+  }, [files, used]);
 
   useEffect(() => {
+    if (!hasThumbs) return;
     const el = wrapRef.current;
     if (el) el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
-  }, [files.length]);
+  }, [files.length, hasThumbs]);
 
-  const isFull = files.length >= total;
+  const isFull = used >= total;
 
   const handleTileClick = () => {
     if (onTileClick) return onTileClick();
@@ -122,17 +130,21 @@ export default function PhotoCard({
         className="flex items-center gap-1 overflow-x-auto py-2 pr-10 scrollbar-thin"
       >
         <UploadTile
-          current={files.length}
+          current={used}
           total={total}
           disabled={isFull}
           onClick={handleTileClick}
         />
-        {files.map((f, i) => (
-          <Thumb key={`${f.name}-${f.lastModified}-${f.size}-${i}`} file={f} />
-        ))}
+        {hasThumbs &&
+          files.map((f, i) => (
+            <Thumb
+              key={`${f.name}-${f.lastModified}-${f.size}-${i}`}
+              file={f}
+            />
+          ))}
       </div>
 
-      {canRight && (
+      {hasThumbs && canRight && (
         <button
           type="button"
           aria-label="오른쪽으로 더 보기"

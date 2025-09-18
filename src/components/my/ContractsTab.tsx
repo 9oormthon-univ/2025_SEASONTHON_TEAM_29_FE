@@ -16,10 +16,10 @@ export default function ContractsTab({
   error: string | null;
 }) {
   if (loading)
-    return <p className="text-sm text-text-secondary">불러오는 중…</p>;
+    return <p className="text-sm text-text-secondary pt-5">불러오는 중…</p>;
   if (error) return <p className="text-sm text-red-500">{error}</p>;
   if (!groups.length)
-    return <p className="text-sm text-text-secondary">계약 내역이 없어요.</p>;
+    return <p className="text-sm text-text-secondary pt-5">계약 내역이 없어요.</p>;
 
   return (
     <div className="flex flex-col gap-6 pt-5">

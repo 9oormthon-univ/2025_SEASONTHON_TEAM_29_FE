@@ -17,9 +17,9 @@ export default function VendorReviewStats({
   return (
     <section className="rounded-2xl border border-box-line p-4 flex items-center h-28">
       {/* 왼쪽: 웨딧링 점수 */}
-      <div className="flex ml-8 flex-col items-start">
+      <div className="flex ml-8 flex-col items-center">
         <span className="text-base font-bold text-gray-800">웨딧링</span>
-        <span className="mt-1 text-xl font-medium text-primary-500">
+        <span className="text-xl font-medium text-primary-500">
           {averageRating.toFixed(1)}점
         </span>
       </div>

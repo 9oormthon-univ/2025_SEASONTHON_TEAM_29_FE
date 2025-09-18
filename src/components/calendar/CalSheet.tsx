@@ -52,7 +52,7 @@ export default function CalSheet({
 
       <div
         className="absolute inset-x-0 bottom-0 mx-auto w-full max-w-[420px]
-                   rounded-t-2xl bg-white p-5 pb-[calc(env(safe-area-inset-bottom)+100px)]
+                   rounded-t-2xl bg-white p-5 pb-[calc(env(safe-area-inset-bottom)+70px)]
                    shadow-[0_-8px_24px_rgba(0,0,0,0.08)]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -63,7 +63,7 @@ export default function CalSheet({
           오늘은 어떤 {isEvent ? '행사가 있을까요?' : '이벤트가 있으신가요?'}
         </p>
 
-        <div className="mt-4">
+        <div className="mt-7">
           {/* 일정 등록: 행사 모드에서는 비활성 */}
           {!isEvent && (
             <Link
@@ -79,20 +79,23 @@ export default function CalSheet({
           )}
         </div>
 
-        <ul className="mt-5 space-y-3">
+        <ul className="mt-5 space-y-4">
           {items.map((it) => (
             <li key={it.id}>
               <Link
                 href="/coming-soon"
                 className="flex items-center gap-3 active:opacity-90"
               >
-                <Image
-                  src={STICKER_SRC[it.sticker]}
-                  alt=""
-                  width={28}
-                  height={28}
-                  className="h-7 w-7"
-                />
+                <div className="relative size-10 overflow-hidden rounded-md">
+                  <Image
+                    src={STICKER_SRC[it.sticker]}
+                    alt=""
+                    fill
+                    className="object-contain"  // 꽉 채우기 (잘릴 수 있음)
+                    sizes="40px"
+                    draggable={false}
+                  />
+                </div>
                 <span className="text-[15px] text-gray-700">{it.title}</span>
               </Link>
             </li>

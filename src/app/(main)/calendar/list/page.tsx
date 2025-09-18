@@ -47,7 +47,7 @@ export default function CalendarListPage() {
   const title = mode === 'event' ? '행사 모아보기' : '일정 모아보기';
 
   return (
-    <main className="mx-auto w-full max-w-[420px] pb-[24px]">
+    <main className="mx-auto w-full max-w-[420px] pb-[36px]">
       <Header
         showBack
         onBack={() => router.push('/calendar')}
@@ -79,14 +79,15 @@ export default function CalendarListPage() {
             rows.map((it) => (
               <li key={it.id}>
                 <Link href="/coming-soon" className="flex items-center gap-3 px-2 py-3 active:opacity-90">
+                <div className="relative size-10 shrink-0 overflow-hidden rounded-md">
                   <Image
-                    src={STICKER_SRC[it.sticker]}  // ✅ 앞에 '/' 더 붙이지 마세요!
+                    src={STICKER_SRC[it.sticker]}
                     alt=""
-                    width={28}
-                    height={28}
-                    className="h-7 w-7 shrink-0"
-                    draggable={false}
+                    fill
+                    className="object-contain"  // ↔ 필요시 object-contain
+                    sizes="40px"
                   />
+                </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[15px] text-gray-800">{it.title}</p>
                     <p className="mt-0.5 text-[12px] text-gray-400">{it.date.replaceAll('-', '.')}</p>

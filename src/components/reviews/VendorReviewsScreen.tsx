@@ -47,7 +47,7 @@ export default function VendorReviewsScreen({ vendorId }: { vendorId: number }) 
   const router = useRouter();
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-[420px] bg-white pb-16">
+    <main className="mx-auto min-h-screen w-full max-w-[420px] bg-white pb-24">
       <Header showBack value="전체리뷰" onBack={() => router.back()}/>
 
       {/* 상단: 총 개수 텍스트 */}

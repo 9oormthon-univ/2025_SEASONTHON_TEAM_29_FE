@@ -41,6 +41,7 @@ export default function ToursPage() {
       try {
         if (activeTab === 'dressTour') {
           const bundle = await getTours();
+          console.log(bundle);
           if (!alive) return;
           setData(bundle);
         } else {
@@ -64,6 +65,7 @@ export default function ToursPage() {
       (activeTab === 'dressTour'
         ? data.dressTour.length === 0
         : data.dressRomance.length === 0));
+  console.log(data);
 
   return (
     <main className="w-full max-w-[420px] mx-auto pb-[96px]">
@@ -71,14 +73,13 @@ export default function ToursPage() {
         showBack
         onBack={() => router.push('/home')}
         value="투어일지"
-        rightSlot={<PlusButton activeTab={activeTab} />}
+        rightSlot={activeTab === 'dressRomance' ? <PlusButton activeTab={activeTab} /> : null}
       />
 
       <TourTabs value={activeTab} onChange={setActiveTab} />
 
       <section className="flex-1 overflow-y-auto">
         {loading && <p className="p-4">불러오는 중…</p>}
-        {!loading && err && <p className="p-4 text-sm text-rose-500">데이터를 불러오지 못했어요. {err}</p>}
         {isEmpty && <p className="p-4 text-sm text-gray-500">데이터가 없습니다.</p>}
         {!loading && !err && data && <TourList data={data} activeTab={activeTab} />}
       </section>

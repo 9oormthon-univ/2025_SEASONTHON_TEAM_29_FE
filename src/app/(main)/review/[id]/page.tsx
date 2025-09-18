@@ -22,7 +22,7 @@ type ReviewData = {
   vendorId: number;
   vendorName: string;
   vendorLogoUrl: string;
-  vendorCategory: 'WEDDING_HALL' | 'DRESS' | 'MAKEUP' | 'STUDIO' | string;
+  vendorType: 'WEDDING_HALL' | 'DRESS' | 'MAKEUP' | 'STUDIO' | string;
 };
 
 type ApiResponse<T> = {
@@ -120,7 +120,7 @@ export default function ReviewDetailPage() {
   const categoryKo = useMemo<CompanyType>(() => {
     if (!data) return '웨딩홀';
     return (
-      CATEGORY_MAP[data.vendorCategory as keyof typeof CATEGORY_MAP] ?? '웨딩홀'
+      CATEGORY_MAP[data.vendorType as keyof typeof CATEGORY_MAP] ?? '웨딩홀'
     );
   }, [data]);
   const router = useRouter();
@@ -144,12 +144,12 @@ export default function ReviewDetailPage() {
       {data && !loading && !error && (
         <>
           <section className="px-5 mt-3 flex items-center gap-3">
-            <div className="w-14 h-16 rounded-full overflow-hidden flex items-center justify-center">
+            <div className="w-[70px] h-[70px] rounded-full overflow-hidden flex items-center justify-center">
               <Image
                 src="/pinkProfile.svg"
                 alt="profile"
-                width={56}
-                height={64}
+                width={70}
+                height={70}
                 className="object-contain"
                 priority
                 unoptimized
@@ -162,7 +162,7 @@ export default function ReviewDetailPage() {
             </div>
           </section>
 
-          <section className="px-5 mt-5">
+          <section className="px-5 mt-2">
             <CompanyLongCard
               className="w-full"
               title={data.vendorName}
@@ -173,9 +173,9 @@ export default function ReviewDetailPage() {
             />
           </section>
 
-          <section className="px-5 mt-6">
+          <section className="px-5 mt-3">
             <div className="w-full flex flex-col items-center">
-              <div className="text-sm font-medium text-text--default">
+              <div className="text-[14px] font-medium text-text--default">
                 웨딧링 점수
               </div>
               <div className="mt-2">
@@ -212,24 +212,24 @@ export default function ReviewDetailPage() {
             </section>
           )}
 
-          <section className="px-5 mt-6">
+          <section className="px-5 mt-8">
             <div className="inline-flex px-2.5 py-1 rounded-lg bg-primary-200">
-              <span className="text-xs font-medium text-text--default">
+              <span className="text-sm font-medium text-text--default">
                 좋았던 점
               </span>
             </div>
-            <p className="mt-3 text-sm leading-normal text-text--default whitespace-pre-line">
+            <p className="mt-3 text-sm pl-0.5 leading-normal text-text--default whitespace-pre-line">
               {data.contentBest}
             </p>
           </section>
 
           <section className="px-5 mt-6 mb-10">
             <div className="inline-flex px-2.5 py-1 rounded-lg bg-box-line">
-              <span className="text-xs font-medium text-text--default">
+              <span className="text-sm font-medium text-text--default">
                 아쉬운 점
               </span>
             </div>
-            <p className="mt-3 text-sm leading-normal text-text--default whitespace-pre-line">
+            <p className="mt-3 text-sm pl-0.5 leading-normal text-text--default whitespace-pre-line">
               {data.contentWorst}
             </p>
           </section>

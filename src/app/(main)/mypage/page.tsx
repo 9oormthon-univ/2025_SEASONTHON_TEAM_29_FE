@@ -80,7 +80,7 @@ export default function Page() {
       <BottomNav innerMax="max-w-96" />
 
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
-        <h3 className="px-1 text-base font-semibold text-foreground">업체 선택</h3>
+        <h3 className="px-4 pt-5 text-base font-semibold text-foreground">후기 작성하러 가기</h3>
         <ReviewCompanyPicker
           items={reviewables.map((r) => ({
             id: r.vendorId,
