@@ -59,7 +59,8 @@
 ### **상태 관리 & 유틸**
 - **clsx 2.1.1** – 조건부 클래스 네임 관리  
 - **js-cookie 3.0.5** – 쿠키 기반 상태 관리
-- **tanstack-query** - 서버 상태와 캐싱을 자동 관리 UI와 데이터 동기화를 위한 상태관리 
+- **tanstack-query** - 서버 상태와 캐싱을 자동 관리 UI와 데이터 동기화를 위한 상태관리
+- **zustand** - 유저 정보 관리를 위한 상태관리 라이브러리
 
 ### **PWA**
 - **next-pwa 5.6.0** – 서비스 워커 및 오프라인 모드 지원 / 폰으로도 쉽게 접근하도록 mobile-first 디자인 구현 
@@ -72,6 +73,15 @@
 
 ### **타입 지원**
 - `@types/react`, `@types/react-dom`, `@types/node`, `@types/js-cookie`
+
+---
+
+## Architecure
+
+- API 호출 → services/http.ts
+- 토큰 만료 시 → reissueOnce() → refreshStore
+- 새 access token 발급 후 재요청
+- 최종적으로 UI에 정상 응답 전달
 
 ---
 
