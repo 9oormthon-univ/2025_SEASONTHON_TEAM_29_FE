@@ -1,9 +1,12 @@
-import type { InvitationRequestBody, MediaItem } from '@/types/invitation';
+import type {
+  InvitationRequestBody,
+  MediaItem,
+  InvitationApi,
+} from '@/types/invitation';
 import type { InviteForm } from '@/types/invite';
 import type { PlaceSectionValue } from '@/components/invitation/section/PlaceSection';
 import type { GallerySectionValue } from '@/components/invitation/section/GallerySection';
 import type { InvitationData } from '@/types/invitationGet';
-import type { InvitationApi } from '@/types/invitation';
 
 type MediaArg = {
   mainMedia?: MediaItem | null;
@@ -17,6 +20,7 @@ type GalleryItem = string | { key?: string; contentType?: string };
 function asDict(v: unknown): Dict {
   return v && typeof v === 'object' ? (v as Dict) : {};
 }
+
 function asGalleryArr(v: unknown): GalleryItem[] {
   if (!Array.isArray(v)) return [];
   return v.filter(
@@ -24,6 +28,7 @@ function asGalleryArr(v: unknown): GalleryItem[] {
       typeof x === 'string' || (x && typeof x === 'object'),
   );
 }
+
 export function toInvitationPayload(
   form: InviteForm,
   place: PlaceSectionValue,
@@ -143,23 +148,40 @@ export function toInvitationPayload(
 
   return payload;
 }
-export function toInvitationApiData(d: InvitationData): InvitationApi['data'] {
+
+type InvitationExtras = Partial<
+  Pick<InvitationApi['data'], 'ending' | 'account' | 'background'>
+>;
+type PlaceExtras = Partial<{ location: string; lat: number; lng: number }>;
+type InvitationDataCompat = InvitationData &
+  InvitationExtras & {
+    marriagePlace: InvitationData['marriagePlace'] & PlaceExtras;
+  };
+
+export function toInvitationApiData(
+  d: InvitationDataCompat,
+): InvitationApi['data'] {
+  const { ending = '', account = '', background = '' } = d;
+  const { vendorName, floorAndHall, drawSketchMap, location, lat, lng } =
+    d.marriagePlace;
+
   return {
     id: d.id,
     memberId: d.memberId,
-    ending: (d as any).ending ?? '', // 응답에 없으면 기본값
-    account: (d as any).account ?? '',
-    background: (d as any).background ?? '',
+    ending,
+    account,
+    background,
     theme: d.theme,
     basicInformation: d.basicInformation,
     greetings: d.greetings,
     marriageDate: d.marriageDate,
     marriagePlace: {
-      vendorName: d.marriagePlace.vendorName,
-      floorAndHall: d.marriagePlace.floorAndHall,
-      drawSketchMap: d.marriagePlace.drawSketchMap,
-      address: d.marriagePlace.location ?? undefined, // ✅ 위치 문자열을 address로
-      // lat/lng은 서버가 주면 여기서 추가
+      vendorName,
+      floorAndHall,
+      drawSketchMap,
+      address: location,
+      lat,
+      lng,
     },
     mainMediaUrl: d.mainMediaUrl,
     filmMediaUrl: d.filmMediaUrl ?? [],

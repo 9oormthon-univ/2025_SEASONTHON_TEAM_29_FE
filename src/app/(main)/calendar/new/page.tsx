@@ -39,25 +39,31 @@ export default function CalendarNewPage() {
 
   const disabled = !title.trim() || !sticker;
 
-    // ?date=2025-09-18 이런 형태로 들어온 값 읽기
-    const dateParam = searchParams.get('date');
-    // 없으면 오늘 날짜
-    const targetDate = dateParam ? new Date(dateParam) : new Date();
-  
-    // ISO string (자정 기준 allDay 이벤트)
-    const startDateTime = new Date(
-      targetDate.getFullYear(),
-      targetDate.getMonth(),
-      targetDate.getDate(),
-      23, 0, 0, 0,
-    ).toISOString();
-  
-    const endDateTime = new Date(
-      targetDate.getFullYear(),
-      targetDate.getMonth(),
-      targetDate.getDate(),
-      23, 59, 59, 999,
-    ).toISOString();
+  // ?date=2025-09-18 이런 형태로 들어온 값 읽기
+  const dateParam = searchParams.get('date');
+  // 없으면 오늘 날짜
+  const targetDate = dateParam ? new Date(dateParam) : new Date();
+
+  // ISO string (자정 기준 allDay 이벤트)
+  const startDateTime = new Date(
+    targetDate.getFullYear(),
+    targetDate.getMonth(),
+    targetDate.getDate(),
+    23,
+    0,
+    0,
+    0,
+  ).toISOString();
+
+  const endDateTime = new Date(
+    targetDate.getFullYear(),
+    targetDate.getMonth(),
+    targetDate.getDate(),
+    23,
+    59,
+    59,
+    999,
+  ).toISOString();
 
   const stickers: StickerKey[] = useMemo(
     () => [
@@ -126,7 +132,7 @@ export default function CalendarNewPage() {
         <div className="mt-5 grid grid-cols-4 gap-2">
           {stickers.map((key) => {
             const active = sticker === key;
-            const { w, h, className } = ICON_CFG[key];
+            const { w, h, className: iconClass } = ICON_CFG[key];
             return (
               <button
                 key={key}
@@ -145,10 +151,10 @@ export default function CalendarNewPage() {
                   <Image
                     src={STICKER_SRC[key]}
                     alt={key}
-                    width={40}
-                    height={40}
+                    width={w}
+                    height={h}
                     draggable={false}
-                    className="block w-15 h-15 object-contain"
+                    className={clsx('block object-contain', iconClass)}
                   />
                 </span>
               </button>
