@@ -1,4 +1,3 @@
-// src/app/(main)/page.tsx  (파일 경로는 프로젝트 구조에 맞게)
 'use client';
 
 import SearchBar from '@/components/common/atomic/SearchBar';
@@ -12,15 +11,13 @@ import { categories, stories } from '@/data/homeData';
 import { useHomeReviews } from '@/hooks/useHomeReviews';
 import { useVendorsByCategory } from '@/hooks/useVendorsByCategory';
 import { getEditorialBanners } from '@/lib/editorials';
+import Priced from '@/components/home/CostComponent';
 
 export default function HomePage() {
   const banners = getEditorialBanners();
 
-  // 실데이터: 메이크업 / 스튜디오
   const makeup = useVendorsByCategory('MAKEUP', 5);
   const studio = useVendorsByCategory('STUDIO', 5);
-
-  // ✅ 실데이터: 최신 리뷰
   const reviews = useHomeReviews(10);
 
   return (
@@ -28,7 +25,7 @@ export default function HomePage() {
       <SearchBar showCart={true} />
       <BannerSquareCarousel items={banners} />
       <CategoryQuick items={categories} />
-
+      <Priced />
       {reviews.items.length > 0 && (
         <ReviewSquareCarousel items={reviews.items} />
       )}
