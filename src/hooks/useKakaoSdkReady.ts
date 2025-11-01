@@ -15,7 +15,8 @@ export function useKakaoSdkReady() {
     let script = document.querySelector('script[src*="dapi.kakao.com"]');
     if (!script) {
       // 환경변수에서 API 키 읽기 (Next.js에서 window 환경에 할당 필요)
-      const apiKey = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || (window as any).NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY;
+      const winEnv = window as unknown as { NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY?: string };
+      const apiKey = process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY || winEnv.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY;
       if (!apiKey) {
         console.error('카카오맵 API 키가 설정되지 않았습니다. 환경변수 NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY를 확인하세요.');
         return;
