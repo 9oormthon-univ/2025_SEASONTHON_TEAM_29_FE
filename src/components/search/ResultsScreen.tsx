@@ -4,13 +4,13 @@ import Header from '@/components/common/monocules/Header';
 import { categories } from '@/data/homeData';
 import { resolveRegionName } from '@/lib/region';
 import {
-  dressOriginLabel,
-  dressStyleLabel,
-  hallMealLabel,
-  hallStyleLabel,
-  makeupStyleLabel,
-  studioShotLabel,
-  studioStyleLabel,
+    dressOriginLabel,
+    dressStyleLabel,
+    hallMealLabel,
+    hallStyleLabel,
+    makeupStyleLabel,
+    studioShotLabel,
+    studioStyleLabel,
 } from '@/services/mappers/searchMapper';
 import type { CategoryKey } from '@/types/category';
 import type { SearchItem } from '@/types/search';
@@ -35,6 +35,10 @@ export default function ResultsScreen({
 
   // ✅ 현재 카테고리
   const cat = sp.get('cat') as CategoryKey | null;
+  
+  // ✅ 지도에서 선택된 매장인지 확인
+  const isFromMap = sp.has('vendorId') && sp.has('lat') && sp.has('lng');
+  const selectedStoreName = sp.get('storeName');
 
   // ✅ chips 생성 로직
   const chips = useMemo(() => {
@@ -107,6 +111,18 @@ export default function ResultsScreen({
         value="검색결과"
       />
         <div className="px-[22px] flex-1 overflow-y-auto">
+
+        {/* ✅ 지도에서 선택된 매장 알림 */}
+        {isFromMap && selectedStoreName && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center">
+              <SvgObject src="/icons/map.svg" className="w-4 h-4 text-blue-600 mr-2" />
+              <span className="text-sm font-medium text-blue-800">
+                지도에서 선택한 매장: <span className="font-bold">{selectedStoreName}</span>
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* ✅ Chips: 가로 스크롤 */}
         <div className="-mx-[6px] px-[6px] mb-2">

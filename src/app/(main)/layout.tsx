@@ -10,7 +10,7 @@ import { Suspense } from 'react';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? '';
 
-  const HIDE_EXACT = ['/search', '/search/filters'];
+  const HIDE_EXACT = ['/search', '/search/filters', '/search/map'];
   const HIDE_PREFIX = [
     '/tours/',
     '/mypage/connection',

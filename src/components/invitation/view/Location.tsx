@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import clsx from 'clsx';
 import SvgObject from '@/components/common/atomic/SvgObject';
+import clsx from 'clsx';
+import { useEffect, useRef, useState } from 'react';
 
 type Props = {
   vendorTitle?: string;
@@ -41,6 +41,13 @@ export default function Location({
       if (!mapRef.current) return;
       const kakao = window.kakao;
 
+      // services 라이브러리가 로드되었는지 확인
+      if (!kakao.maps.services) {
+        console.error('Kakao Maps services library not loaded');
+        setError('지도 서비스를 불러오지 못했습니다.');
+        return;
+      }
+
       const draw = (center: KakaoLatLng) => {
         const map = new kakao.maps.Map(mapRef.current as HTMLElement, {
           center,
@@ -54,29 +61,40 @@ export default function Location({
         return;
       }
 
-      const geocoder = new kakao.maps.services.Geocoder();
-      geocoder.addressSearch(address, (result, status) => {
-        if (status === kakao.maps.services.Status.OK && result[0]) {
-          const { x, y } = result[0];
-          const latNum = Number(y);
-          const lngNum = Number(x);
-          const c = new kakao.maps.LatLng(latNum, lngNum);
-          setPos({ lat: latNum, lng: lngNum });
-          draw(c);
-        } else {
-          setError('주소를 좌표로 변환하지 못했습니다.');
-        }
-      });
+      // 주소가 유효한지 확인
+      if (!address || address.trim().length === 0) {
+        setError('유효한 주소가 제공되지 않았습니다.');
+        return;
+      }
+
+      try {
+        const geocoder = new kakao.maps.services.Geocoder();
+        geocoder.addressSearch(address.trim(), (result, status) => {
+          if (status === kakao.maps.services.Status.OK && result[0]) {
+            const { x, y } = result[0];
+            const latNum = Number(y);
+            const lngNum = Number(x);
+            const c = new kakao.maps.LatLng(latNum, lngNum);
+            setPos({ lat: latNum, lng: lngNum });
+            draw(c);
+          } else {
+            setError('주소를 좌표로 변환하지 못했습니다.');
+          }
+        });
+      } catch (error) {
+        console.error('Geocoder error:', error);
+        setError('주소 검색 중 오류가 발생했습니다.');
+      }
     };
 
-    if (window.kakao?.maps) {
+    if (window.kakao?.maps?.services) {
       init();
       return;
     }
 
     if (document.getElementById('kakao-map-sdk')) {
       const t = window.setInterval(() => {
-        if (window.kakao?.maps) {
+        if (window.kakao?.maps?.services) {
           window.clearInterval(t);
           init();
         }

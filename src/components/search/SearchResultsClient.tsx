@@ -12,6 +12,12 @@ export function SearchResultsClient() {
     const cat = sp.get('cat') as SearchParams['category'] | null;
     if (!cat) return null;
 
+    // 지도에서 선택된 매장인지 확인
+    const vendorId = sp.get('vendorId');
+    const lat = sp.get('lat');
+    const lng = sp.get('lng');
+    const storeName = sp.get('storeName');
+
     const regionCode = sp.getAll('region');
     const price = Number(sp.get('price') ?? 0);
 
@@ -28,6 +34,10 @@ export function SearchResultsClient() {
             hasParking: sp.has('hasParking')
               ? sp.get('hasParking') === 'true'
               : null,
+            // 지도에서 선택된 매장 정보 추가
+            ...(vendorId && { vendorId: Number(vendorId) }),
+            ...(lat && lng && { latitude: Number(lat), longitude: Number(lng) }),
+            ...(storeName && { storeName }),
           },
         };
       case 'dress':
@@ -38,6 +48,10 @@ export function SearchResultsClient() {
             price,
             dressStyle: sp.getAll('dressStyle'),
             dressOrigin: sp.getAll('dressOrigin'),
+            // 지도에서 선택된 매장 정보 추가
+            ...(vendorId && { vendorId: Number(vendorId) }),
+            ...(lat && lng && { latitude: Number(lat), longitude: Number(lng) }),
+            ...(storeName && { storeName }),
           },
         };
       case 'studio':
@@ -51,6 +65,10 @@ export function SearchResultsClient() {
             iphoneSnap: sp.has('iphoneSnap')
               ? sp.get('iphoneSnap') === 'true'
               : null,
+            // 지도에서 선택된 매장 정보 추가
+            ...(vendorId && { vendorId: Number(vendorId) }),
+            ...(lat && lng && { latitude: Number(lat), longitude: Number(lng) }),
+            ...(storeName && { storeName }),
           },
         };
       case 'makeup':
@@ -65,7 +83,11 @@ export function SearchResultsClient() {
               : null,
             hasPrivateRoom: sp.has('room')
               ? sp.get('room') === 'true'
-              : null,             
+              : null,
+            // 지도에서 선택된 매장 정보 추가
+            ...(vendorId && { vendorId: Number(vendorId) }),
+            ...(lat && lng && { latitude: Number(lat), longitude: Number(lng) }),
+            ...(storeName && { storeName }),
           },
         };
     }
