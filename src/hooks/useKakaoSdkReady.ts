@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 
+type WindowWithKakao = Window & { kakao?: { maps?: { load?: unknown } } };
+
 export function useKakaoSdkReady() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     // 이미 SDK가 로드된 경우
-    const w = window as unknown as { kakao?: { maps?: { load?: unknown } } };
+    const w = window as WindowWithKakao;
     if (w.kakao && w.kakao.maps && typeof w.kakao.maps.load === 'function') {
       setReady(true);
       return;
@@ -31,7 +33,7 @@ export function useKakaoSdkReady() {
 
     // SDK 로드를 폴링
     const interval = setInterval(() => {
-      if (window.kakao?.maps?.load) {
+      if (typeof (window as WindowWithKakao).kakao?.maps?.load === 'function') {
         setReady(true);
         clearInterval(interval);
       }
