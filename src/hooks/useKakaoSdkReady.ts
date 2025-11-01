@@ -13,7 +13,7 @@ export function useKakaoSdkReady() {
     }
 
     // 이미 같은 스크립트가 있는지 체크
-    let script = document.querySelector('script[src*="dapi.kakao.com"]');
+    let script = document.querySelector('script[src*="dapi.kakao.com"]') as HTMLScriptElement | null;
     if (!script) {
       // 환경변수에서 API 키 읽기 (Next.js에서 window 환경에 할당 필요)
       const winEnv = window as unknown as { NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY?: string };
@@ -22,10 +22,11 @@ export function useKakaoSdkReady() {
         console.error('카카오맵 API 키가 설정되지 않았습니다. 환경변수 NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY를 확인하세요.');
         return;
       }
-      script = document.createElement('script');
-      script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&autoload=false`;
-      script.async = true;
-      document.head.appendChild(script);
+      const s = document.createElement('script');
+      s.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${apiKey}&autoload=false`;
+      s.async = true;
+      document.head.appendChild(s);
+      script = s;
     }
 
     // SDK 로드를 폴링
