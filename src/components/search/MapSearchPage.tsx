@@ -9,7 +9,7 @@ import { searchStudios } from '@/services/search/studio.api';
 import { getVendorDetail } from '@/services/vendor.api';
 import type { SearchItem } from '@/types/search';
 import type { VendorCategory, VendorDetail } from '@/types/vendor';
-import NextImage from 'next/image';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import SvgObject from '../common/atomic/SvgObject';
@@ -80,7 +80,7 @@ export default function MapSearchPage() {
     const path = CATEGORY_ICON_PATH[type];
     const cached = iconImgCacheRef.current.get(path);
     if (cached) return cached;
-    const img = new Image();
+    const img = new window.Image();
     img.src = path;
     await new Promise<void>((res, rej) => {
       img.onload = () => res();
@@ -435,7 +435,15 @@ export default function MapSearchPage() {
                 <div className="flex gap-2 overflow-x-auto">
                   {!!selectedStore.repMediaUrl && (
                     <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                      <NextImage src={selectedStore.repMediaUrl} alt="" fill sizes="144px" className="object-cover" />
+                      <Image
+                        src={selectedStore.repMediaUrl}
+                        alt=""
+                        fill
+                        sizes="144px"
+                        className="object-contain"
+                        priority
+                        unoptimized
+                      />
                     </div>
                   )}
                   {(selectedStore.products ?? [])
@@ -443,7 +451,7 @@ export default function MapSearchPage() {
                     .slice(0, 5)
                     .map((src, idx) => (
                       <div key={idx} className="relative h-36 w-36 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <NextImage src={src} alt="" fill sizes="144px" className="object-cover" />
+                        <Image src={src} alt="" fill sizes="144px" className="object-cover" unoptimized />
                       </div>
                     ))}
                 </div>
