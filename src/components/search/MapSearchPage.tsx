@@ -56,6 +56,34 @@ export default function MapSearchPage() {
   const hasFetchedRef = useRef(false);
   const detailCacheRef = useRef<Map<number, VendorDetail>>(new Map());
 
+  // 페이지 전역 스크롤 잠금 (진입 시 잠그고, 이탈 시 복원)
+  useEffect(() => {
+    const htmlEl = document.documentElement as HTMLElement;
+    const bodyEl = document.body as HTMLBodyElement;
+    const prev = {
+      htmlOverflow: htmlEl.style.overflow,
+      bodyOverflow: bodyEl.style.overflow,
+      htmlTouchAction: htmlEl.style.getPropertyValue('touch-action'),
+      bodyTouchAction: bodyEl.style.getPropertyValue('touch-action'),
+      htmlOverscroll: htmlEl.style.getPropertyValue('overscroll-behavior'),
+      bodyOverscroll: bodyEl.style.getPropertyValue('overscroll-behavior'),
+    };
+    htmlEl.style.overflow = 'hidden';
+    bodyEl.style.overflow = 'hidden';
+    htmlEl.style.setProperty('touch-action', 'none');
+    bodyEl.style.setProperty('touch-action', 'none');
+    htmlEl.style.setProperty('overscroll-behavior', 'none');
+    bodyEl.style.setProperty('overscroll-behavior', 'none');
+    return () => {
+      htmlEl.style.overflow = prev.htmlOverflow;
+      bodyEl.style.overflow = prev.bodyOverflow;
+      htmlEl.style.setProperty('touch-action', prev.htmlTouchAction || '');
+      bodyEl.style.setProperty('touch-action', prev.bodyTouchAction || '');
+      htmlEl.style.setProperty('overscroll-behavior', prev.htmlOverscroll || '');
+      bodyEl.style.setProperty('overscroll-behavior', prev.bodyOverscroll || '');
+    };
+  }, []);
+
   // Projection 기반 오프셋 panTo: 중앙 살짝 위로
   const panToWithOffsetOnce = useCallback((m: KakaoMap, lat: number, lng: number, _offsetY = 160) => {
     try {
@@ -359,12 +387,17 @@ export default function MapSearchPage() {
         {/* 선택된 매장 바텀시트 (드래그로 내리기) */}
         {selectedStore && (
           <div
-            className="fixed inset-x-0 z-30 w-full select-none"
+            className="fixed inset-x-0 z-30 w-full select-none touch-none overscroll-none"
             style={{ bottom: 'env(safe-area-inset-bottom)', transform: `translateY(${dragY}px)` }}
             onPointerDown={(e) => {
+              // 스크롤 방지 및 포인터 캡처
+              e.preventDefault();
+              try { (e.currentTarget as HTMLElement).setPointerCapture?.((e as unknown as PointerEvent).pointerId as number); } catch {}
+              document.body.style.overflow = 'hidden';
               setDragging(true);
               const startY = (e as unknown as PointerEvent).clientY ?? 0;
               const onMove = (ev: PointerEvent) => {
+                ev.preventDefault();
                 const curY = ev.clientY ?? 0;
                 const dy = Math.max(0, curY - startY);
                 setDragY(dy);
@@ -373,8 +406,9 @@ export default function MapSearchPage() {
               };
               const onUp = () => {
                 setDragging(false);
-                window.removeEventListener('pointermove', onMove);
-                window.removeEventListener('pointerup', onUp);
+                document.body.style.overflow = '';
+                window.removeEventListener('pointermove', onMove as EventListener);
+                window.removeEventListener('pointerup', onUp as EventListener);
                 const finalY = dragYRef.current;
                 if (finalY > 120) {
                   setSelectedStore(null);
@@ -387,8 +421,8 @@ export default function MapSearchPage() {
                   dragMovedRef.current = false;
                 }, 0);
               };
-              window.addEventListener('pointermove', onMove);
-              window.addEventListener('pointerup', onUp);
+              window.addEventListener('pointermove', onMove as EventListener, { passive: false } as AddEventListenerOptions);
+              window.addEventListener('pointerup', onUp as EventListener, { passive: true } as AddEventListenerOptions);
             }}
           >
             <div
