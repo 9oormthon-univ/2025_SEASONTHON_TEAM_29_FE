@@ -6,7 +6,8 @@ export function useKakaoSdkReady() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     // 이미 SDK가 로드된 경우
-    if (window.kakao?.maps?.load) {
+    const w = window as unknown as { kakao?: { maps?: { load?: unknown } } };
+    if (w.kakao && w.kakao.maps && typeof w.kakao.maps.load === 'function') {
       setReady(true);
       return;
     }

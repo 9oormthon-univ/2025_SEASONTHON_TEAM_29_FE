@@ -9,20 +9,22 @@ import { searchStudios } from '@/services/search/studio.api';
 import { getVendorDetail } from '@/services/vendor.api';
 import type { SearchItem } from '@/types/search';
 import type { VendorCategory, VendorDetail } from '@/types/vendor';
+import NextImage from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import SvgObject from '../common/atomic/SvgObject';
 import Header from '../common/monocules/Header';
 
 // 카카오맵 타입은 `src/types/kakao.maps.d.ts`에 선언되어 있음
-
-// 카테고리 색상/한글명
-const categoryColors: Record<VendorCategory, string> = {
-  WEDDING_HALL: '#FF6B6B',
-  DRESS: '#4ECDC4',
-  STUDIO: '#45B7D1',
-  MAKEUP: '#96CEB4',
+// 카테고리 아이콘 경로 (homeData.ts와 동일)
+const CATEGORY_ICON_PATH: Record<VendorCategory, string> = {
+  WEDDING_HALL: '/icons/Category/weddinghall.svg',
+  DRESS: '/icons/Category/dress.svg',
+  STUDIO: '/icons/Category/studio.svg',
+  MAKEUP: '/icons/Category/makeup.svg',
 };
+
+// (colors 제거)
 
 // 카테고리 한글명 매핑
 const categoryNames: Record<VendorCategory, string> = {
@@ -74,16 +76,8 @@ export default function MapSearchPage() {
     }
   }, []);
 
-  // 카테고리별 아이콘 경로 (homeData.ts와 동일)
-  const categoryIconPath: Record<VendorCategory, string> = {
-    WEDDING_HALL: '/icons/Category/weddinghall.svg',
-    DRESS: '/icons/Category/dress.svg',
-    STUDIO: '/icons/Category/studio.svg',
-    MAKEUP: '/icons/Category/makeup.svg',
-  };
-
-  const loadCategoryIcon = async (type: VendorCategory) => {
-    const path = categoryIconPath[type];
+  const loadCategoryIcon = useCallback(async (type: VendorCategory) => {
+    const path = CATEGORY_ICON_PATH[type];
     const cached = iconImgCacheRef.current.get(path);
     if (cached) return cached;
     const img = new Image();
@@ -94,9 +88,9 @@ export default function MapSearchPage() {
     });
     iconImgCacheRef.current.set(path, img);
     return img;
-  };
+  }, []);
 
-  const createBubbleDataUrl = async (bg: string, stroke: string, size: number, type: VendorCategory) => {
+  const createBubbleDataUrl = useCallback(async (bg: string, stroke: string, size: number, type: VendorCategory) => {
     const icon = await loadCategoryIcon(type);
     const w = size;
     const tail = Math.max(6, Math.round(size * 0.25));
@@ -133,9 +127,9 @@ export default function MapSearchPage() {
     const ih = Math.max(1, Math.round(icon.height * ratio));
     ctx.drawImage(icon, Math.round(cx - iw / 2), Math.round(cy - ih / 2), iw, ih);
     return c.toDataURL();
-  };
+  }, [loadCategoryIcon]);
 
-  const getBubbleMarkerImages = async (type: VendorCategory, baseSize: number, selSize: number) => {
+  const getBubbleMarkerImages = useCallback(async (type: VendorCategory, baseSize: number, selSize: number) => {
     // 색상: 기본(연한 핑크) / 선택(메인 핑크)
     const primary = getComputedStyle(document.documentElement).getPropertyValue('--color-primary-500').trim() || '#ff6669';
     const primaryLight = getComputedStyle(document.documentElement).getPropertyValue('--color-primary-400').trim() || '#ff9b9d';
@@ -158,7 +152,7 @@ export default function MapSearchPage() {
     const ret = { normal, selected };
     markerImageCacheRef.current.set(key, ret);
     return ret;
-  };
+  }, [createBubbleDataUrl]);
 
   const highlightMarker = (vendorId: number) => {
     const prevId = selectedVendorIdRef.current;
@@ -326,11 +320,11 @@ export default function MapSearchPage() {
     };
     build();
     markersRef.current = newMarkers;
-  }, [map, vendors, panToWithOffsetOnce]);
+  }, [map, vendors, panToWithOffsetOnce, getBubbleMarkerImages]);
 
   // (마커 커스텀 이미지는 추후 적용 가능)
 
-  const handleStoreSelect = () => {};
+  // no-op
 
   const handleBack = () => {
     router.back();
@@ -441,7 +435,7 @@ export default function MapSearchPage() {
                 <div className="flex gap-2 overflow-x-auto">
                   {!!selectedStore.repMediaUrl && (
                     <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                      <img src={selectedStore.repMediaUrl} alt="" className="h-full w-full object-cover" />
+                      <NextImage src={selectedStore.repMediaUrl} alt="" fill sizes="144px" className="object-cover" />
                     </div>
                   )}
                   {(selectedStore.products ?? [])
@@ -449,7 +443,7 @@ export default function MapSearchPage() {
                     .slice(0, 5)
                     .map((src, idx) => (
                       <div key={idx} className="relative h-36 w-36 shrink-0 overflow-hidden rounded-md border border-gray-200">
-                        <img src={src} alt="" className="h-full w-full object-cover" />
+                        <NextImage src={src} alt="" fill sizes="144px" className="object-cover" />
                       </div>
                     ))}
                 </div>
