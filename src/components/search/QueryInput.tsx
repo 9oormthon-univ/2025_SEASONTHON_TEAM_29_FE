@@ -2,7 +2,7 @@
 'use client';
 
 import { searchRegions } from '@/lib/region';
-import { Search, X } from 'lucide-react';
+import { MapPin, Search, X } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 
 type Props = {
@@ -10,6 +10,7 @@ type Props = {
   onQueryChange: (v: string) => void;
   selected: string[];
   onSelectedChange: (list: string[]) => void;
+  onMapClick?: () => void;
 };
 
 export default function QueryInput({
@@ -17,6 +18,7 @@ export default function QueryInput({
   onQueryChange,
   selected,
   onSelectedChange,
+  onMapClick,
 }: Props) {
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -85,14 +87,29 @@ export default function QueryInput({
         />
       </div>
 
-      {/* ✅ 검색 버튼 */}
-      <button
-        aria-label="search"
-        className="absolute right-2 top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full text-gray-600 hover:bg-gray-200"
-        onClick={() => setOpen(false)}
-      >
-        <Search className="h-5 w-5" />
-      </button>
+      {/* ✅ 검색 버튼과 지도 버튼 */}
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+        {/* 지도 버튼 */}
+        <button
+          aria-label="지도로 검색"
+          className="grid h-8 w-8 place-items-center rounded-full text-gray-600 hover:bg-gray-200"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMapClick?.();
+          }}
+        >
+          <MapPin className="h-5 w-5" />
+        </button>
+        
+        {/* 검색 버튼 */}
+        <button
+          aria-label="search"
+          className="grid h-8 w-8 place-items-center rounded-full text-gray-600 hover:bg-gray-200"
+          onClick={() => setOpen(false)}
+        >
+          <Search className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* ✅ 드롭다운: relative 안에 넣어서 input 바로 아래 뜨도록 */}
       {open && suggestions.length > 0 && (

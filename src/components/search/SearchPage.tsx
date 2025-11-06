@@ -52,6 +52,11 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
   const toggle = (list: string[], v: string, set: (v: string[]) => void) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
+  /** 지도 검색 페이지로 이동 */
+  function goMapSearch() {
+    router.push('/search/map');
+  }
+
   /** 검색 실행 */
   function goResults() {
     const p = new URLSearchParams();
@@ -110,6 +115,7 @@ export default function SearchPage({ initialCat = null as CategoryKey | null }) 
             onQueryChange={setQuery}
             selected={areas}
             onSelectedChange={setAreas}
+            onMapClick={goMapSearch}
           />
         </section>
 

@@ -56,6 +56,8 @@ export type VendorDetail = {
   longitude: number;
   kakaoMapUrl?: string;
   repMediaUrl?: string;
+  averageRating?: number;
+  reviewCount?: number;
   products: VendorProductSummary[];
 };
 

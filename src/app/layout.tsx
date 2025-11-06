@@ -1,6 +1,7 @@
 import '@/app/globals.css';
 import { Providers } from '@/lib/providers';
 import type { Viewport } from 'next';
+import Script from 'next/script';
 import { PwaHead } from './_pwa-head';
 
 export const metadata = {
@@ -31,6 +32,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <head>
         <PwaHead />
+        {process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY && (
+          <Script
+            id="kakao-maps-sdk"
+            src={`https://dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=${process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY}&libraries=services`}
+            strategy="beforeInteractive"
+          />
+        )}
       </head>
       <body className="min-h-dvh bg-white text-gray-900 antialiased overflow-x-hidden touch-pan-y touch-manipulation">
         <Providers>{children}</Providers>

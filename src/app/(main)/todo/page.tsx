@@ -35,6 +35,7 @@ export default function TodoPage() {
       const count = todos.filter((t) => t.isCompleted).length;
       heartsRef.current?.dropInitial(count);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]); // todos는 의존성 제거 → 매번 초기화 방지
 
   // ✅ 헤더 높이 기반으로 하트 레이어 높이 계산
