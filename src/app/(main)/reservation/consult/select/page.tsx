@@ -101,8 +101,16 @@ export default function ConsultTimePage() {
     try {
       setPosting(true);
       setError(null);
-      await createReservation({ slotId: selectedSlotId });
+      const response = await createReservation({ slotId: selectedSlotId });
       setDone(true);
+      
+      // 예약 성공 시 알림 트리거 (서버에서 SSE로 오지 않는 경우를 대비)
+      if (response?.data && typeof window !== 'undefined' && (window as any).triggerReservationNotification) {
+        // 약간의 지연을 두어 서버에서 SSE 알림이 먼저 오도록 함
+        setTimeout(() => {
+          (window as any).triggerReservationNotification(response.data);
+        }, 1000);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : '예약 실패');
     } finally {

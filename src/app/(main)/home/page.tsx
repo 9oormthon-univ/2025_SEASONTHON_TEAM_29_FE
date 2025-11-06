@@ -4,6 +4,7 @@ import SearchBar from '@/components/common/atomic/SearchBar';
 import Up from '@/components/common/atomic/Up';
 import BannerSquareCarousel from '@/components/home/BannerSquareCarousel';
 import CategoryQuick from '@/components/home/CategoryQuick';
+import Priced from '@/components/home/CostComponent';
 import ReviewSquareCarousel from '@/components/home/ReviewSquareCarousel';
 import StoryWideCarousel from '@/components/home/StoryWideCarousel';
 import VendorSquareCarousel from '@/components/home/VendorSquareCarousel';
@@ -11,7 +12,6 @@ import { categories, stories } from '@/data/homeData';
 import { useHomeReviews } from '@/hooks/useHomeReviews';
 import { useVendorsByCategory } from '@/hooks/useVendorsByCategory';
 import { getEditorialBanners } from '@/lib/editorials';
-import Priced from '@/components/home/CostComponent';
 
 export default function HomePage() {
   const banners = getEditorialBanners();
@@ -22,7 +22,7 @@ export default function HomePage() {
 
   return (
     <main className="w-full max-w-[420px] mx-auto px-[22px] pb-24">
-      <SearchBar showCart={true} />
+      <SearchBar showCart={true} showNotification={true}/>
       <BannerSquareCarousel items={banners} />
       <CategoryQuick items={categories} />
       <Priced />
