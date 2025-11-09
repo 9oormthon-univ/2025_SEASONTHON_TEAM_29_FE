@@ -106,7 +106,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         console.log('🔔 예약 알림 트리거됨:', notif);
       };
     }
-    }
   }, [handleNotification]);
 
   const handleToastClose = useCallback((toastId: string) => {
