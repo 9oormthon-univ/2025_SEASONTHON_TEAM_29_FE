@@ -7,9 +7,11 @@ import { useEffect, useRef, useState } from 'react';
 
 type NotificationHandler = (notification: NotificationResponseDTO) => void;
 
+type SSEController = AbortController;
+
 export function useNotificationSSE(onNotification?: NotificationHandler) {
   const [isConnected, setIsConnected] = useState(false);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const eventSourceRef = useRef<SSEController | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 5;
@@ -35,10 +37,7 @@ export function useNotificationSSE(onNotification?: NotificationHandler) {
 
     function connect() {
       if (eventSourceRef.current) {
-        // EventSource가 아닌 경우도 있으므로 체크
-        if ('close' in eventSourceRef.current) {
-          (eventSourceRef.current as EventSource).close();
-        }
+        eventSourceRef.current.abort();
         eventSourceRef.current = null;
       }
 
@@ -166,7 +165,7 @@ export function useNotificationSSE(onNotification?: NotificationHandler) {
           }
         });
 
-      eventSourceRef.current = abortController as any;
+      eventSourceRef.current = abortController;
 
     }
 
@@ -177,11 +176,7 @@ export function useNotificationSSE(onNotification?: NotificationHandler) {
         clearTimeout(reconnectTimeoutRef.current);
       }
       if (eventSourceRef.current) {
-        if ('abort' in eventSourceRef.current) {
-          (eventSourceRef.current as AbortController).abort();
-        } else if ('close' in eventSourceRef.current) {
-          (eventSourceRef.current as EventSource).close();
-        }
+        eventSourceRef.current.abort();
         eventSourceRef.current = null;
       }
       setIsConnected(false);

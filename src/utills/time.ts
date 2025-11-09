@@ -15,7 +15,6 @@ export function formatRelativeTime(isoString: string): string {
   const diffMs = now.getTime() - date.getTime();
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   // 오늘인 경우
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());

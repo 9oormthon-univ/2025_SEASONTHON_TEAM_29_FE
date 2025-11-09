@@ -109,6 +109,7 @@ export default function MapSearchPage() {
     const cached = iconImgCacheRef.current.get(path);
     if (cached) return cached;
     const img = new window.Image();
+    img.crossOrigin = 'anonymous';
     img.src = path;
     await new Promise<void>((res, rej) => {
       img.onload = () => res();
@@ -119,7 +120,12 @@ export default function MapSearchPage() {
   }, []);
 
   const createBubbleDataUrl = useCallback(async (bg: string, stroke: string, size: number, type: VendorCategory) => {
-    const icon = await loadCategoryIcon(type);
+    let icon: HTMLImageElement | null = null;
+    try {
+      icon = await loadCategoryIcon(type);
+    } catch (err) {
+      console.warn('[MapSearch] 카테고리 아이콘 로드 실패, 기본 원형으로 대체합니다:', err);
+    }
     const w = size;
     const tail = Math.max(6, Math.round(size * 0.25));
     const h = size + tail;
@@ -149,11 +155,19 @@ export default function MapSearchPage() {
     ctx.strokeStyle = stroke;
     ctx.stroke();
     // 카테고리 아이콘 (정비율로 contain)
-    const maxIcon = Math.floor(size * 0.56);
-    const ratio = Math.min(maxIcon / icon.width, maxIcon / icon.height);
-    const iw = Math.max(1, Math.round(icon.width * ratio));
-    const ih = Math.max(1, Math.round(icon.height * ratio));
-    ctx.drawImage(icon, Math.round(cx - iw / 2), Math.round(cy - ih / 2), iw, ih);
+    if (icon) {
+      const maxIcon = Math.floor(size * 0.56);
+      const ratio = Math.min(maxIcon / icon.width, maxIcon / icon.height);
+      const iw = Math.max(1, Math.round(icon.width * ratio));
+      const ih = Math.max(1, Math.round(icon.height * ratio));
+      ctx.drawImage(icon, Math.round(cx - iw / 2), Math.round(cy - ih / 2), iw, ih);
+    } else {
+      // 아이콘이 없으면 작은 원으로 표시
+      ctx.beginPath();
+      ctx.arc(cx, cy, Math.max(4, size * 0.18), 0, Math.PI * 2);
+      ctx.fillStyle = stroke;
+      ctx.fill();
+    }
     return c.toDataURL();
   }, [loadCategoryIcon]);
 

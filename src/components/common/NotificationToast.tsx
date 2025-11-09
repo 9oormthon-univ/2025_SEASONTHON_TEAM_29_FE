@@ -6,7 +6,6 @@ import { formatRelativeTime } from '@/utills/time';
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import Image from 'next/image';
-import SvgObject from './atomic/SvgObject';
 
 type ToastProps = {
   notification: NotificationResponseDTO;
