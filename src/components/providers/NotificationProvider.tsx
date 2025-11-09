@@ -3,12 +3,12 @@
 
 import NotificationToast from '@/components/common/NotificationToast';
 import { useNotificationSSE } from '@/hooks/useNotificationSSE';
+import { tokenStore } from '@/lib/tokenStore';
 import type { NotificationResponseDTO } from '@/types/notification';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
-import { tokenStore } from '@/lib/tokenStore';
 
-type ToastNotification = NotificationResponseDTO & { id: string };
+type ToastNotification = NotificationResponseDTO & { toastKey: string };
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -22,14 +22,12 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     (notification: NotificationResponseDTO) => {
       console.log('🔔 알림 수신됨:', notification);
       // 토스트에 추가
-      const toastId = `toast-${notification.id}-${Date.now()}`;
+      const toastKey = `toast-${notification.id}-${Date.now()}`;
+      const toast: ToastNotification = { ...notification, toastKey };
       setToasts((prev) => {
-        const newToasts = [
-          ...prev,
-          { ...notification, id: toastId },
-        ];
-        console.log('🔔 토스트 추가됨. 총 개수:', newToasts.length);
-        return newToasts;
+        const next = [...prev, toast];
+        console.log('🔔 토스트 추가됨. 총 개수:', next.length);
+        return next;
       });
 
       // 안 읽은 알림 개수 갱신 (간단하게 +1)
@@ -108,8 +106,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   }, [handleNotification]);
 
-  const handleToastClose = useCallback((toastId: string) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== toastId));
+  const handleToastClose = useCallback((toastKey: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.toastKey !== toastKey));
   }, []);
 
   const handleToastClick = useCallback(
@@ -159,7 +157,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         <div className="fixed top-0 left-0 right-0 z-[9999] pointer-events-none flex flex-col items-center">
           {toasts.map((toast, index) => (
             <div
-              key={toast.id}
+              key={toast.toastKey}
               className="pointer-events-auto w-full"
               style={{ 
                 marginTop: index === 0 ? '16px' : `${index * 100}px`,
@@ -169,7 +167,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             >
               <NotificationToast
                 notification={toast}
-                onClose={() => handleToastClose(toast.id)}
+                onClose={() => handleToastClose(toast.toastKey)}
                 onClick={() => handleToastClick(toast)}
               />
             </div>

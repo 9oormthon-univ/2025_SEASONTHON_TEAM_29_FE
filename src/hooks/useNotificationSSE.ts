@@ -37,10 +37,7 @@ export function useNotificationSSE(onNotification?: NotificationHandler) {
 
     function connect() {
       if (eventSourceRef.current) {
-        // EventSource가 아닌 경우도 있으므로 체크
-        if ('close' in eventSourceRef.current) {
-          (eventSourceRef.current as EventSource).close();
-        }
+        eventSourceRef.current.abort();
         eventSourceRef.current = null;
       }
 
