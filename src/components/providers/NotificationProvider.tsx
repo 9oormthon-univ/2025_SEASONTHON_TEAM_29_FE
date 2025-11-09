@@ -69,11 +69,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   }, [toasts]);
 
-  // 개발 환경에서 테스트용 함수 노출
+  // 테스트 및 수동 트리거 함수 노출
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // 테스트 알림
-      (window as any).testNotification = () => {
+      window.testNotification = () => {
         const testNotif: NotificationResponseDTO = {
           id: Date.now(),
           category: '일정',
@@ -89,7 +89,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       };
       
       // 예약 성공 알림 트리거 (예약 성공 시 호출 가능)
-      (window as any).triggerReservationNotification = (reservationId: number, vendorName?: string) => {
+      window.triggerReservationNotification = (reservationId: number, vendorName?: string) => {
         const notif: NotificationResponseDTO = {
           id: Date.now(),
           category: '일정',
@@ -105,6 +105,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
         handleNotification(notif);
         console.log('🔔 예약 알림 트리거됨:', notif);
       };
+    }
     }
   }, [handleNotification]);
 

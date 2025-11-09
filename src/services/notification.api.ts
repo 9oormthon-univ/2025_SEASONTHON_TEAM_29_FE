@@ -1,9 +1,9 @@
 // src/services/notification.api.ts
 import { http, type ApiEnvelope } from '@/services/http';
 import type {
-  NotificationCategory,
-  NotificationPageResponse,
-  UnreadCountResponse,
+    NotificationCategory,
+    NotificationPageResponse,
+    UnreadCountResponse,
 } from '@/types/notification';
 
 const BASE = '/v1/notifications';

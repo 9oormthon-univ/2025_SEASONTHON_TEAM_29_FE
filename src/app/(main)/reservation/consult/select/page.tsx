@@ -105,10 +105,10 @@ export default function ConsultTimePage() {
       setDone(true);
       
       // 예약 성공 시 알림 트리거 (서버에서 SSE로 오지 않는 경우를 대비)
-      if (response?.data && typeof window !== 'undefined' && (window as any).triggerReservationNotification) {
+      if (response?.data && typeof window !== 'undefined' && window.triggerReservationNotification) {
         // 약간의 지연을 두어 서버에서 SSE 알림이 먼저 오도록 함
         setTimeout(() => {
-          (window as any).triggerReservationNotification(response.data);
+          window.triggerReservationNotification?.(response.data);
         }, 1000);
       }
     } catch (e) {
