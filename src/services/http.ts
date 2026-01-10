@@ -14,9 +14,18 @@ export type ApiEnvelope<T> = {
 };
 
 function absoluteUrl(path: string) {
+  // 클라이언트 사이드: 상대 경로 반환 (rewrites가 작동)
   if (typeof window !== 'undefined') return path;
-  const site = process.env.NEXT_PUBLIC_SITE_URL;
-  return new URL(path, site).toString();
+  
+  // 서버 사이드: NEXT_PUBLIC_API_URL 직접 사용 (rewrites가 작동하지 않음)
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+  if (!apiUrl) {
+    throw new Error('NEXT_PUBLIC_API_URL이 설정되지 않았습니다.');
+  }
+  
+  // path가 이미 /api로 시작하면 제거하고 API URL과 결합
+  const cleanPath = path.startsWith('/api') ? path.replace('/api', '') : path;
+  return `${apiUrl}${cleanPath}`;
 }
 
 function toHeaderRecord(h?: HeadersInit): Record<string, string> {
@@ -87,13 +96,41 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
     headers['Content-Type'] = 'application/json';
   }
 
-  // 클라 환경 + 인증 필요 시 Authorization 자동첨부
-  if (typeof window !== 'undefined' && !init.skipAuth) {
-    const at = tokenStore.get();
-    if (at) headers['Authorization'] = `Bearer ${at}`;
+  // 인증 필요 시 Authorization 자동첨부
+  if (!init.skipAuth) {
+    let token: string | null = null;
+    
+    if (typeof window !== 'undefined') {
+      // 클라이언트 사이드: js-cookie 사용
+      token = tokenStore.get();
+    } else {
+      // 서버 사이드: Next.js cookies() 사용
+      try {
+        const { cookies } = await import('next/headers');
+        const cookieStore = await cookies();
+        token = cookieStore.get('accessToken')?.value || null;
+      } catch {
+        // cookies()를 사용할 수 없는 환경 (예: 빌드 타임)
+        token = null;
+      }
+    }
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
   }
 
   const url = absoluteUrl(`${BASE}${path}`);
+
+  // 서버 사이드 디버깅 로그
+  if (typeof window === 'undefined') {
+    console.log('[http] Server-side request:', {
+      path: `${BASE}${path}`,
+      absoluteUrl: url,
+      hasAuth: !!headers['Authorization'],
+      skipAuth: init.skipAuth,
+    });
+  }
 
   let res: Response | null = null;
   try {
@@ -102,8 +139,15 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
       headers,
       cache: init.cache ?? 'no-store',
     });
-  } catch {
-    throw new Error('네트워크 오류가 발생했습니다.');
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : '네트워크 오류가 발생했습니다.';
+    if (typeof window === 'undefined') {
+      console.error('[http] Fetch error:', {
+        url,
+        error: errorMsg,
+      });
+    }
+    throw new Error(errorMsg);
   }
 
   // 401 → 한 번만 리프레시 & 재시도
@@ -125,7 +169,18 @@ export async function http<T>(path: string, init: HttpInit = {}): Promise<T> {
     }
   }
 
-  if (!res.ok) throw await toErr(res);
+  if (!res.ok) {
+    const error = await toErr(res);
+    if (typeof window === 'undefined') {
+      console.error('[http] Response error:', {
+        url,
+        status: res.status,
+        statusText: res.statusText,
+        error: error.message,
+      });
+    }
+    throw error;
+  }
   return safeJson<T>(res);
 }
 

@@ -1,57 +1,43 @@
+# Expo
+.expo/
+dist/
+web-build/
+
 # dependencies
-**/node_modules/
-.pnp.cjs
-.pnp.loader.mjs
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+node_modules/
 
-# next.js build & cache
-**/.next/
-**/out/
-
-# production / build
-**/build/
-**/dist/
-
-# storybook
-**/storybook-static/
-*.storybook.log
-src/stories/*
-
-# coverage / testing
-**/coverage/
-
-# env
-.env*
-*.env
-
-# vercel / turbo
-.vercel/
-**/.turbo/
+# production
+/build
 
 # misc
 .DS_Store
+.env*.local
+*.log
 *.pem
-*.tsbuildinfo
-next-env.d.ts
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
-.eslintcache
-.idea/
-.vscode/
 
-# npm caches & local config
-.npm-cache/
-.npm/
-.npmrc
+# local env files
+.env
+.env*.local
 
-# next-pwa / Workbox generated artifacts
-public/workbox-*.js
-public/worker-*.js
-public/fallback-*.js
-public/sw.js
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# storybook
+storybook-static/
+
+# Next.js
+.next/
+out/
+
+# OS
+.DS_Store
+Thumbs.db

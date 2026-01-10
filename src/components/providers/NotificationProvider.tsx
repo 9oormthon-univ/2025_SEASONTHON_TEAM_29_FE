@@ -2,8 +2,6 @@
 'use client';
 
 import NotificationToast from '@/components/common/NotificationToast';
-import { useNotificationSSE } from '@/hooks/useNotificationSSE';
-import { tokenStore } from '@/lib/tokenStore';
 import type { NotificationResponseDTO } from '@/types/notification';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -36,28 +34,28 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     [],
   );
 
-  // SSE 연결 (로그인 상태일 때만)
-  // useEffect를 사용하여 토큰 변경 감지
-  const [token, setToken] = useState<string | null>(null);
+  // // SSE 연결 (로그인 상태일 때만)
+  // // useEffect를 사용하여 토큰 변경 감지
+  // const [token, setToken] = useState<string | null>(null);
   
-  useEffect(() => {
-    const checkToken = () => {
-      const currentToken = tokenStore.get();
-      setToken(currentToken);
-    };
+  // useEffect(() => {
+  //   const checkToken = () => {
+  //     const currentToken = tokenStore.get();
+  //     setToken(currentToken);
+  //   };
     
-    checkToken();
-    // 주기적으로 토큰 체크 (로그인/로그아웃 감지)
-    const interval = setInterval(checkToken, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  //   checkToken();
+  //   // 주기적으로 토큰 체크 (로그인/로그아웃 감지)
+  //   const interval = setInterval(checkToken, 1000);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-  const { isConnected } = useNotificationSSE(token ? handleNotification : undefined);
+  // const { isConnected } = useNotificationSSE(token ? handleNotification : undefined);
   
-  useEffect(() => {
-    console.log('🔔 SSE 연결 상태:', isConnected);
-    console.log('🔔 현재 토큰:', token ? '있음' : '없음');
-  }, [isConnected, token]);
+  // useEffect(() => {
+  //   console.log('🔔 SSE 연결 상태:', isConnected);
+  //   console.log('🔔 현재 토큰:', token ? '있음' : '없음');
+  // }, [isConnected, token]);
   
   // 디버깅: 토스트 상태 확인
   useEffect(() => {
